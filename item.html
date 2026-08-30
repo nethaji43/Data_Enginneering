@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title id="pageTitle">Loading… — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .item-head{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:28px;}
+  .item-num-badge{
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);
+    border:1px solid var(--border); border-radius:20px; padding:3px 10px; white-space:nowrap;
+  }
+
+  .block{margin-top:30px;}
+  .block-label{
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--text-faint); margin:0 0 12px; display:flex; align-items:center; gap:8px;
+  }
+  .explanation{font-size:15.5px; line-height:1.75; color:var(--text);}
+  .explanation p{margin:0 0 14px;}
+  .explanation p:last-child{margin-bottom:0;}
+
+  .practice-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
+  .practice-item{
+    display:flex; gap:12px; align-items:flex-start; background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:13px 15px; font-size:14.5px; line-height:1.55;
+  }
+  .practice-item::before{content:'\2192'; color:#7EE787; flex-shrink:0; font-family:'JetBrains Mono',monospace;}
+
+  .qna{display:flex; flex-direction:column; gap:10px;}
+  .qna-item{border:1px solid var(--border); border-radius:10px; background:var(--surface); overflow:hidden;}
+  .qna-q{
+    width:100%; text-align:left; background:none; border:none; color:var(--text); font-family:'Inter',sans-serif;
+    font-size:14.5px; font-weight:600; padding:13px 15px; cursor:pointer; display:flex; justify-content:space-between;
+    align-items:center; gap:10px;
+  }
+  .qna-q .arrow{transition:transform .15s; color:var(--text-faint); flex-shrink:0;}
+  .qna-item.open .qna-q .arrow{transform:rotate(180deg);}
+  .qna-a{max-height:0; overflow:hidden; transition:max-height .2s ease;}
+  .qna-a-inner{padding:0 15px 15px; font-size:14px; line-height:1.65; color:var(--text-dim);}
+
+  .no-content{color:var(--text-faint); font-size:14px; font-style:italic;}
+
+  .action-row{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:44px; flex-wrap:wrap;}
+  .nav-links{display:flex; gap:10px; font-family:'JetBrains Mono',monospace; font-size:12.5px;}
+  .nav-links a{color:var(--text-dim); text-decoration:none;}
+  .nav-links a:hover{color:#58A6FF;}
+  .nav-links span.disabled{color:var(--text-faint); opacity:.4;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" id="backLink" href="index.html">&larr; BACK TO TOPIC</a>
+  <p class="crumb" id="crumb">Loading…</p>
+
+  <div class="item-head">
+    <h1 id="itemTitle" style="margin-bottom:0;">Loading…</h1>
+    <span class="item-num-badge" id="itemBadge"></span>
+  </div>
+
+  <div class="block">
+    <p class="block-label">Explanation</p>
+    <div class="explanation" id="explanationBlock"></div>
+  </div>
+
+  <div class="block" id="practiceBlock" style="display:none;">
+    <p class="block-label">&#9733; Practice</p>
+    <div id="practiceList"></div>
+  </div>
+
+  <div class="block" id="qnaBlock" style="display:none;">
+    <p class="block-label">Q&amp;A</p>
+    <div class="qna" id="qnaList"></div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn btn-complete" id="completeBtn">Mark as learned</button>
+    <div class="nav-links" id="navLinks"></div>
+  </div>
+
+</div>
+
+<script src="assets/common.js"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const topicSlug = params.get('topic');
+const itemN = parseInt(params.get('n'), 10);
+
+async function init(){
+  if(!topicSlug || !itemN){
+    document.getElementById('itemTitle').textContent = 'Item not found';
+    document.getElementById('explanationBlock').innerHTML = '<p class="no-content">Missing ?topic= or ?n= in the URL.</p>';
+    return;
+  }
+
+  let data;
+  try{
+    const res = await fetch(`content/${topicSlug}.json`);
+    if(!res.ok) throw new Error('not found');
+    data = await res.json();
+  }catch(e){
+    document.getElementById('itemTitle').textContent = 'Content not available';
+    document.getElementById('explanationBlock').innerHTML = `<p class="no-content">Couldn't load content for "${topicSlug}" yet.</p>`;
+    return;
+  }
+
+  document.documentElement.style.setProperty('--ring-color', data.meta.accent || '#58A6FF');
+  document.getElementById('backLink').textContent = `\u2190 BACK TO ${data.meta.title.toUpperCase()}`;
+  document.getElementById('backLink').href = data.meta.topicPageUrl || 'index.html';
+  document.getElementById('crumb').innerHTML = `<a href="${data.meta.topicPageUrl || 'index.html'}">${data.meta.title}</a> &middot; Item ${itemN} of ${data.items.length}`;
+
+  const item = data.items.find(it => it.n === itemN);
+  if(!item){
+    document.getElementById('itemTitle').textContent = 'Item not found in this topic';
+    document.getElementById('explanationBlock').innerHTML = '<p class="no-content">This item hasn\u2019t been added to the content file yet.</p>';
+    return;
+  }
+
+  document.getElementById('pageTitle').textContent = `${item.title} — ${data.meta.title}`;
+  document.getElementById('itemTitle').textContent = item.title;
+  document.getElementById('itemBadge').textContent = `#${item.n}`;
+
+  // Each entry in item.explanation is already a full HTML block
+  // (a <p>, a <div class="code-block">, a <table>, etc.) — joined as-is
+  // so content authors can mix paragraphs, code, diagrams, and tables freely.
+  const expBlock = document.getElementById('explanationBlock');
+  if(item.explanation && item.explanation.length){
+    expBlock.innerHTML = item.explanation.join('');
+  } else {
+    expBlock.innerHTML = '<p class="no-content">Notes for this item are coming soon.</p>';
+  }
+
+  // Like explanation, each entry in item.practice is a raw HTML block the
+  // content author composes directly — a <ul class="practice-list"> of
+  // action steps, a <div class="diagram"> for a scenario, a
+  // <div class="prompt-block"> for reflection questions, etc. — so
+  // different kinds of practice content don't all look the same.
+  if(item.practice && item.practice.length){
+    document.getElementById('practiceBlock').style.display = '';
+    document.getElementById('practiceList').innerHTML = item.practice.join('');
+  }
+
+  if(item.qna && item.qna.length){
+    document.getElementById('qnaBlock').style.display = '';
+    const qnaList = document.getElementById('qnaList');
+    item.qna.forEach((pair, i)=>{
+      const el = document.createElement('div');
+      el.className = 'qna-item';
+      el.innerHTML = `
+        <button class="qna-q"><span>${pair.q}</span><span class="arrow">&#9660;</span></button>
+        <div class="qna-a"><div class="qna-a-inner">${pair.a}</div></div>
+      `;
+      const btn = el.querySelector('.qna-q');
+      const answer = el.querySelector('.qna-a');
+      btn.addEventListener('click', ()=>{
+        const isOpen = el.classList.toggle('open');
+        answer.style.maxHeight = isOpen ? answer.scrollHeight + 'px' : '0';
+      });
+      qnaList.appendChild(el);
+    });
+  }
+
+  // Completed state, read/written to the same per-topic key the topic page uses
+  const itemsKey = deTopicItemsKey(data.meta.topicId);
+  let progress = deReadStore(itemsKey);
+  const completeBtn = document.getElementById('completeBtn');
+
+  function refreshButton(){
+    const isDone = !!progress[itemN];
+    completeBtn.textContent = isDone ? '\u2713 Learned' : 'Mark as learned';
+    completeBtn.classList.toggle('is-done', isDone);
+  }
+  refreshButton();
+
+  completeBtn.addEventListener('click', ()=>{
+    if(progress[itemN]) delete progress[itemN]; else progress[itemN] = true;
+    deWriteStore(itemsKey, progress);
+    deSyncTopicToRoadmap(data.meta.topicId, data.items.length);
+    refreshButton();
+  });
+
+  // Prev / next navigation within the topic
+  const nav = document.getElementById('navLinks');
+  const prev = data.items.find(it => it.n === itemN - 1);
+  const next = data.items.find(it => it.n === itemN + 1);
+  nav.innerHTML = `
+    ${prev ? `<a href="item.html?topic=${topicSlug}&n=${prev.n}">&larr; Prev</a>` : `<span class="disabled">&larr; Prev</span>`}
+    ${next ? `<a href="item.html?topic=${topicSlug}&n=${next.n}">Next &rarr;</a>` : `<span class="disabled">Next &rarr;</span>`}
+  `;
+}
+
+init();
+</script>
+</body>
+</html>

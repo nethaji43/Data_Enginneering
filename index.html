@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  /* Page-specific bits that don't belong in the shared stylesheet */
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap;}
+  .controls{display:flex; gap:10px; margin:36px 0 8px; flex-wrap:wrap; align-items:center;}
+  .empty-msg{color:var(--text-faint); font-family:'JetBrains Mono',monospace; font-size:13px; padding:60px 0; text-align:center; display:none;}
+
+  .line{margin-top:40px;}
+  .line-head{display:flex; align-items:center; gap:12px; margin-bottom:18px;}
+  .line-dot{width:12px; height:12px; border-radius:50%; flex-shrink:0;}
+  .line-name{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:18px;}
+  .line-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint); background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .station{display:flex; gap:16px; cursor:pointer;}
+  .marker-col{display:flex; flex-direction:column; align-items:center; width:28px; flex-shrink:0;}
+  .dot{width:28px; height:28px; border-radius:50%; background:var(--surface); border:2.5px solid var(--line-color,#58A6FF); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--line-color,#58A6FF); transition:all .18s ease; flex-shrink:0;}
+  .station:hover .dot{transform:scale(1.08);}
+  .station.done .dot{background:var(--line-color,#58A6FF); color:#0D1117;}
+  .connector{flex:1; width:2px; background:var(--line-color,#58A6FF); opacity:.28; margin-top:2px; min-height:10px;}
+  .station:last-child .connector{display:none;}
+
+  .content{padding-bottom:20px; flex:1; min-width:0;}
+  .title-row{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+  .t-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15.5px; transition:color .15s;}
+  a.t-title{color:var(--text); text-decoration:none;}
+  a.t-title:hover{color:#58A6FF;}
+  .station.done .t-title{color:var(--text-dim);}
+  .t-desc{font-size:13.5px; color:var(--text-dim); margin-top:3px; line-height:1.5;}
+  .station.done .t-desc{color:var(--text-faint);}
+  .station.hidden{display:none;}
+  .line.hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Data Engineering &middot; Self-Study Line Map</p>
+  <div class="hero">
+    <div>
+      <h1>Complete Data Engineering Roadmap</h1>
+      <p class="sub">74 stops across 9 lines. Click any stop with an arrow to open it and mark items learned — your progress is saved in this browser.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="64" height="64" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/74</div>
+        <div class="ring-label">COMPLETE</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input class="search" id="search" type="text" placeholder="Search a topic — e.g. Airflow, Kafka, indexing..." />
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="remaining">Remaining</button>
+    <button class="chip" data-filter="done">Completed</button>
+  </div>
+
+  <div id="lines"></div>
+  <p class="empty-msg" id="emptyMsg">No stops match that search.</p>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER</span>
+    <button class="btn btn-ghost" id="resetBtn">Reset progress</button>
+  </div>
+
+</div>
+
+<script src="assets/common.js"></script>
+<script>
+const ROADMAP = [
+  { id:'foundation', name:'Foundation', color:'#E3B341', topics:[
+    {n:1, t:'Git & GitHub', d:'Version control basics and collaborative code hosting.', link:'topics/01-git/01-git-fundamentals.html'},
+    {n:2, t:'Python', d:'Core language for scripting, ETL logic, and automation.'},
+    {n:3, t:'SQL', d:'Query language for retrieving and manipulating relational data.'},
+    {n:4, t:'Linux / Command Line', d:'Shell navigation, permissions, and process management.'},
+    {n:5, t:'Databases Fundamentals', d:'Tables, keys, constraints, and relational basics.'},
+    {n:6, t:'Data Structures & Basic Algorithms', d:'Arrays, lists, dicts, and complexity thinking.'},
+    {n:7, t:'Python Virtual Environments & Package Management', d:'Isolating dependencies with venv, pip, and poetry.'},
+  ]},
+  { id:'data-handling', name:'Data Handling', color:'#39C5CF', topics:[
+    {n:8, t:'NumPy', d:'Numerical arrays and vectorized computation in Python.'},
+    {n:9, t:'Pandas', d:'DataFrames for cleaning, transforming, and analyzing tabular data.'},
+    {n:10, t:'Data Cleaning & Data Transformation', d:'Handling nulls, duplicates, and reshaping messy datasets.'},
+    {n:11, t:'Data Formats — CSV, JSON, Parquet, Avro', d:'Row vs columnar storage formats and their trade-offs.'},
+    {n:12, t:'Working with Files', d:'Reading, writing, and managing local and remote files.'},
+    {n:13, t:'APIs & JSON', d:'Consuming REST APIs and parsing JSON responses.'},
+    {n:14, t:'Web Scraping Basics', d:'Extracting data from web pages programmatically. (Optional but useful.)'},
+  ]},
+  { id:'db-concepts', name:'Database & Data Concepts', color:'#A371F7', topics:[
+    {n:15, t:'Advanced SQL', d:'Joins, CTEs, window functions, subqueries, query optimization, indexes.'},
+    {n:16, t:'Database Design', d:'Structuring schemas for integrity and scalability.'},
+    {n:17, t:'Normalization & Denormalization', d:'Reducing redundancy versus optimizing for read performance.'},
+    {n:18, t:'Data Modeling', d:'Representing business entities and relationships in data.'},
+    {n:19, t:'OLTP vs OLAP', d:'Transactional workloads versus analytical workloads.'},
+    {n:20, t:'Data Warehousing', d:'Centralized storage built for analytics and reporting.'},
+    {n:21, t:'Dimensional Modeling', d:'Fact tables, dimension tables, star/snowflake schema, slowly changing dimensions.'},
+  ]},
+  { id:'core-de', name:'Core Data Engineering', color:'#56D364', topics:[
+    {n:22, t:'ETL', d:'Extract, Transform, Load — the classic pipeline pattern.'},
+    {n:23, t:'ELT', d:'Load-then-transform pattern used in modern warehouses.'},
+    {n:24, t:'Data Pipelines', d:'Automated, connected steps that move and process data.'},
+    {n:25, t:'Batch Processing', d:'Processing data in scheduled, discrete chunks.'},
+    {n:26, t:'Data Quality & Validation', d:'Ensuring accuracy, completeness, and consistency of data.'},
+    {n:27, t:'Logging & Error Handling', d:'Tracking failures and building resilient pipelines.'},
+    {n:28, t:'Testing Data Pipelines', d:'Unit and integration tests for data workflows.'},
+    {n:29, t:'Data Lineage & Metadata Basics', d:'Tracing where data came from and how it changed.'},
+  ]},
+  { id:'tools', name:'Tools', color:'#F78166', topics:[
+    {n:30, t:'PostgreSQL', d:'Popular open-source relational database engine.'},
+    {n:31, t:'Docker', d:'Containerizing applications and pipelines for portability.'},
+    {n:32, t:'Apache Airflow', d:'Orchestrating and scheduling data pipeline workflows.'},
+    {n:33, t:'dbt', d:'SQL-based transformation and modeling framework.'},
+    {n:34, t:'Apache Spark', d:'Distributed engine for large-scale data processing.'},
+    {n:35, t:'PySpark', d:'Python API for writing Spark data pipelines.'},
+  ]},
+  { id:'big-data', name:'Big Data', color:'#F778BA', topics:[
+    {n:36, t:'Distributed Systems Fundamentals', d:'Concepts behind scaling systems across many machines.'},
+    {n:37, t:'Big Data Concepts', d:'Volume, velocity, and variety of large-scale data.'},
+    {n:38, t:'Partitioning', d:'Splitting data for parallel processing and performance.'},
+    {n:39, t:'Distributed Processing', d:'Coordinating computation across a cluster of nodes.'},
+    {n:40, t:'Performance Optimization in Spark', d:'Tuning jobs for speed and resource efficiency.'},
+    {n:41, t:'Apache Kafka', d:'Distributed event streaming platform for real-time data.'},
+    {n:42, t:'Streaming Data', d:'Processing continuous, unbounded data in real time.'},
+    {n:43, t:'Structured Streaming', d:"Spark's high-level API for streaming pipelines."},
+  ]},
+  { id:'cloud', name:'Cloud — Choose One First', color:'#58A6FF', topics:[
+    {n:44, t:'Cloud Fundamentals', d:'Core concepts behind cloud computing models.'},
+    {n:45, t:'AWS / Azure / GCP', d:'Pick one primary cloud provider and go deep.'},
+    {n:46, t:'Cloud Storage', d:'Object and blob storage for raw and processed data.'},
+    {n:47, t:'IAM & Security Basics', d:'Managing access, roles, and permissions in the cloud.'},
+    {n:48, t:'Cloud Data Warehouse', d:'Managed analytics warehouses like Redshift, BigQuery, Synapse.'},
+    {n:49, t:'Cloud Data Lake', d:'Centralized storage for raw, structured, and unstructured data.'},
+    {n:50, t:'Cloud ETL Services', d:'Managed pipeline tools like Glue, Data Factory, Dataflow.'},
+    {n:51, t:'Cloud Monitoring & Logging', d:'Observability for pipelines and infrastructure health.'},
+    {n:52, t:'Cloud Deployment', d:'Deploying and managing data workloads in the cloud.'},
+  ]},
+  { id:'advanced', name:'Advanced / Production Engineering', color:'#FF7B72', topics:[
+    {n:53, t:'CI/CD', d:'Automating build, test, and deployment pipelines.'},
+    {n:54, t:'GitHub Actions', d:'Workflow automation directly from GitHub repositories.'},
+    {n:55, t:'Infrastructure as Code Basics', d:'Managing infrastructure through versioned configuration.'},
+    {n:56, t:'Terraform', d:'Declarative IaC tool for provisioning cloud resources.'},
+    {n:57, t:'Data Pipeline Monitoring', d:'Alerting and tracking pipeline health in production.'},
+    {n:58, t:'Workflow Orchestration', d:'Coordinating dependent tasks across complex pipelines.'},
+    {n:59, t:'Secrets Management', d:'Securely storing credentials and sensitive config.'},
+    {n:60, t:'Data Governance', d:'Policies for data access, quality, and compliance.'},
+    {n:61, t:'Data Security & Privacy', d:'Protecting sensitive data and meeting regulations.'},
+  ]},
+  { id:'projects', name:'Projects & Portfolio', color:'#7EE787', topics:[
+    {n:62, t:'Small Python + SQL Projects', d:'Foundational exercises combining scripting and queries.'},
+    {n:63, t:'API → Database Pipeline', d:'Ingesting API data into a database.'},
+    {n:64, t:'CSV/JSON → ETL → PostgreSQL', d:'End-to-end batch pipeline into a relational store.'},
+    {n:65, t:'Airflow ETL Pipeline', d:'Orchestrated pipeline scheduled and monitored with Airflow.'},
+    {n:66, t:'PySpark Big Data Project', d:'Large-scale processing project using Spark.'},
+    {n:67, t:'dbt Data Transformation Project', d:'Modeling and transforming warehouse data with dbt.'},
+    {n:68, t:'Cloud End-to-End Data Pipeline', d:'Full pipeline built on a cloud platform.'},
+    {n:69, t:'Kafka Streaming Project', d:'Real-time ingestion and processing pipeline.'},
+    {n:70, t:'Complete Production-Style End-to-End Project', d:'Capstone combining ingestion, transformation, orchestration, and cloud.'},
+    {n:71, t:'Deploy Projects', d:'Making projects runnable and accessible beyond your machine.'},
+    {n:72, t:'Documentation & Architecture Diagrams', d:'Explaining design decisions and system architecture clearly.'},
+    {n:73, t:'GitHub Portfolio', d:'Organizing and presenting projects publicly on GitHub.'},
+    {n:74, t:'Resume & LinkedIn Portfolio', d:'Presenting your skills and projects to employers.'},
+  ]},
+];
+
+const TOTAL = ROADMAP.reduce((s,l)=>s+l.topics.length,0);
+let progress = deReadStore(ROADMAP_KEY); // { [topicN]: true }
+let currentFilter = 'all';
+let currentQuery = '';
+
+function render(){
+  const linesEl = document.getElementById('lines');
+  linesEl.innerHTML = '';
+  let anyVisible = false;
+
+  ROADMAP.forEach(line=>{
+    const lineDiv = document.createElement('div');
+    lineDiv.className = 'line';
+    const doneInLine = line.topics.filter(t=>progress[t.n]).length;
+
+    const head = document.createElement('div');
+    head.className = 'line-head';
+    head.innerHTML = `
+      <span class="line-dot" style="background:${line.color}"></span>
+      <span class="line-name">${line.name}</span>
+      <span class="line-count">${doneInLine}/${line.topics.length}</span>
+    `;
+    lineDiv.appendChild(head);
+
+    let lineHasVisible = false;
+
+    line.topics.forEach(topic=>{
+      const isDone = !!progress[topic.n];
+      const matchesFilter = currentFilter === 'all' || (currentFilter==='done' && isDone) || (currentFilter==='remaining' && !isDone);
+      const q = currentQuery.trim().toLowerCase();
+      const matchesQuery = !q || topic.t.toLowerCase().includes(q) || topic.d.toLowerCase().includes(q);
+      const visible = matchesFilter && matchesQuery;
+      if(visible){ lineHasVisible = true; anyVisible = true; }
+
+      const st = document.createElement('div');
+      st.className = 'station' + (isDone?' done':'') + (visible?'':' hidden');
+      st.style.setProperty('--line-color', line.color);
+      st.innerHTML = `
+        <div class="marker-col">
+          <div class="dot">${isDone ? '✓' : topic.n}</div>
+          <div class="connector"></div>
+        </div>
+        <div class="content">
+          <div class="title-row">${topic.link ? `<a class="t-title t-link" href="${topic.link}">${topic.t} &rarr;</a>` : `<span class="t-title">${topic.t}</span>`}</div>
+          <div class="t-desc">${topic.d}</div>
+        </div>
+      `;
+      lineDiv.appendChild(st);
+    });
+
+    if(lineHasVisible){ linesEl.appendChild(lineDiv); }
+  });
+
+  document.getElementById('emptyMsg').style.display = anyVisible ? 'none' : 'block';
+  updateProgressRing();
+}
+
+function updateProgressRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', (e)=>{ currentQuery = e.target.value; render(); });
+
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    currentFilter = chip.dataset.filter;
+    render();
+  });
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(confirm('Reset all progress? This cannot be undone.')){
+    progress = {};
+    deWriteStore(ROADMAP_KEY, {});
+    render();
+  }
+});
+
+// Re-read progress whenever the page regains focus, so completing
+// items on a topic/item page and coming back here shows up live.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ROADMAP_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>

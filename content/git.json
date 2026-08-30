@@ -1,0 +1,245 @@
+{
+  "meta": {
+    "topicId": 1,
+    "title": "Git Fundamentals",
+    "accent": "#E3B341",
+    "topicPageUrl": "topics/01-git/01-git-fundamentals.html"
+  },
+  "items": [
+    {
+      "n": 1,
+      "title": "What is Version Control?",
+      "explanation": [
+        "<h3>Simple Meaning</h3>",
+        "<p>Version Control is a system that tracks changes made to files over time. It helps you know:</p>",
+        "<ul><li>What changed?</li><li>Who changed it?</li><li>When was it changed?</li><li>Why was it changed?</li><li>How can we go back to an older version?</li></ul>",
+
+        "<h3>Simple Example</h3>",
+        "<p>Imagine you are creating a Python file: <code>calculator.py</code></p>",
+        "<p>Version 1</p>",
+        "<div class=\"code-block\">a = 10\nb = 20\nprint(a + b)</div>",
+        "<p>Later, you change it \u2014 Version 2</p>",
+        "<div class=\"code-block\">a = 10\nb = 20\nprint(a + b)\nprint(a - b)</div>",
+        "<p>Later, you make another change \u2014 Version 3</p>",
+        "<div class=\"code-block\">a = 10\nb = 20\nprint(a + b)\nprint(a - b)\nprint(a * b)</div>",
+        "<p>Without Version Control, you might save files like:</p>",
+        "<ul><li>calculator.py</li><li>calculator_final.py</li><li>calculator_final2.py</li><li>calculator_final_latest.py</li><li>calculator_final_latest_correct.py \ud83d\ude04</li></ul>",
+        "<p>This becomes confusing. With Version Control, you keep <strong>one project</strong> and track its history instead:</p>",
+        "<div class=\"diagram\">Version 1 &rarr; Add addition\n       \u2193\nVersion 2 &rarr; Add subtraction\n       \u2193\nVersion 3 &rarr; Add multiplication</div>",
+
+        "<h3>Why is Version Control Needed?</h3>",
+        "<p>Suppose today your website is working perfectly. Tomorrow you make some changes:</p>",
+        "<div class=\"diagram\">Website Version 1 \u2705 Working\n        \u2193\nYou change some code\n        \u2193\nWebsite Version 2 \u274c Broken</div>",
+        "<p>With Version Control, you can check what changed and, if necessary, return to the previous working version:</p>",
+        "<div class=\"diagram\">Version 1 \u2705 \u2190 You can return here\nVersion 2 \u274c</div>",
+
+        "<h3>Real-World Example</h3>",
+        "<p>Imagine you and two other developers are working on a project:</p>",
+        "<div class=\"diagram\">Project\n\u2502\n\u251c\u2500\u2500 You            \u2192 Working on Login\n\u251c\u2500\u2500 Developer A    \u2192 Working on Dashboard\n\u2514\u2500\u2500 Developer B    \u2192 Working on Payment</div>",
+        "<p>Version Control helps manage everyone's changes and keeps a history of them. You can know:</p>",
+        "<div class=\"diagram\">Commit 1 \u2192 Nethaji      \u2192 Added login page\nCommit 2 \u2192 Developer A  \u2192 Added dashboard\nCommit 3 \u2192 Developer B  \u2192 Added payment feature</div>",
+        "<p>This is one major reason Version Control is essential in software development.</p>",
+
+        "<h3>Important Concept</h3>",
+        "<p>Version Control does not only mean creating backup copies. It also helps you:</p>",
+        "<table><tr><th>Feature</th><th>Meaning</th></tr><tr><td>Track changes</td><td>See what changed</td></tr><tr><td>History</td><td>View older versions</td></tr><tr><td>Restore</td><td>Go back to an older version</td></tr><tr><td>Collaboration</td><td>Multiple developers can work together</td></tr><tr><td>Compare</td><td>Compare one version with another</td></tr><tr><td>Experiment</td><td>Try changes safely</td></tr><tr><td>Branching</td><td>Work on features separately</td></tr></table>",
+
+        "<h3>Simple Analogy \ud83d\udcd6</h3>",
+        "<p>Think of a Google Docs document. You write:</p>",
+        "<div class=\"diagram\">Version 1 \u2192 Original document\nVersion 2 \u2192 Added paragraph\nVersion 3 \u2192 Corrected mistakes\nVersion 4 \u2192 Added conclusion</div>",
+        "<p>Google Docs keeps version history, so you can see older versions. Git does something similar for your project files, but is designed specifically for managing source code and project development.</p>",
+
+        "<div class=\"definition-box\"><b>One-Line Definition:</b> Version Control is a system that records and manages changes to files over time, allowing us to track, compare, restore, and collaborate on different versions of a project.</div>"
+      ],
+       "practice": [
+        "<p class=\"practice-note\">No Git commands are required yet for this topic \u2014 just understand the concept. Walk through this scenario:</p>",
+        "<div class=\"diagram\">Day 1 \u2192 Create index.html\nDay 2 \u2192 Add a login button\nDay 3 \u2192 Add CSS styling\nDay 4 \u2192 Website stops working after changes</div>"
+      ],
+      "qna": [
+        {"q" : "Q1. Why would Version Control be useful here?","a":"Version control is useful because it tracks every change to your files, lets you undo mistakes safely, and helps multiple people work together without losing data."},
+        {"q": "Q2. If the Day 4 changes break the website, what could Version Control help you do?", "a":"Version control helps you quickly restore the website to the working state it had before Day 4."},
+        {"q":"Q3. Is Version Control useful only for one developer, or also for multiple developers?","a":"Version control is very useful for both a single developer and multiple developers."}
+
+      ]
+    },
+    {
+      "n": 2,
+      "title": "What is Git",
+      "explanation": [
+        "<h3>Simple Definition</h3>",
+        "<p><strong>Git is a Version Control System used to track and manage changes in files and projects.</strong></p>",
+        "<p>In simple words:</p>",
+        "<div><b>Version Control</b> is the concept/system, and <b>Git</b> is a tool that implements Version Control.</div>",
+        "<h3>Simple Example</h3>",
+        "<p>Imagine you have a project:</p>",
+        "<div class=\"diagram\">My Website\n│\n├── index.html\n├── style.css\n└── script.js</div>",
+        "<p>As you develop the project, Git can track its history:</p>",
+        "<div class=\"diagram\">Version 1 → Created website\n       ↓\nVersion 2 → Added navigation bar\n       ↓\nVersion 3 → Added login page\n       ↓\nVersion 4 → Fixed login bug</div>",
+        "<p>Git helps you save important points in your project's history. These saved points are called <strong>commits</strong>. We will learn commits in detail later.</p>",
+
+        "<h3>Why Do We Use Git?</h3>",
+        "<p>Git helps developers:</p>",
+        "<ul><li>Track changes in files</li><li>See project history</li><li>Compare different versions</li><li>Return to an earlier version if needed</li><li>Create separate branches for new features</li><li>Merge changes together</li><li>Collaborate with other developers</li></ul>",
+
+        "<h3>Important Concept: Git Works on Your Computer</h3>",
+        "<p>This is a very important concept. Git is software installed and used on your computer:</p>",
+        "<div class=\"diagram\">Your Computer\n│\n├── Project Files\n│\n└── Git\n    ├── Tracks changes\n    ├── Stores history\n    └── Manages versions</div>",
+        "<p>You can use Git without GitHub and even without an internet connection.</p>",
+        "<div class=\"diagram\">Your PC\n   │\n   └── Git\n       │\n       └── Project History</div>",
+
+        "<h3>Git and GitHub</h3>",
+        "<p>Later, you can connect your local Git repository to an online platform such as GitHub:</p>",
+        "<div class=\"diagram\">Your PC                    Internet\n   │                          │\n   └── Git ──────────────── GitHub</div>",
+        "<div class=\"definition-box\"><b>Important:</b> Git and GitHub are not the same thing.</div>",
+        "<p>We will understand GitHub in detail in the next topic and learn the exact difference between Git and GitHub in Topic 4.</p>",
+
+        "<h3>Real-World Example</h3>",
+        "<p>Suppose you are building a website. On the first day, you create the basic website:</p>",
+        "<div class=\"diagram\">Commit 1\n\"Create website\"</div>",
+        "<p>Later, you add a login page:</p>",
+        "<div class=\"diagram\">Commit 2\n\"Add login page\"</div>",
+        "<p>Then you fix a bug:</p>",
+        "<div class=\"diagram\">Commit 3\n\"Fix login validation\"</div>",
+        "<p>Git maintains this project history:</p>",
+        "<div class=\"diagram\">[Commit 1] ─── [Commit 2] ─── [Commit 3]\n Create site      Add login      Fix bug</div>",
+        "<p>If a later change creates a problem, Git provides tools to inspect the history and recover from mistakes.</p>",
+
+        "<h3>Git is Distributed</h3>",
+        "<p>Git is called a <strong>Distributed Version Control System</strong>. This means developers can have their own local copy of a repository and its history on their computers.</p>",
+        "<div class=\"diagram\">Developer A PC ── Git Repository + History\nDeveloper B PC ── Git Repository + History\nDeveloper C PC ── Git Repository + History</div>",
+        "<p>For now, you do not need to worry deeply about this concept. You will understand it better when we learn about local repositories, remote repositories, GitHub, push, pull, and clone.</p>",
+
+        "<h3>Important Points to Remember</h3>",
+        "<table><tr><th>Point</th><th>Meaning</th></tr><tr><td>Git is software</td><td>You install and run Git on your computer</td></tr><tr><td>Git is a Version Control System</td><td>It tracks and manages changes in projects</td></tr><tr><td>Git works locally</td><td>You can use it on your computer without GitHub</td></tr><tr><td>Internet is not always required</td><td>Many Git operations work completely offline</td></tr><tr><td>GitHub is optional</td><td>Git can be used independently of GitHub</td></tr><tr><td>Git is distributed</td><td>Developers can have local copies of repository history</td></tr></table>",
+
+        "<h3>Version Control vs Git</h3>",
+        "<table><tr><th>Version Control</th><th>Git</th></tr><tr><td>A general concept/system for managing versions</td><td>A specific software/tool that provides Version Control</td></tr><tr><td>Many Version Control Systems exist</td><td>Git is one popular Version Control System</td></tr><tr><td>General idea</td><td>Specific implementation</td></tr></table>",
+
+        "<h3>Simple Analogy 🚗</h3>",
+        "<div class=\"diagram\">Vehicle → Car\nVersion Control → Git</div>",
+        "<p>A car is one type of vehicle. Similarly, Git is one type of Version Control System.</p>",
+        "<div class=\"definition-box\"><b>Remember:</b> Version Control is the general concept. Git is a tool used to perform Version Control.</div>",
+
+        "<div class=\"definition-box\"><b>One-Line Definition:</b> Git is a distributed Version Control System that tracks and manages changes to files and projects over time.</div>"
+      ],
+      "practice": [
+          "<p class=\"practice-note\">No Git commands are required yet for this topic — just understand the concept. Walk through this scenario:</p>",
+          "<div class=\"diagram\">Day 1 → Create website\nDay 2 → Add a login page\nDay 3 → Add a dashboard\nDay 4 → Fix a login bug</div>",
+          "<p class=\"practice-note\">Think about how Git could keep the history of these changes. If one of the changes causes a problem, think about how Git could help you identify or recover from it.</p>",
+          "<div class=\"definition-box\"><b>Practice Goal:</b> Understand that Git tracks the history of changes locally on your computer and can work without GitHub or an internet connection.</div>"
+      ],
+      "qna": [
+              {
+                "q": "Q1. What is Git?",
+                "a": "Git is a distributed Version Control System used to track and manage changes in files and projects over time."
+                },
+                {
+                "q": "Q2. What is the relationship between Version Control and Git?",
+                "a": "Version Control is the general concept or system for managing file versions, while Git is a specific software tool that implements Version Control."
+                },
+                {
+                "q": "Q3. Can you use Git without GitHub?",
+                "a": "Yes. Git works independently on your computer. You can create repositories, track changes, and create commits without using GitHub."
+                },
+                {
+                "q": "Q4. Can Git work without an internet connection?",
+                "a": "Yes. Most local Git operations such as tracking changes, committing, creating branches, and viewing history can work without an internet connection."
+                },
+                {
+                "q": "Q5. Is Git the same as GitHub?",
+                "a": "No. Git is Version Control software used to manage project history, while GitHub is an online platform that can host and collaborate on Git repositories."
+                },
+                {
+                "q": "Q6. What is Git's main purpose?",
+                "a": "Git's main purpose is to track, manage, compare, and maintain the history of changes made to files in a project."
+                }
+      ]
+    },
+    {
+      "n": 3,
+      "title": "What is GitHub",
+      "explanation": [
+        "<p>GitHub is a website that hosts Git repositories online and adds collaboration features on top of Git itself: pull requests, issues, code review, and project boards.</p>",
+        "<p>Git is the tool; GitHub is a service built around that tool. You can use Git without ever touching GitHub (e.g. hosting your own server), but GitHub is the most common place developers share and collaborate on Git repositories.</p>"
+      ],
+      "practice": [
+        "Browse a well-known open-source repository on GitHub and identify where the commit history, issues, and pull requests each live.",
+        "Create a free GitHub account if you don't already have one (covered in more detail in the GitHub Basics section)."
+      ],
+      "qna": [
+        { "q": "Are GitHub and Git made by the same company?", "a": "No. Git is an open-source tool maintained by the community. GitHub is a company (now owned by Microsoft) that built a hosting platform around Git." }
+      ]
+    },
+    {
+      "n": 4,
+      "title": "Difference between Git vs GitHub",
+      "explanation": [
+        "<p>Git: the version control tool itself \u2014 works entirely on your local machine, tracks history, manages branches, has no concept of 'projects' or 'accounts'.</p>",
+        "<p>GitHub: a cloud platform that stores Git repositories remotely and adds a UI, collaboration tools (pull requests, issues), and social features (stars, followers) on top.</p>"
+      ],
+      "practice": [
+        "List three things Git can do without any internet connection.",
+        "List three things GitHub adds that plain Git doesn't have."
+      ],
+      "qna": [
+        { "q": "Could I use Git with a different hosting site instead of GitHub?", "a": "Yes \u2014 GitLab and Bitbucket are common alternatives that do a similar job of hosting Git repositories." }
+      ]
+    },
+    {
+      "n": 5,
+      "title": "What is a Repository",
+      "explanation": [
+        "<p>A repository (or 'repo') is a project folder that Git is tracking. It contains your actual files plus a hidden .git folder that stores the entire history of changes.</p>",
+        "<p>A repository can exist purely on your machine (a local repository) or be hosted online (a remote repository, e.g. on GitHub) \u2014 usually a project has both, kept in sync.</p>"
+      ],
+      "practice": [
+        "Look at any project folder on your machine \u2014 check whether it has a hidden .git folder inside it (it won't, unless you've already run git init there)."
+      ],
+      "qna": []
+    },
+    {
+      "n": 6,
+      "title": "Local repository vs Remote repository",
+      "explanation": [
+        "<p>A local repository lives on your own computer \u2014 it's what you interact with day to day: making commits, switching branches, viewing history.</p>",
+        "<p>A remote repository lives on a server (typically GitHub) and acts as the shared source of truth that everyone on a team pushes to and pulls from.</p>",
+        "<p>You keep them in sync using commands like `git push` (send your local commits to the remote) and `git pull` (bring the remote's commits into your local copy).</p>"
+      ],
+      "practice": [
+        "Draw (on paper or in a note) a simple diagram: your laptop (local) with an arrow labeled 'push' and 'pull' pointing to/from GitHub (remote)."
+      ],
+      "qna": [
+        { "q": "Can a repository have more than one remote?", "a": "Yes \u2014 for example when you fork a project, you'll often have 'origin' (your fork) and 'upstream' (the original project) as two separate remotes." }
+      ]
+    },
+    {
+      "n": 7,
+      "title": "What is the .git hidden folder",
+      "explanation": [
+        "<p>The .git folder is created inside your project the moment you run `git init`. It's where Git actually stores everything: the full commit history, branches, configuration, and staged changes.</p>",
+        "<p>You never edit files inside .git directly \u2014 you interact with it through Git commands. Deleting this folder removes all Git history for that project (the regular files remain, but the tracked history is gone).</p>"
+      ],
+      "practice": [
+        "In a test folder, run `git init`, then list hidden files (`ls -la` on Mac/Linux, or enable 'show hidden items' on Windows) to actually see the .git folder appear."
+      ],
+      "qna": [
+        { "q": "Is it safe to delete .git if I just want to stop tracking a project?", "a": "Yes, deleting .git removes Git tracking only \u2014 your actual project files are untouched. Just make sure you don't need the history first, since it can't be recovered afterward." }
+      ]
+    },
+    {
+      "n": 8,
+      "title": "Git working areas",
+      "explanation": [
+        "<p>Git organizes changes through four conceptual areas: the <strong>Working Directory</strong> (the actual files you edit), the <strong>Staging Area</strong> (changes you've marked as ready to be committed, via `git add`), the <strong>Local Repository</strong> (committed history on your machine, via `git commit`), and the <strong>Remote Repository</strong> (the shared copy on GitHub, via `git push`).</p>",
+        "<p>A change moves through these stages in order: you edit a file (working directory) \u2192 stage it (`git add`) \u2192 commit it (`git commit`) \u2192 push it (`git push`). Understanding this flow is the key to understanding almost every Git command.</p>"
+      ],
+      "practice": [
+        "In a test repo, edit a file and run `git status` after each step (before staging, after `git add`, after `git commit`) to watch it move between areas.",
+        "Explain the four areas out loud in order, without looking at your notes."
+      ],
+      "qna": [
+        { "q": "Can I skip the staging area?", "a": "Not entirely \u2014 but `git commit -am \"message\"` stages and commits already-tracked (modified) files in one step. New untracked files still need an explicit `git add` first." }
+      ]
+    }
+  ]
+}

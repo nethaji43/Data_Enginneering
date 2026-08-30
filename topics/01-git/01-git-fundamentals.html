@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Git Fundamentals — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#E3B341; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(227,179,65,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#E3B341; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+  .group-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#0D1117; background:#E3B341; border-radius:5px; padding:2px 7px; letter-spacing:.05em;}
+
+  .section .note, .section .cmdbox, .section .workflow{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:pointer;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#E3B341; border-color:#E3B341;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#E3B341;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .opt-tag{font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-faint); border:1px solid var(--border); border-radius:5px; padding:1px 6px; margin-left:6px;}
+  .item.item-hidden{display:none;}
+
+  .workflow{padding:18px; background:var(--surface-2); border:1px solid var(--border); border-radius:10px; margin-top:14px; margin-bottom:18px;}
+  .wf-step{display:flex; align-items:center; gap:12px;}
+  .wf-dot{width:10px; height:10px; border-radius:50%; background:#E3B341; flex-shrink:0;}
+  .wf-text{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text);}
+  .wf-line{width:2px; height:16px; background:#E3B341; opacity:.35; margin-left:4px;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Foundation</b> &middot; Topic 1 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Git Fundamentals</h1>
+      <p class="sub">Version control, branching, and the GitHub collaboration workflow — the first stop on the line. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/88</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search within Git Fundamentals — e.g. rebase, merge conflict, stash..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 1;         // matches topic.n = 1 (Git & GitHub) in index.html
+const CONTENT_SLUG = 'git'; // matches /content/git.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'Basic Concepts', items:[
+      {t:'What is Version Control'},
+      {t:'What is Git'},
+      {t:'What is GitHub'},
+      {t:'Difference between Git vs GitHub'},
+      {t:'What is a Repository'},
+      {t:'Local repository vs Remote repository'},
+      {t:'What is the .git hidden folder'},
+      {t:'Git working areas', tags:['Working Directory','Staging Area','Local Repository','Remote Repository']},
+  ]},
+  { title:'Git Installation & Configuration', items:[
+      {t:'Install Git'}, {t:'Check Git version'}, {t:'Configure username'},
+      {t:'Configure email'}, {t:'View Git configuration'}, {t:'Global vs Local configuration'},
+    ], commands:['git --version','git config','git config --global user.name','git config --global user.email']
+  },
+  { title:'Create and Track a Repository', items:[
+      {t:'git init'}, {t:'git status'}, {t:'git add'}, {t:'git commit'},
+      {t:'Good commit messages'}, {t:'git log'},
+    ], commands:['git init','git status','git add .','git commit -m "Initial commit"','git log']
+  },
+  { title:'Viewing Changes', items:[
+      {t:'git diff'},
+      {t:'Difference between Modified / Staged / Committed', tags:['Modified','Staged','Committed']},
+      {t:'View staged changes'}, {t:'View commit history'},
+    ], commands:['git diff','git diff --staged','git log --oneline']
+  },
+  { title:'Branching', important:true, items:[
+      {t:'What is a branch'}, {t:'Why branches are used'}, {t:'Create a branch'},
+      {t:'Switch branches'}, {t:'List branches'}, {t:'Delete a branch'}, {t:'Understand main'},
+    ],
+    note:{type:'info', text:'Learn both the modern commands (switch) and the older ones (checkout) — you\u2019ll see both in the wild.'},
+    commands:['git branch','git branch feature-name','git switch feature-name','git switch -c feature-name','git checkout feature-name']
+  },
+  { title:'Merging & Merge Conflicts', important:true, items:[
+      {t:'What is Git merge'}, {t:'Merge one branch into another'}, {t:'Fast-forward merge'},
+      {t:'Merge commit'}, {t:'What is a merge conflict'}, {t:'Create a merge conflict intentionally'},
+      {t:'Resolve a merge conflict'},
+    ], commands:['git merge feature-name'],
+    note:{type:'practice', text:"Don't just watch this topic \u2014 practice creating and resolving at least 2\u20133 conflicts yourself."}
+  },
+  { title:'Undoing Changes',
+    intro:{type:'info', text:'This is extremely important because you will eventually make mistakes.'},
+    items:[
+      {t:'Discard uncommitted changes'}, {t:'Unstage files'}, {t:'Amend the latest commit'},
+      {t:'Revert a commit'}, {t:'Understand reset'},
+      {t:'Difference between restore, reset, and revert', tags:['git restore','git reset','git revert']},
+    ], commands:['git restore','git restore --staged','git commit --amend','git revert','git reset'],
+    note:{type:'warning', text:'Understand these fully before using destructive options such as --hard.'}
+  },
+  { title:'Stashing', items:[
+      {t:'What is Git stash'}, {t:'Save unfinished work'}, {t:'View stashes'},
+      {t:'Restore a stash'}, {t:'Apply vs Pop'}, {t:'Delete stashes'},
+    ], commands:['git stash','git stash list','git stash apply','git stash pop','git stash drop']
+  },
+  { title:'Rebase', items:[
+      {t:'What is rebase'}, {t:'Merge vs Rebase'}, {t:'Basic rebase'},
+      {t:'Interactive rebase basics'}, {t:'When you should not rebase shared/public history'},
+    ], commands:['git rebase main','git rebase -i'],
+    note:{type:'info', text:"You don't need to become an expert immediately, but understand it properly."}
+  },
+  { title:'GitHub Basics', group:'GitHub', items:[
+      {t:'Create a GitHub account'}, {t:'Create a repository'}, {t:'Public vs Private repositories'},
+      {t:'Repository structure'}, {t:'README.md'}, {t:'Markdown basics'}, {t:'.gitignore'},
+      {t:'License basics', optional:true},
+  ]},
+  { title:'Connect Git to GitHub', important:true, items:[
+      {t:'What is origin'}, {t:'Add a remote repository'}, {t:'View remotes'}, {t:'Push code'},
+      {t:'Pull changes'}, {t:'Clone a repository'}, {t:'Fetch changes'},
+    ], commands:['git remote add origin <repository-url>','git remote -v','git push','git pull','git clone','git fetch'],
+    note:{type:'info', text:'fetch downloads information only; pull downloads and integrates the changes.'}
+  },
+  { title:'Collaboration & Pull Requests', important:true, items:[
+      {t:'Fork vs Clone'}, {t:'What is a Pull Request'}, {t:'Create a feature branch'},
+      {t:'Push branch to GitHub'}, {t:'Create a Pull Request'}, {t:'Review changes'},
+      {t:'Merge Pull Request'}, {t:'Resolve conflicts in a team workflow'},
+    ], workflow:['main','Create feature branch','Make changes','Commit','Push branch','Pull Request','Review','Merge']
+  },
+  { title:'Useful GitHub Features', items:[
+      {t:'Issues'}, {t:'Labels'}, {t:'Milestones', optional:true},
+      {t:'Releases & Tags'}, {t:'GitHub profile README'}, {t:'Repository visibility/settings'},
+  ]},
+  { title:'Authentication & Security', items:[
+      {t:'HTTPS vs SSH'}, {t:'Personal Access Token basics'}, {t:'SSH key basics'},
+      {t:'Never commit secrets', tags:['Passwords','API keys','.env files','Secrets']},
+    ], note:{type:'warning', text:'Use .gitignore to keep secrets out of your repository.'}
+  },
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        ${sec.group ? `<span class="group-tag">${sec.group}</span>` : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${sec.intro.text}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${it.t}${it.optional?'<span class="opt-tag">optional</span>':''}</a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      row.querySelector('.check').addEventListener('click', ()=>toggleItem(it.n));
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    if(sec.commands){
+      const box = document.createElement('div');
+      box.className = 'cmdbox';
+      box.innerHTML = `
+        <div class="cmdbox-head"><span class="cmdbox-label">Commands</span><button class="copy-btn">Copy</button></div>
+        <pre>${sec.commands.join('\n')}</pre>
+      `;
+      box.querySelector('.copy-btn').addEventListener('click', (e)=>{
+        navigator.clipboard.writeText(sec.commands.join('\n')).then(()=>{
+          e.target.textContent = 'Copied';
+          setTimeout(()=>{ e.target.textContent = 'Copy'; }, 1400);
+        }).catch(()=>{});
+      });
+      secEl.appendChild(box);
+    }
+
+    if(sec.workflow){
+      const wf = document.createElement('div');
+      wf.className = 'workflow';
+      wf.innerHTML = sec.workflow.map((step,i)=>`
+        <div class="wf-step"><span class="wf-dot"></span><span class="wf-text">${step}</span></div>
+        ${i < sec.workflow.length-1 ? '<div class="wf-line"></div>' : ''}
+      `).join('');
+      secEl.appendChild(wf);
+    }
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${sec.note.text}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+function toggleItem(n){
+  if(progress[n]) delete progress[n]; else progress[n] = true;
+  deWriteStore(ITEMS_KEY, progress);
+  deSyncTopicToRoadmap(TOPIC_ID, TOTAL);
+  render();
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>
