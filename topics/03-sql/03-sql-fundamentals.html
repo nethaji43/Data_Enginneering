@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SQL Foundations — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#E3B341; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(227,179,65,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#E3B341; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:pointer;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#E3B341; border-color:#E3B341;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#E3B341;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Foundation</b> &middot; Topic 3 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>SQL Foundations</h1>
+      <p class="sub">Querying, joins, and window functions — the single most-used skill in the whole roadmap. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/94</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search within SQL — e.g. window functions, CTE, joins..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 3;         // matches topic.n = 3 (SQL) in index.html
+const CONTENT_SLUG = 'sql'; // matches /content/sql.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'SQL Fundamentals', important:true, items:[
+      {t:'What is SQL'}, {t:'Database, Table, Row and Column'}, {t:'Schema basics'}, {t:'Data Types'},
+      {t:'`SELECT`'}, {t:'`FROM`'}, {t:'`DISTINCT`'}, {t:'Column Aliases using `AS`'}, {t:'`LIMIT` / `TOP`'},
+  ]},
+  { title:'Filtering Data', important:true, items:[
+      {t:'`WHERE`'},
+      {t:'Comparison Operators', tags:['=','!= / <>','>','<','>=','<=']},
+      {t:'`AND`'}, {t:'`OR`'}, {t:'`NOT`'}, {t:'`IN`'}, {t:'`BETWEEN`'}, {t:'`LIKE`'},
+      {t:'Wildcards', tags:['%','_']},
+      {t:'`IS NULL`'}, {t:'`IS NOT NULL`'},
+  ]},
+  { title:'Sorting & Basic Results', items:[
+      {t:'`ORDER BY`'}, {t:'`ASC`'}, {t:'`DESC`'}, {t:'Multiple Column Sorting'},
+  ]},
+  { title:'Aggregate Functions', important:true, items:[
+      {t:'`COUNT()`'}, {t:'`SUM()`'}, {t:'`AVG()`'}, {t:'`MIN()`'}, {t:'`MAX()`'},
+      {t:'`GROUP BY`'}, {t:'`HAVING`'},
+  ]},
+  { title:'SQL Joins — Extremely Important', important:true, items:[
+      {t:'Why Joins are Used'}, {t:'`INNER JOIN`'}, {t:'`LEFT JOIN`'}, {t:'`RIGHT JOIN`'},
+      {t:'`FULL OUTER JOIN`'}, {t:'`CROSS JOIN`'}, {t:'`SELF JOIN`'}, {t:'Join Multiple Tables'},
+      {t:'Understanding Duplicate Rows in Joins'}, {t:'Understanding Missing Matches in Joins'},
+  ]},
+  { title:'Set Operations', items:[
+      {t:'`UNION`'}, {t:'`UNION ALL`'}, {t:'`INTERSECT`'}, {t:'`EXCEPT`'},
+    ], note:{type:'info', text:"Learn database-specific alternatives later, if a particular database doesn't support all of these."}
+  },
+  { title:'SQL Data Manipulation (DML)', important:true, items:[
+      {t:'`INSERT`'}, {t:'`UPDATE`'}, {t:'`DELETE`'},
+  ]},
+  { title:'SQL Table & Database Basics (DDL)', items:[
+      {t:'`CREATE DATABASE`'}, {t:'`CREATE TABLE`'}, {t:'`ALTER TABLE`'},
+      {t:'`DROP TABLE`'}, {t:'`TRUNCATE TABLE`'},
+  ]},
+  { title:'Constraints & Keys', important:true, items:[
+      {t:'`PRIMARY KEY`'}, {t:'`FOREIGN KEY`'}, {t:'`UNIQUE`'},
+      {t:'`NOT NULL`'}, {t:'`DEFAULT`'}, {t:'`CHECK`'},
+  ]},
+  { title:'Subqueries', important:true, items:[
+      {t:'Scalar Subqueries'}, {t:'Multi-row Subqueries'}, {t:'Correlated Subqueries'},
+      {t:'Subqueries with `IN`'}, {t:'Subqueries with `EXISTS`'},
+  ]},
+  { title:'Common Table Expressions (CTEs)', important:true, items:[
+      {t:'What is a CTE'}, {t:'`WITH`'}, {t:'Multiple CTEs'}, {t:'CTE vs Subquery'},
+  ]},
+  { title:'Window Functions — Extremely Important for Data Engineering', important:true, items:[
+      {t:'What is a Window Function'}, {t:'`OVER()`'}, {t:'`PARTITION BY`'},
+      {t:'`ROW_NUMBER()`'}, {t:'`RANK()`'}, {t:'`DENSE_RANK()`'},
+      {t:'`LAG()`'}, {t:'`LEAD()`'}, {t:'Running Total'}, {t:'Moving Average'},
+  ]},
+  { title:'Conditional & NULL Handling', important:true, items:[
+      {t:'`CASE WHEN`'}, {t:'`COALESCE()`'}, {t:'`NULLIF()`'}, {t:'Handling `NULL` Values'},
+  ]},
+  { title:'String Functions', items:[
+      {t:'`CONCAT()`'}, {t:'`UPPER()`'}, {t:'`LOWER()`'}, {t:'`TRIM()`'},
+      {t:'`LENGTH()` / `LEN()`'}, {t:'`SUBSTRING()`'}, {t:'`REPLACE()`'},
+  ]},
+  { title:'Date & Time Functions', items:[
+      {t:'Current Date/Time'}, {t:'Extracting Year, Month and Day'}, {t:'Date Formatting'},
+      {t:'Date Arithmetic'}, {t:'Date Difference'},
+  ]},
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${sec.intro.text}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}</a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      row.querySelector('.check').addEventListener('click', ()=>toggleItem(it.n));
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${sec.note.text}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+function toggleItem(n){
+  if(progress[n]) delete progress[n]; else progress[n] = true;
+  deWriteStore(ITEMS_KEY, progress);
+  deSyncTopicToRoadmap(TOPIC_ID, TOTAL);
+  render();
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>

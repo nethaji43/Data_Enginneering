@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Python Foundations — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#E3B341; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(227,179,65,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#E3B341; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:pointer;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#E3B341; border-color:#E3B341;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#E3B341;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Foundation</b> &middot; Topic 2 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Python Foundations</h1>
+      <p class="sub">Core language, data structures, and the built-ins you'll lean on in every pipeline you write. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/77</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search within Python — e.g. generators, decorators, kwargs..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 2;            // matches topic.n = 2 (Python) in index.html
+const CONTENT_SLUG = 'python'; // matches /content/python.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'Python Basics', items:[
+      {t:'Variables'},
+      {t:'Data Types', tags:['int','float','str','bool','None']},
+      {t:'Type Conversion'},
+      {t:'Operators', tags:['Arithmetic','Comparison','Logical','Assignment']},
+      {t:'Conditional Statements', tags:['if','elif','else']},
+      {t:'Loops', tags:['for','while']},
+      {t:'`break`, `continue`, `pass`'},
+  ]},
+  { title:'Data Structures', important:true, items:[
+      {t:'Lists'}, {t:'Tuples'}, {t:'Sets'}, {t:'Dictionaries'},
+      {t:'Accessing and Modifying Data'}, {t:'Nested Lists and Dictionaries'},
+      {t:'Iterating Through Collections'},
+  ]},
+  { title:'Functions', important:true, items:[
+      {t:'Creating Functions'}, {t:'Parameters and Arguments'}, {t:'Return Values'},
+      {t:'Default Arguments'}, {t:'Keyword Arguments'}, {t:'`*args`'}, {t:'`**kwargs`'},
+      {t:'Variable Scope'}, {t:'Lambda Functions'},
+  ]},
+  { title:'Strings', items:[
+      {t:'Indexing'}, {t:'Slicing'}, {t:'String Methods'}, {t:'f-Strings'}, {t:'Split and Join'},
+    ], note:{type:'info', text:'Regular Expressions can be learned later, when you need them for data cleaning.'}
+  },
+  { title:'Python File Handling — Basic Only', important:true, items:[
+      {t:'`open()`'}, {t:'File Modes', tags:['r','w','a']}, {t:'`with open()`'},
+      {t:'`read()`'}, {t:'`readline()`'}, {t:'`readlines()`'}, {t:'`write()`'},
+      {t:'File Paths'}, {t:'`pathlib`'}, {t:'Basic File Exceptions'},
+    ], note:{type:'warning', text:"Stop here. Don't deeply learn CSV, JSON, Parquet, or Avro yet \u2014 those already have their own stop later in the roadmap."}
+  },
+  { title:'Exception Handling', important:true, items:[
+      {t:'`try`'}, {t:'`except`'}, {t:'`else`'}, {t:'`finally`'}, {t:'Specific Exceptions'}, {t:'`raise`'},
+  ]},
+  { title:'Modules & Packages', important:true, items:[
+      {t:'Importing Modules'}, {t:'Creating Your Own Modules'}, {t:'Packages Basics'},
+      {t:'`__init__.py` Basics'}, {t:'Useful Standard Libraries', tags:['os','pathlib','datetime']},
+  ]},
+  { title:'Built-in Functions & Comprehensions', important:true, items:[
+      {t:'List Comprehensions'}, {t:'Dictionary Comprehensions'}, {t:'`enumerate()`'},
+      {t:'`zip()`'}, {t:'`sorted()`'}, {t:'`map()` Basics'}, {t:'`filter()` Basics'},
+  ]},
+  { title:'Iterators & Generators', items:[
+      {t:'Iterable vs Iterator'}, {t:'`iter()`'}, {t:'`next()`'}, {t:'Generators'},
+      {t:'`yield`'}, {t:'Generator Expressions'},
+    ], note:{type:'info', text:'This becomes genuinely useful later, when you\u2019re processing large amounts of data.'}
+  },
+  { title:'Virtual Environments & Package Management', important:true, items:[
+      {t:'What is `pip`'}, {t:'Installing Packages'}, {t:'Package Versions'},
+      {t:'Virtual Environments'}, {t:'`venv`'}, {t:'`requirements.txt`'},
+  ]},
+  { title:'Logging', important:true, items:[
+      {t:'Why Logging Instead of Only `print()`'},
+      {t:'Log Levels', tags:['DEBUG','INFO','WARNING','ERROR','CRITICAL']},
+      {t:'Basic `logging` Module'}, {t:'Logging to Files'},
+  ]},
+  { title:'Date & Time', items:[
+      {t:'`datetime`'}, {t:'Date Formatting'}, {t:'Date Parsing'},
+      {t:'Date Calculations'}, {t:'Time Zones Basics'},
+  ]},
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${sec.intro.text}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}</a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      row.querySelector('.check').addEventListener('click', ()=>toggleItem(it.n));
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${sec.note.text}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+function toggleItem(n){
+  if(progress[n]) delete progress[n]; else progress[n] = true;
+  deWriteStore(ITEMS_KEY, progress);
+  deSyncTopicToRoadmap(TOPIC_ID, TOTAL);
+  render();
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>

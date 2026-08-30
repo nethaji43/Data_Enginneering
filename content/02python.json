@@ -1,0 +1,17 @@
+{
+    "meta": {
+    "topicId": 2,
+    "title": "Python Fundamentals",
+    "accent": "#E3B341",
+    "topicPageUrl": "topics/02-python/02-python-fundamentals.html"
+  },
+  "items":[
+    {
+        "n":1,
+        "title": "Variable",
+        "explanation":[],
+        "practice":[],
+        "qna":[]
+    }
+]
+}

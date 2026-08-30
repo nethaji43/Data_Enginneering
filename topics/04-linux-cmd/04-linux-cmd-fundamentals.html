@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Git Fundamentals — Data Engineering Roadmap</title>
+<title>Linux / Command Line — Data Engineering Roadmap</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/style.css">
@@ -18,9 +18,8 @@
   .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
   .star{color:#E3B341; font-size:14px;}
   .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
-  .group-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#0D1117; background:#E3B341; border-radius:5px; padding:2px 7px; letter-spacing:.05em;}
 
-  .section .note, .section .cmdbox, .section .workflow{margin-left:20px; margin-right:20px;}
+  .section .note, .section .workflow{margin-left:20px; margin-right:20px;}
   .section .note:first-child{margin-top:14px;}
 
   .items{padding:6px 8px 16px;}
@@ -37,9 +36,9 @@
   a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
   a.item-text:hover{color:#E3B341;}
   .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
   .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
   .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
-  .opt-tag{font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-faint); border:1px solid var(--border); border-radius:5px; padding:1px 6px; margin-left:6px;}
   .item.item-hidden{display:none;}
 
   .workflow{padding:18px; background:var(--surface-2); border:1px solid var(--border); border-radius:10px; margin-top:14px; margin-bottom:18px;}
@@ -53,12 +52,12 @@
 <div class="wrap narrow">
 
   <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
-  <p class="crumb"><b>Foundation</b> &middot; Topic 1 of 74</p>
+  <p class="crumb"><b>Foundation</b> &middot; Topic 4 of 74</p>
 
   <div class="hero">
     <div>
-      <h1>Git Fundamentals</h1>
-      <p class="sub">Version control, branching, and the GitHub collaboration workflow — the first stop on the line. Click any item to open its notes, practice, and Q&amp;A.</p>
+      <h1>Linux / Command Line &#128039;</h1>
+      <p class="sub">Navigation, permissions, pipes, and just enough shell scripting to automate the boring parts. Click any item to open its notes, practice, and Q&amp;A.</p>
     </div>
     <div class="ring-wrap">
       <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
@@ -66,13 +65,13 @@
         <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
       </svg>
       <div>
-        <div class="ring-num" id="progressNum">0/88</div>
+        <div class="ring-num" id="progressNum">0/96</div>
         <div class="ring-label">LEARNED</div>
       </div>
     </div>
   </div>
 
-  <input class="search" id="search" type="text" placeholder="Search within Git Fundamentals — e.g. rebase, merge conflict, stash..." style="margin-top:28px;" />
+  <input class="search" id="search" type="text" placeholder="Search within Linux — e.g. permissions, grep, environment variables..." style="margin-top:28px;" />
 
   <div id="sections"></div>
 
@@ -84,96 +83,67 @@
 
 <script src="../../assets/common.js"></script>
 <script>
-const TOPIC_ID = 1;         // matches topic.n = 1 (Git & GitHub) in index.html
-const CONTENT_SLUG = '01git'; // matches /content/git.json, used for item.html links
+const TOPIC_ID = 4;           // matches topic.n = 4 (Linux / Command Line) in index.html
+const CONTENT_SLUG = 'linux'; // matches /content/linux.json, used for item.html links
 const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
 
 const SECTIONS = [
-  { title:'Basic Concepts', items:[
-      {t:'What is Version Control'},
-      {t:'What is Git'},
-      {t:'What is GitHub'},
-      {t:'Difference between Git vs GitHub'},
-      {t:'What is a Repository'},
-      {t:'Local repository vs Remote repository'},
-      {t:'What is the .git hidden folder'},
-      {t:'Git working areas', tags:['Working Directory','Staging Area','Local Repository','Remote Repository']},
+  { title:'Command Line Basics', important:true, items:[
+      {t:'What is CLI'}, {t:'Terminal vs Shell'}, {t:'Linux File System basics'},
+      {t:'Root directory `/`'}, {t:'Home directory `~`'}, {t:'Current working directory'},
+      {t:'Relative paths'}, {t:'Absolute paths'}, {t:'Command syntax'},
+      {t:'Command options and arguments'}, {t:'`--help`'}, {t:'`man`'},
   ]},
-  { title:'Git Installation & Configuration', items:[
-      {t:'Install Git'}, {t:'Check Git version'}, {t:'Configure username'},
-      {t:'Configure email'}, {t:'View Git configuration'}, {t:'Global vs Local configuration'},
-    ], commands:['git --version','git config','git config --global user.name','git config --global user.email']
-  },
-  { title:'Create and Track a Repository', items:[
-      {t:'git init'}, {t:'git status'}, {t:'git add'}, {t:'git commit'},
-      {t:'Good commit messages'}, {t:'git log'},
-    ], commands:['git init','git status','git add .','git commit -m "Initial commit"','git log']
-  },
-  { title:'Viewing Changes', items:[
-      {t:'git diff'},
-      {t:'Difference between Modified / Staged / Committed', tags:['Modified','Staged','Committed']},
-      {t:'View staged changes'}, {t:'View commit history'},
-    ], commands:['git diff','git diff --staged','git log --oneline']
-  },
-  { title:'Branching', important:true, items:[
-      {t:'What is a branch'}, {t:'Why branches are used'}, {t:'Create a branch'},
-      {t:'Switch branches'}, {t:'List branches'}, {t:'Delete a branch'}, {t:'Understand main'},
-    ],
-    note:{type:'info', text:'Learn both the modern commands (switch) and the older ones (checkout) — you\u2019ll see both in the wild.'},
-    commands:['git branch','git branch feature-name','git switch feature-name','git switch -c feature-name','git checkout feature-name']
-  },
-  { title:'Merging & Merge Conflicts', important:true, items:[
-      {t:'What is Git merge'}, {t:'Merge one branch into another'}, {t:'Fast-forward merge'},
-      {t:'Merge commit'}, {t:'What is a merge conflict'}, {t:'Create a merge conflict intentionally'},
-      {t:'Resolve a merge conflict'},
-    ], commands:['git merge feature-name'],
-    note:{type:'practice', text:"Don't just watch this topic \u2014 practice creating and resolving at least 2\u20133 conflicts yourself."}
-  },
-  { title:'Undoing Changes',
-    intro:{type:'info', text:'This is extremely important because you will eventually make mistakes.'},
-    items:[
-      {t:'Discard uncommitted changes'}, {t:'Unstage files'}, {t:'Amend the latest commit'},
-      {t:'Revert a commit'}, {t:'Understand reset'},
-      {t:'Difference between restore, reset, and revert', tags:['git restore','git reset','git revert']},
-    ], commands:['git restore','git restore --staged','git commit --amend','git revert','git reset'],
-    note:{type:'warning', text:'Understand these fully before using destructive options such as --hard.'}
-  },
-  { title:'Stashing', items:[
-      {t:'What is Git stash'}, {t:'Save unfinished work'}, {t:'View stashes'},
-      {t:'Restore a stash'}, {t:'Apply vs Pop'}, {t:'Delete stashes'},
-    ], commands:['git stash','git stash list','git stash apply','git stash pop','git stash drop']
-  },
-  { title:'Rebase', items:[
-      {t:'What is rebase'}, {t:'Merge vs Rebase'}, {t:'Basic rebase'},
-      {t:'Interactive rebase basics'}, {t:'When you should not rebase shared/public history'},
-    ], commands:['git rebase main','git rebase -i'],
-    note:{type:'info', text:"You don't need to become an expert immediately, but understand it properly."}
-  },
-  { title:'GitHub Basics', group:'GitHub', items:[
-      {t:'Create a GitHub account'}, {t:'Create a repository'}, {t:'Public vs Private repositories'},
-      {t:'Repository structure'}, {t:'README.md'}, {t:'Markdown basics'}, {t:'.gitignore'},
-      {t:'License basics', optional:true},
+  { title:'Navigation', important:true, items:[
+      {t:'`pwd`'}, {t:'`ls`'}, {t:'`ls -l`'}, {t:'`ls -a`'}, {t:'`cd`'},
+      {t:'`cd ..`'}, {t:'`cd ~`'}, {t:'Absolute path navigation'}, {t:'Relative path navigation'},
   ]},
-  { title:'Connect Git to GitHub', important:true, items:[
-      {t:'What is origin'}, {t:'Add a remote repository'}, {t:'View remotes'}, {t:'Push code'},
-      {t:'Pull changes'}, {t:'Clone a repository'}, {t:'Fetch changes'},
-    ], commands:['git remote add origin <repository-url>','git remote -v','git push','git pull','git clone','git fetch'],
-    note:{type:'info', text:'fetch downloads information only; pull downloads and integrates the changes.'}
+  { title:'Files & Directories', important:true, items:[
+      {t:'`mkdir`'}, {t:'`mkdir -p`'}, {t:'`touch`'}, {t:'`cp`'}, {t:'`mv`'},
+      {t:'`rm`'}, {t:'`rm -r`'}, {t:'`rmdir`'}, {t:'`cat`'}, {t:'`less`'}, {t:'`head`'}, {t:'`tail`'},
+    ], note:{type:'info', text:'Focus: create, copy, move, rename, read, and delete files/directories.'}
   },
-  { title:'Collaboration & Pull Requests', important:true, items:[
-      {t:'Fork vs Clone'}, {t:'What is a Pull Request'}, {t:'Create a feature branch'},
-      {t:'Push branch to GitHub'}, {t:'Create a Pull Request'}, {t:'Review changes'},
-      {t:'Merge Pull Request'}, {t:'Resolve conflicts in a team workflow'},
-    ], workflow:['main','Create feature branch','Make changes','Commit','Push branch','Pull Request','Review','Merge']
+  { title:'Viewing & Searching Data', important:true, items:[
+      {t:'`grep`'}, {t:'Basic Regular Expressions with `grep`'}, {t:'`find`'}, {t:'`wc`'},
+      {t:'`sort`'}, {t:'`uniq`'}, {t:'`cut`'}, {t:'`awk` basics'}, {t:'`sed` basics'},
+    ], note:{type:'info', text:'These are particularly useful for checking and processing text, logs, and data files from the command line.'}
   },
-  { title:'Useful GitHub Features', items:[
-      {t:'Issues'}, {t:'Labels'}, {t:'Milestones', optional:true},
-      {t:'Releases & Tags'}, {t:'GitHub profile README'}, {t:'Repository visibility/settings'},
+  { title:'Redirection & Pipes — Extremely Important', important:true, items:[
+      {t:'Standard Input', tags:['stdin']}, {t:'Standard Output', tags:['stdout']}, {t:'Standard Error', tags:['stderr']},
+      {t:'Output Redirection `>`'}, {t:'Append Output `>>`'}, {t:'Error Redirection `2>`'},
+      {t:'Pipes `|`'}, {t:'Combining Multiple Commands'},
+    ], workflow:['large_log_file','grep ERROR','sort','uniq']
+  },
+  { title:'File Permissions', important:true, items:[
+      {t:'What are File Permissions'}, {t:'Read', tags:['r']}, {t:'Write', tags:['w']}, {t:'Execute', tags:['x']},
+      {t:'`chmod`'}, {t:'Permission numbers', tags:['755','644']}, {t:'`chown` basics'},
   ]},
-  { title:'Authentication & Security', items:[
-      {t:'HTTPS vs SSH'}, {t:'Personal Access Token basics'}, {t:'SSH key basics'},
-      {t:'Never commit secrets', tags:['Passwords','API keys','.env files','Secrets']},
-    ], note:{type:'warning', text:'Use .gitignore to keep secrets out of your repository.'}
+  { title:'Environment Variables', important:true, items:[
+      {t:'What are Environment Variables'}, {t:'`echo $VARIABLE`'}, {t:'`export`'},
+      {t:'`PATH`'}, {t:'Temporary vs Persistent Variables'}, {t:'`.bashrc` basics'},
+  ]},
+  { title:'Processes & System Basics', items:[
+      {t:'What is a Process'}, {t:'`ps`'}, {t:'`top`'}, {t:'`kill`'},
+      {t:'Process IDs', tags:['PID']}, {t:'Background processes `&`'}, {t:'`jobs`'},
+  ]},
+  { title:'Disk & System Information', items:[
+      {t:'`df`'}, {t:'`du`'}, {t:'`free`'}, {t:'`uname`'}, {t:'`whoami`'}, {t:'`hostname`'},
+  ]},
+  { title:'Networking Basics', items:[
+      {t:'`ping`'}, {t:'`curl`'}, {t:'`wget`'}, {t:'`ssh` basics'}, {t:'`scp` basics'},
+    ], note:{type:'info', text:'For now, just understand how these work. Later cloud and DevOps topics will give you more practical experience.'}
+  },
+  { title:'Package Management', items:[
+      {t:'What is a Package Manager'}, {t:'`apt update`'}, {t:'`apt install`'},
+      {t:'`apt remove`'}, {t:'`apt search`'},
+    ], note:{type:'info', text:'Focus mainly on Ubuntu/Debian `apt` initially.'}
+  },
+  { title:'Shell Scripting Basics', important:true, items:[
+      {t:'What is a Shell Script'}, {t:'Creating `.sh` files'}, {t:'Shebang `#!/bin/bash`'},
+      {t:'Variables'}, {t:'User Input'}, {t:'`if` statements'}, {t:'Loops'},
+      {t:'Functions'}, {t:'Script Arguments'}, {t:'Making Scripts Executable'},
+    ], workflow:['Download Data','Run Python Script','Check Result','Write Log'],
+    note:{type:'info', text:'This is enough shell scripting for your foundation.'}
   },
 ];
 
@@ -181,6 +151,10 @@ const SECTIONS = [
 let counter = 0;
 SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
 const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
 
 let progress = deReadStore(ITEMS_KEY);
 let query = '';
@@ -201,7 +175,6 @@ function render(){
     secEl.innerHTML = `<div class="section-head">
         <span class="section-title">${sec.title}</span>
         ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
-        ${sec.group ? `<span class="group-tag">${sec.group}</span>` : ''}
         <span class="section-count">${doneCount}/${sec.items.length}</span>
       </div>`;
 
@@ -220,7 +193,7 @@ function render(){
         <span class="item-num">${it.n}</span>
         <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
         <span class="item-body">
-          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${it.t}${it.optional?'<span class="opt-tag">optional</span>':''}</a>
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}</a>
           ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
         </span>
       `;
@@ -228,22 +201,6 @@ function render(){
       itemsWrap.appendChild(row);
     });
     secEl.appendChild(itemsWrap);
-
-    if(sec.commands){
-      const box = document.createElement('div');
-      box.className = 'cmdbox';
-      box.innerHTML = `
-        <div class="cmdbox-head"><span class="cmdbox-label">Commands</span><button class="copy-btn">Copy</button></div>
-        <pre>${sec.commands.join('\n')}</pre>
-      `;
-      box.querySelector('.copy-btn').addEventListener('click', (e)=>{
-        navigator.clipboard.writeText(sec.commands.join('\n')).then(()=>{
-          e.target.textContent = 'Copied';
-          setTimeout(()=>{ e.target.textContent = 'Copy'; }, 1400);
-        }).catch(()=>{});
-      });
-      secEl.appendChild(box);
-    }
 
     if(sec.workflow){
       const wf = document.createElement('div');
@@ -258,7 +215,7 @@ function render(){
     if(sec.note){
       const n = document.createElement('div');
       n.className = `note note-${sec.note.type}`;
-      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${sec.note.text}</span>`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
       n.style.marginBottom = '18px';
       secEl.appendChild(n);
     } else {
