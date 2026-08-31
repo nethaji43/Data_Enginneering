@@ -231,75 +231,466 @@
       ]
     },
     {
-      "n": 4,
-      "title": "Difference between Git vs GitHub",
-      "explanation": [
-        "<p>Git: the version control tool itself \u2014 works entirely on your local machine, tracks history, manages branches, has no concept of 'projects' or 'accounts'.</p>",
-        "<p>GitHub: a cloud platform that stores Git repositories remotely and adds a UI, collaboration tools (pull requests, issues), and social features (stars, followers) on top.</p>"
-      ],
-      "practice": [
-        "List three things Git can do without any internet connection.",
-        "List three things GitHub adds that plain Git doesn't have."
-      ],
-      "qna": [
-        { "q": "Could I use Git with a different hosting site instead of GitHub?", "a": "Yes \u2014 GitLab and Bitbucket are common alternatives that do a similar job of hosting Git repositories." }
-      ]
+        "n": 4,
+        "title": "Difference between Git vs GitHub",
+        "explanation": [
+          "<h3>Simple Meaning</h3>",
+          "<p><strong>Git and GitHub are related, but they are not the same thing.</strong></p>",
+          "<p>Git is a <strong>Version Control System</strong> that tracks changes in your project. GitHub is an <strong>online platform</strong> that hosts Git repositories and provides collaboration tools.</p>",
+          "<div class=\"definition-box\"><b>Simple Rule:</b> Git manages your project history. GitHub helps you store, share, and collaborate on Git repositories online.</div>",
+
+          "<h3>Quick Comparison</h3>",
+          "<div class=\"diagram\">Git                              GitHub\n│                                │\nRuns as software/tool             Online platform\n│                                │\nTracks changes                    Hosts Git repositories\n│                                │\nWorks locally                     Supports remote collaboration\n│                                │\nCan work offline                  Normally requires internet for remote interaction</div>",
+
+          "<h3>Simple Example</h3>",
+          "<p>Imagine you create a website on your computer.</p>",
+          "<div class=\"diagram\">Your Computer\n│\n├── index.html\n├── style.css\n└── script.js\n     ↓\nGit tracks changes\n     ↓\nCommit 1 → Create website\nCommit 2 → Add login page\nCommit 3 → Add CSS styling</div>",
+          "<p>This is Git working locally. Now you want to store your project online and share it with other developers.</p>",
+          "<div class=\"diagram\">Your Computer\n     ↓\nLocal Git Repository\n     ↓\n     ↓ Push\n     ↓\nGitHub Repository\n     ↓\nOnline storage + sharing + collaboration</div>",
+
+          "<h3>Detailed Difference</h3>",
+          "<table><tr><th>Feature</th><th>Git</th><th>GitHub</th></tr><tr><td>What is it?</td><td>A Version Control System</td><td>An online platform for Git repositories</td></tr><tr><td>Main purpose</td><td>Track and manage changes</td><td>Host, share, and collaborate on repositories</td></tr><tr><td>Where does it work?</td><td>Mainly on your local computer</td><td>Online through a remote platform</td></tr><tr><td>Installation</td><td>Installed on your computer</td><td>No GitHub software installation is required to use the website</td></tr><tr><td>Internet required?</td><td>No, for normal local operations</td><td>Yes, to access and sync with the remote service</td></tr><tr><td>Can work alone?</td><td>Yes</td><td>Used with Git repositories for hosting and collaboration</td></tr><tr><td>Main features</td><td>Commit, branch, merge, history</td><td>Repositories, Pull Requests, Issues, code review, collaboration</td></tr></table>",
+
+          "<h3>How Git and GitHub Work Together</h3>",
+          "<p>Git manages your work locally. GitHub can store a remote copy of that Git repository.</p>",
+          "<div class=\"diagram\">1. Create project on your computer\n          ↓\n2. Git tracks your changes\n          ↓\n3. Create commits locally\n          ↓\n4. Connect local Git repository to GitHub\n          ↓\n5. Push commits to GitHub\n          ↓\n6. GitHub stores the remote repository</div>",
+          "<p>Later, other developers can download or synchronize changes using Git and GitHub.</p>",
+
+          "<h3>Real-World Analogy 📚</h3>",
+          "<p>Think of Git as the system you use to maintain the history of a document on your computer. GitHub is like an online workspace where that project can be stored and shared with other people.</p>",
+          "<div class=\"diagram\">Git → Manage history locally\nGitHub → Store and share the Git project remotely</div>",
+
+          "<h3>Important Point</h3>",
+          "<p>You can use <strong>Git without GitHub</strong>. For example, you can create a local repository, make commits, create branches, merge branches, and view history without connecting to the internet.</p>",
+          "<p>However, GitHub builds on Git by hosting Git projects and adding collaboration and development tools such as Pull Requests and Issues.</p>",
+
+          "<div class=\"definition-box\"><b>One-Line Difference:</b> Git is a Version Control System that tracks and manages changes, while GitHub is an online platform that hosts Git repositories and helps developers share and collaborate on projects.</div>"
+        ],
+        "practice": [
+          "<p class=\"practice-note\">No commands are required yet. Understand the role of Git and GitHub in this scenario:</p>",
+          "<div class=\"diagram\">You create a website\n        ↓\nGit tracks your changes on your computer\n        ↓\nYou create commits\n        ↓\nYou want an online copy and collaboration\n        ↓\nGitHub hosts the repository online</div>",
+          "<p class=\"practice-note\">Think about these two questions: If you are working without internet and make a commit, which tool is doing the work? If you want to share that committed project with another developer online, which platform helps you do that?</p>",
+          "<div class=\"definition-box\"><b>Practice Goal:</b> Clearly remember: <strong>Git = tracks and manages versions locally.</strong> <strong>GitHub = hosts and helps collaborate on Git repositories online.</strong></div>"
+        ],
+        "qna": [
+          {
+            "q": "Q1. What is the main difference between Git and GitHub?",
+            "a": "Git is a Version Control System that tracks and manages changes in a project, while GitHub is an online platform that hosts Git repositories and provides collaboration tools."
+          },
+          {
+            "q": "Q2. Can Git work without GitHub?",
+            "a": "Yes. You can use Git locally to create repositories, track changes, make commits, create branches, merge changes, and view history without GitHub."
+          },
+          {
+            "q": "Q3. Can Git work without an internet connection?",
+            "a": "Yes. Local Git operations can work without an internet connection because the repository and its history are stored on your computer."
+          },
+          {
+            "q": "Q4. What does GitHub add to Git?",
+            "a": "GitHub hosts Git repositories online and adds tools for sharing, collaboration, Pull Requests, code review, Issues, and other development workflows."
+          },
+          {
+            "q": "Q5. If you run git commit, are you using Git or GitHub?",
+            "a": "You are using Git. The commit is created in your local Git repository."
+          },
+          {
+            "q": "Q6. If you push your local commits to an online repository on GitHub, what is the role of GitHub?",
+            "a": "GitHub acts as the remote online platform that hosts the repository and allows the commits to be stored, shared, and accessed by collaborators."
+          }
+        ]
     },
     {
       "n": 5,
-      "title": "What is a Repository",
+      "title": "What is a Repository?",
       "explanation": [
-        "<p>A repository (or 'repo') is a project folder that Git is tracking. It contains your actual files plus a hidden .git folder that stores the entire history of changes.</p>",
-        "<p>A repository can exist purely on your machine (a local repository) or be hosted online (a remote repository, e.g. on GitHub) \u2014 usually a project has both, kept in sync.</p>"
+        "<h3>Simple Meaning</h3>",
+        "<p>A <strong>repository</strong>, often called a <strong>repo</strong>, is a place where a project and its related files are stored and managed.</p>",
+        "<p>When Git is used, a repository also contains the information Git needs to track the project's history and changes.</p>",
+
+        "<h3>Simple Example</h3>",
+        "<p>Imagine you are creating a website. Your project folder contains:</p>",
+        "<div class=\"diagram\">My-Website\n│\n├── index.html\n├── style.css\n├── script.js\n└── images</div>",
+        "<p>Initially, this is just a normal project folder. When you initialize Git inside it, the folder becomes a <strong>Git repository</strong>.</p>",
+        "<div class=\"diagram\">My-Website\n│\n├── .git          ← Git repository data\n├── index.html\n├── style.css\n├── script.js\n└── images</div>",
+
+        "<h3>What Does a Repository Contain?</h3>",
+        "<p>A Git repository manages both your project files and the history associated with those files.</p>",
+        "<div class=\"diagram\">Repository\n│\n├── Project Files\n│   ├── index.html\n│   ├── style.css\n│   └── script.js\n│\n└── Git History\n    ├── Commits\n    ├── Branches\n    └── Other Git information</div>",
+
+        "<h3>Normal Folder vs Git Repository</h3>",
+        "<table><tr><th>Normal Folder</th><th>Git Repository</th></tr><tr><td>Stores project files</td><td>Stores project files and Git history</td></tr><tr><td>No Git tracking by default</td><td>Git can track changes</td></tr><tr><td>No commit history</td><td>Contains commit history after commits are created</td></tr><tr><td>Cannot use Git features unless initialized</td><td>Supports Git features such as commits and branches</td></tr></table>",
+
+        "<h3>How Does a Folder Become a Git Repository?</h3>",
+        "<p>You use the following command inside a project folder:</p>",
+        "<div class=\"code-block\">git init</div>",
+        "<p>Git creates a hidden <code>.git</code> folder containing Git's repository data. After that, Git can manage and track the project.</p>",
+        "<div class=\"diagram\">Normal Project Folder\n        ↓\nRun: git init\n        ↓\n.git folder is created\n        ↓\nGit Repository</div>",
+        "<p>We will learn <code>git init</code> and the <code>.git</code> folder in detail in upcoming topics.</p>",
+
+        "<h3>Repository and Project</h3>",
+        "<p>For beginners, you can usually think of a repository as the <strong>Git-managed version of your project folder</strong>.</p>",
+        "<div class=\"definition-box\"><b>Simple Idea:</b> Project = your files and application. Repository = the place where Git manages the project and its history.</div>",
+        "<p>A repository may contain source code, documents, configuration files, images, and other files related to a project.</p>",
+
+        "<h3>Local and Remote Repository</h3>",
+        "<p>A repository can exist in different locations. The two important types you will learn are:</p>",
+        "<div class=\"diagram\">Repository\n│\n├── Local Repository\n│   └── Stored on your computer\n│\n└── Remote Repository\n    └── Stored on a remote server or online platform such as GitHub</div>",
+        "<p>We will study the difference between Local and Remote repositories in the next topic.</p>",
+
+        "<h3>Real-World Example</h3>",
+        "<p>Suppose you are building a Data Engineering learning project:</p>",
+        "<div class=\"diagram\">Data-Engineering-Project\n│\n├── python\n│   ├── basics.py\n│   └── functions.py\n│\n├── sql\n│   └── joins.sql\n│\n├── README.md\n└── .git</div>",
+        "<p>Git can use the repository to track changes made throughout the project.</p>",
+        "<div class=\"diagram\">Commit 1 → Add Python basics\n        ↓\nCommit 2 → Add SQL joins\n        ↓\nCommit 3 → Update README\n        ↓\nCommit 4 → Fix Python code</div>",
+
+        "<h3>Important Points to Remember</h3>",
+        "<table><tr><th>Point</th><th>Meaning</th></tr><tr><td>Repository = Repo</td><td>Both mean the same thing</td></tr><tr><td>Contains project files</td><td>Stores files related to your project</td></tr><tr><td>Git repository</td><td>Allows Git to manage project changes and history</td></tr><tr><td>Local repository</td><td>Exists on your computer</td></tr><tr><td>Remote repository</td><td>Exists on a remote server or online platform</td></tr><tr><td>.git folder</td><td>Contains Git's internal repository data</td></tr></table>",
+
+        "<h3>Simple Analogy 📁</h3>",
+        "<p>Think of a normal folder as a box containing your project files. A Git repository is like that box plus a complete record of the project's important history.</p>",
+        "<div class=\"diagram\">Normal Folder\n→ Contains files\n\nGit Repository\n→ Contains/manages project files\n→ Tracks changes\n→ Stores history</div>",
+
+        "<div class=\"definition-box\"><b>One-Line Definition:</b> A repository is a project storage and management location where Git tracks files, changes, commits, and project history.</div>"
       ],
       "practice": [
-        "Look at any project folder on your machine \u2014 check whether it has a hidden .git folder inside it (it won't, unless you've already run git init there)."
-      ],
-      "qna": []
-    },
-    {
-      "n": 6,
-      "title": "Local repository vs Remote repository",
-      "explanation": [
-        "<p>A local repository lives on your own computer \u2014 it's what you interact with day to day: making commits, switching branches, viewing history.</p>",
-        "<p>A remote repository lives on a server (typically GitHub) and acts as the shared source of truth that everyone on a team pushes to and pulls from.</p>",
-        "<p>You keep them in sync using commands like `git push` (send your local commits to the remote) and `git pull` (bring the remote's commits into your local copy).</p>"
-      ],
-      "practice": [
-        "Draw (on paper or in a note) a simple diagram: your laptop (local) with an arrow labeled 'push' and 'pull' pointing to/from GitHub (remote)."
+        "<p class=\"practice-note\">No commands are required yet — just understand how a normal project folder becomes a Git repository. Walk through this scenario:</p>",
+        "<div class=\"diagram\">My-Website\n│\n├── index.html\n├── style.css\n└── script.js\n        ↓\nRun Git initialization\n        ↓\nMy-Website becomes a Git Repository\n        ↓\nGit can now track changes and maintain history</div>",
+        "<p class=\"practice-note\">Think about this: If you create a folder called <code>My-Website</code> with three files, is it automatically a Git repository? What must happen before Git starts managing the folder?</p>",
+        "<div class=\"definition-box\"><b>Practice Goal:</b> Understand that a repository is a Git-managed project location containing project files and the information needed for Git to track their history.</div>"
       ],
       "qna": [
-        { "q": "Can a repository have more than one remote?", "a": "Yes \u2014 for example when you fork a project, you'll often have 'origin' (your fork) and 'upstream' (the original project) as two separate remotes." }
+        {
+          "q": "Q1. What is a repository?",
+          "a": "A repository, or repo, is a place where a project and its related files are stored and managed. A Git repository also contains the information Git needs to track changes and project history."
+        },
+        {
+          "q": "Q2. Is every normal folder automatically a Git repository?",
+          "a": "No. A normal folder becomes a Git repository only after Git is initialized in it or when an existing Git repository is cloned."
+        },
+        {
+          "q": "Q3. What command is used to initialize a new Git repository?",
+          "a": "The command is git init. It initializes Git in the current project folder."
+        },
+        {
+          "q": "Q4. What is the .git folder related to?",
+          "a": "The .git folder contains Git's internal repository data and information needed to manage the repository's history and configuration."
+        },
+        {
+          "q": "Q5. What is the difference between a normal folder and a Git repository?",
+          "a": "A normal folder stores files, while a Git repository is a Git-managed project location where Git can track changes and maintain project history."
+        },
+        {
+          "q": "Q6. What are the two important repository locations you will learn?",
+          "a": "The two important types are a local repository, stored on your computer, and a remote repository, stored on a remote server or online platform."
+        }
       ]
     },
     {
-      "n": 7,
-      "title": "What is the .git hidden folder",
-      "explanation": [
-        "<p>The .git folder is created inside your project the moment you run `git init`. It's where Git actually stores everything: the full commit history, branches, configuration, and staged changes.</p>",
-        "<p>You never edit files inside .git directly \u2014 you interact with it through Git commands. Deleting this folder removes all Git history for that project (the regular files remain, but the tracked history is gone).</p>"
-      ],
-      "practice": [
-        "In a test folder, run `git init`, then list hidden files (`ls -la` on Mac/Linux, or enable 'show hidden items' on Windows) to actually see the .git folder appear."
-      ],
-      "qna": [
-        { "q": "Is it safe to delete .git if I just want to stop tracking a project?", "a": "Yes, deleting .git removes Git tracking only \u2014 your actual project files are untouched. Just make sure you don't need the history first, since it can't be recovered afterward." }
-      ]
-    },
-    {
-      "n": 8,
-      "title": "Git working areas",
-      "explanation": [
-        "<p>Git organizes changes through four conceptual areas: the <strong>Working Directory</strong> (the actual files you edit), the <strong>Staging Area</strong> (changes you've marked as ready to be committed, via `git add`), the <strong>Local Repository</strong> (committed history on your machine, via `git commit`), and the <strong>Remote Repository</strong> (the shared copy on GitHub, via `git push`).</p>",
-        "<p>A change moves through these stages in order: you edit a file (working directory) \u2192 stage it (`git add`) \u2192 commit it (`git commit`) \u2192 push it (`git push`). Understanding this flow is the key to understanding almost every Git command.</p>"
-      ],
-      "practice": [
-        "In a test repo, edit a file and run `git status` after each step (before staging, after `git add`, after `git commit`) to watch it move between areas.",
-        "Explain the four areas out loud in order, without looking at your notes."
-      ],
-      "qna": [
-        { "q": "Can I skip the staging area?", "a": "Not entirely \u2014 but `git commit -am \"message\"` stages and commits already-tracked (modified) files in one step. New untracked files still need an explicit `git add` first." }
-      ]
-    }
+        "n": 6,
+        "title": "Local Repository vs Remote Repository",
+        "explanation": [
+          "<h3>Simple Meaning</h3>",
+          "<p>A Git repository can exist on your <strong>own computer</strong> or on a <strong>remote server/online platform</strong>.</p>",
+          "<p>The repository on your computer is called a <strong>Local Repository</strong>. A repository stored remotely, such as on GitHub, is called a <strong>Remote Repository</strong>.</p>",
+
+          "<div class=\"definition-box\"><b>Simple Rule:</b> Local Repository = on your computer. Remote Repository = stored somewhere else and accessed over a network, commonly online.</div>",
+
+          "<h3>Local Repository</h3>",
+          "<p>A <strong>Local Repository</strong> exists on your computer. This is where you normally work on your project files and use Git commands.</p>",
+          "<div class=\"diagram\">Your Computer\n│\n├── My-Project\n│   ├── .git\n│   ├── index.html\n│   ├── style.css\n│   └── script.js\n│\n└── Local Git Repository</div>",
+          "<p>You can perform many Git operations locally, such as checking status, adding files, creating commits, creating branches, and viewing history.</p>",
+
+          "<h3>Remote Repository</h3>",
+          "<p>A <strong>Remote Repository</strong> is a version of your repository stored on another system or server that can be accessed remotely.</p>",
+          "<p>For this roadmap, GitHub will be the main example of a remote repository hosting platform.</p>",
+          "<div class=\"diagram\">Internet / Network\n        │\n        ↓\nGitHub\n        │\n        └── My-Project Repository\n            ├── index.html\n            ├── style.css\n            ├── script.js\n            └── Git History</div>",
+
+          "<h3>How They Work Together</h3>",
+          "<p>You work on your project locally using Git. When needed, you synchronize changes with the remote repository.</p>",
+          "<div class=\"diagram\">LOCAL REPOSITORY                     REMOTE REPOSITORY\nYour Computer                        GitHub\n      │                                 │\n      │                                 │\n      ├────── Push changes ────────────→│\n      │                                 │\n      │←───── Pull changes ─────────────┤\n      │                                 │</div>",
+          "<p><strong>Push</strong> sends local commits to a remote repository. <strong>Pull</strong> gets remote changes and integrates them into your local work. You will learn these commands in detail later.</p>",
+
+          "<h3>Simple Example</h3>",
+          "<p>Imagine you create a project called <code>My-Website</code> on your computer.</p>",
+          "<div class=\"diagram\">STEP 1\nYour Computer\nMy-Website\n      ↓\nLocal Repository\n      ↓\nCommit 1 → Create website\nCommit 2 → Add login page</div>",
+          "<p>Now you connect the project to GitHub and upload your commits.</p>",
+          "<div class=\"diagram\">STEP 2\nLocal Repository\n      │\n      │ Push\n      ↓\nGitHub\n      ↓\nRemote Repository\n      ↓\nCommit 1 → Create website\nCommit 2 → Add login page</div>",
+
+          "<h3>Important Difference</h3>",
+          "<table><tr><th>Feature</th><th>Local Repository</th><th>Remote Repository</th></tr><tr><td>Location</td><td>Your computer</td><td>Another system/server, often online</td></tr><tr><td>Main use</td><td>Daily development work</td><td>Sharing, synchronization, and collaboration</td></tr><tr><td>Internet required?</td><td>No, for local Git operations</td><td>Usually requires network access to communicate with it</td></tr><tr><td>Git commands</td><td>commit, branch, status, log</td><td>push, pull, fetch and other remote operations</td></tr><tr><td>Example</td><td>Repository in your project folder</td><td>Repository hosted on GitHub</td></tr></table>",
+
+          "<h3>Important: Local and Remote Are Connected but Separate</h3>",
+          "<p>A common beginner mistake is thinking that GitHub automatically updates every time you make a local commit. That is not correct.</p>",
+          "<div class=\"diagram\">Local Repository\nCommit → \"Add login page\"\n        ↓\nYour local history is updated\n\nGitHub Remote Repository\nStill unchanged\n        ↓\nYou must later Push\n        ↓\nRemote repository receives the commit</div>",
+          "<div class=\"definition-box\"><b>Remember:</b> <code>git commit</code> saves changes to your local repository. It does not automatically upload them to GitHub. Uploading to the remote repository is done separately, usually with <code>git push</code>.</div>",
+
+          "<h3>Real-World Collaboration Example</h3>",
+          "<p>Imagine two developers working on the same project.</p>",
+          "<div class=\"diagram\">Developer A                     Developer B\nLocal Repository                Local Repository\n       │                               ↑\n       │ Push                          │ Pull\n       ↓                               │\n              GitHub\n        Remote Repository\n              │\n       Shared project changes</div>",
+          "<p>Each developer has their own local repository. The remote repository helps them share and synchronize changes.</p>",
+
+          "<h3>One Important Note</h3>",
+          "<p>A remote repository does not have to be GitHub. Git can use remote repositories hosted through other services or on your own servers. GitHub is simply the main remote hosting platform we are using while learning this roadmap.</p>",
+
+          "<h3>Simple Analogy 📁☁️</h3>",
+          "<p>Think about a file stored on your laptop and a copy stored in cloud storage:</p>",
+          "<div class=\"diagram\">Local → Your laptop\nRemote → Online/shared location\n\nGit Repository on PC → Local Repository\nGit Repository on GitHub → Remote Repository</div>",
+          "<p>The local repository is where you work directly. The remote repository helps store and share repository data remotely.</p>",
+
+          "<div class=\"definition-box\"><b>One-Line Definition:</b> A Local Repository is a Git repository stored on your computer, while a Remote Repository is a repository stored on another system or server that can be accessed remotely for synchronization and collaboration.</div>"
+        ],
+        "practice": [
+          "<p class=\"practice-note\">No commands are required yet. Understand where the same project can exist and how changes move between the two locations:</p>",
+          "<div class=\"diagram\">YOUR COMPUTER                         GITHUB\n────────────────                         ──────\nLocal Repository                    Remote Repository\n      │                                      │\nCommit → Add login page                    No change yet\n      │\n      │ Push\n      └────────────────────────────────────→│\n                                             ↓\n                                      Add login page</div>",
+          "<p class=\"practice-note\">Think about this situation: You make three commits on your computer but do not push them to GitHub. Where do those three commits exist? Then, after you push them, where do they exist?</p>",
+          "<div class=\"definition-box\"><b>Practice Goal:</b> Clearly understand: <strong>commit = saves changes locally</strong>, while <strong>push = sends local commits to a remote repository</strong>.</div>"
+        ],
+        "qna": [
+          {
+            "q": "Q1. What is a Local Repository?",
+            "a": "A Local Repository is a Git repository stored on your computer where you work on files, create commits, branches, and manage project history."
+          },
+          {
+            "q": "Q2. What is a Remote Repository?",
+            "a": "A Remote Repository is a repository stored on another system or server that can be accessed remotely, commonly for sharing, synchronization, and collaboration."
+          },
+          {
+            "q": "Q3. Is GitHub a Local Repository?",
+            "a": "No. In this learning workflow, a repository hosted on GitHub is used as a Remote Repository."
+          },
+          {
+            "q": "Q4. If I run git commit, are my changes automatically uploaded to GitHub?",
+            "a": "No. git commit saves the changes in your Local Repository. You need a separate remote operation, commonly git push, to send commits to GitHub."
+          },
+          {
+            "q": "Q5. Can I use a Local Repository without an internet connection?",
+            "a": "Yes. Many local Git operations such as status, add, commit, branch, and log can work without an internet connection."
+          },
+          {
+            "q": "Q6. What is the basic difference between Local and Remote Repositories?",
+            "a": "A Local Repository is stored on your computer for local development, while a Remote Repository is stored elsewhere and is used to synchronize and share repository changes."
+          },
+          {
+            "q": "Q7. If I make 3 commits locally but do not push them, where are those commits?",
+            "a": "Those commits exist in your Local Repository. The Remote Repository will not receive them until you synchronize the commits, such as by using git push."
+          }
+        ]
+      },
+      {
+        "n": 7,
+        "title": "What is the .git Hidden Folder?",
+        "explanation": [
+          "<h3>Simple Meaning</h3>",
+          "<p>The <code>.git</code> folder is a <strong>hidden folder created by Git inside your project</strong>. It contains the internal information Git needs to manage your repository.</p>",
+          "<div class=\"definition-box\"><b>Simple Rule:</b> Your project files are what you work on. The <code>.git</code> folder is where Git stores the repository's internal data and history.</div>",
+
+          "<h3>Simple Example</h3>",
+          "<p>Imagine you have a normal project folder:</p>",
+          "<div class=\"diagram\">My-Website\n│\n├── index.html\n├── style.css\n└── script.js</div>",
+          "<p>At this stage, it is just a normal folder. Git is not tracking it yet.</p>",
+          "<p>When Git is initialized, a hidden <code>.git</code> folder is created:</p>",
+          "<div class=\"diagram\">My-Website\n│\n├── .git          ← Hidden Git folder\n├── index.html\n├── style.css\n└── script.js</div>",
+          "<p>Now the folder is a <strong>Git repository</strong>.</p>",
+
+          "<h3>Why is the .git Folder Important?</h3>",
+          "<p>The <code>.git</code> folder contains the information Git needs to manage the repository. This includes information related to:</p>",
+          "<ul><li>Commit history</li><li>Branches</li><li>Repository configuration</li><li>Remote repository information</li><li>Staging information</li><li>Other internal Git data</li></ul>",
+          "<div class=\"diagram\">Project Folder\n│\n├── Your Files\n│   ├── index.html\n│   ├── style.css\n│   └── script.js\n│\n└── .git\n    ├── Git history\n    ├── Branch information\n    ├── Configuration\n    ├── Staging information\n    └── Other internal Git data</div>",
+
+          "<h3>The Most Important Concept</h3>",
+          "<p><strong>The <code>.git</code> folder is what allows Git to recognize and manage the project as a Git repository.</strong></p>",
+          "<p>Without the repository metadata stored in <code>.git</code>, Git does not have the normal repository information needed to track that project's history.</p>",
+          "<div class=\"diagram\">Project Folder + .git folder\n            ↓\n       Git Repository\n\nProject Folder without .git folder\n            ↓\n       Normal Folder</div>",
+
+          "<h3>How is .git Created?</h3>",
+          "<p>When you run the following command inside a project folder:</p>",
+          "<div class=\"code-block\">git init</div>",
+          "<p>Git initializes a repository and creates the <code>.git</code> directory.</p>",
+          "<div class=\"diagram\">Normal Project Folder\n        ↓\nRun: git init\n        ↓\n.git folder is created\n        ↓\nGit Repository</div>",
+          "<p>You will practice <code>git init</code> in detail in Topic 15.</p>",
+
+          "<h3>Why Can't I Normally See .git?</h3>",
+          "<p>The folder starts with a dot: <code>.git</code>. On many systems and tools, files or folders beginning with a dot are treated as hidden by default.</p>",
+          "<p>For example, your project may appear like this in a normal file view:</p>",
+          "<div class=\"diagram\">My-Website\n│\n├── index.html\n├── style.css\n└── script.js</div>",
+          "<p>But when hidden files are shown, you can see:</p>",
+          "<div class=\"diagram\">My-Website\n│\n├── .git\n├── index.html\n├── style.css\n└── script.js</div>",
+
+          "<h3>Do Not Manually Delete .git</h3>",
+          "<p>A very important rule: <strong>do not delete the <code>.git</code> folder unless you intentionally want to remove Git tracking from that project.</strong></p>",
+          "<p>If you remove it, your normal project files may still remain, but the local Git repository metadata and history stored in that folder are removed.</p>",
+          "<div class=\"diagram\">Before deleting .git\n│\n├── Project Files\n└── Git History\n\nAfter deleting .git\n│\n└── Project Files remain\n\nGit repository metadata/history → Removed</div>",
+
+          "<div class=\"definition-box\"><b>Important:</b> Your project files and Git's repository data are different. Deleting <code>.git</code> does not normally delete files such as <code>index.html</code> or <code>style.css</code>, but it removes the Git information stored in that local repository.</div>",
+
+          "<h3>.git is Not Uploaded as a Normal Project Folder</h3>",
+          "<p>When you push a repository to GitHub, Git transfers repository data needed to represent your commits and history. You do not normally see a <code>.git</code> folder displayed as an ordinary folder in the GitHub repository file list.</p>",
+          "<div class=\"diagram\">Your Computer\n│\n└── My-Website\n    ├── .git       ← Local Git metadata\n    ├── index.html\n    └── style.css\n\n        ↓ Push\n\nGitHub Repository\n│\n├── index.html\n└── style.css</div>",
+
+          "<h3>Real-World Example</h3>",
+          "<p>Suppose you are working on a project:</p>",
+          "<div class=\"diagram\">Data-Engineering-Project\n│\n├── .git\n├── python\n│   └── basics.py\n├── sql\n│   └── joins.sql\n└── README.md</div>",
+          "<p>You edit <code>basics.py</code> and create a commit. The project files contain your code, while Git stores the repository information required to manage that commit and its history inside the repository's internal data.</p>",
+          "<div class=\"diagram\">Your Code\n    ↓\npython/basics.py\n    ↓\nGit tracks the change\n    ↓\nRepository metadata stored in .git\n    ↓\nGit can maintain commit history</div>",
+
+          "<h3>Important Points to Remember</h3>",
+          "<table><tr><th>Point</th><th>Meaning</th></tr><tr><td>.git</td><td>The internal directory used by Git for repository data</td></tr><tr><td>Created by</td><td>Git initialization, such as <code>git init</code></td></tr><tr><td>Contains</td><td>History, branches, configuration, staging information, and other Git data</td></tr><tr><td>Location</td><td>Inside the local project repository</td></tr><tr><td>Usually hidden</td><td>May not appear until hidden files are shown</td></tr><tr><td>Delete it?</td><td>Only if you intentionally want to remove the local Git repository data</td></tr></table>",
+
+          "<h3>Simple Analogy 📁</h3>",
+          "<p>Think of your project as a book:</p>",
+          "<div class=\"diagram\">Book Content\n→ index.html\n→ style.css\n→ script.js\n\nBook's History Record\n→ .git</div>",
+          "<p>Your project files contain the actual work. The <code>.git</code> folder contains the internal Git information used to track the history of that work.</p>",
+
+          "<div class=\"definition-box\"><b>One-Line Definition:</b> The <code>.git</code> folder is a hidden directory inside a local Git repository that stores the internal data Git needs to track and manage the repository's history, configuration, branches, and other Git information.</div>"
+        ],
+        "practice": [
+          "<p class=\"practice-note\">No hands-on commands are required yet — just understand what changes when a normal folder becomes a Git repository:</p>",
+          "<div class=\"diagram\">BEFORE GIT\nMy-Website\n├── index.html\n├── style.css\n└── script.js\n\n        ↓ Git is initialized\n\nAFTER GIT\nMy-Website\n├── .git  ← Git's internal repository data\n├── index.html\n├── style.css\n└── script.js</div>",
+          "<p class=\"practice-note\">Think about this situation: Your project contains <code>index.html</code>, <code>style.css</code>, and <code>.git</code>. If you accidentally delete only the <code>.git</code> folder, which files remain? What important Git information would you lose?</p>",
+          "<div class=\"definition-box\"><b>Practice Goal:</b> Remember that your project files are separate from the <code>.git</code> folder. The <code>.git</code> folder contains the local repository information Git uses to track and manage the project's history.</div>"
+        ],
+        "qna": [
+          {
+            "q": "Q1. What is the .git folder?",
+            "a": "The .git folder is a hidden directory that stores the internal data Git needs to manage a local Git repository."
+          },
+          {
+            "q": "Q2. When is the .git folder created?",
+            "a": "It is created when Git initializes a repository, for example when you run git init inside a project folder."
+          },
+          {
+            "q": "Q3. What type of information does .git contain?",
+            "a": "It contains internal Git information related to commits, history, branches, configuration, staging, remotes, and other repository data."
+          },
+          {
+            "q": "Q4. Is a normal project folder automatically a Git repository?",
+            "a": "No. A normal folder becomes a Git repository after Git repository data is initialized or otherwise created for that project."
+          },
+          {
+            "q": "Q5. If I delete the .git folder, will index.html and other project files automatically disappear?",
+            "a": "No. Your normal project files usually remain, but the local Git repository metadata and history stored in the .git folder are removed."
+          },
+          {
+            "q": "Q6. Why should you be careful before deleting the .git folder?",
+            "a": "Because it contains the local Git repository data required for Git to manage the repository's history and other internal information."
+          },
+          {
+            "q": "Q7. Where is the .git folder located?",
+            "a": "It is located inside the root directory of a normal local Git repository."
+          }
+        ]
+      },
+      {
+        "n": 8,
+        "title": "Git Working Areas",
+        "explanation": [
+          "<h3>Simple Meaning</h3>",
+          "<p>When you work with Git, your changes move through different areas before they can be stored in the project's history and shared with a remote repository.</p>",
+          "<p>The four important areas are:</p>",
+          "<div class=\"diagram\">1. Working Directory\n        ↓\n2. Staging Area\n        ↓\n3. Local Repository\n        ↓\n4. Remote Repository</div>",
+          "<div class=\"definition-box\"><b>Simple Rule:</b> You edit files in the Working Directory, select changes in the Staging Area, save them permanently in the Local Repository, and optionally send them to a Remote Repository.</div>",
+
+          "<h3>Complete Flow</h3>",
+          "<p>Suppose you change <code>index.html</code>. The basic Git workflow looks like this:</p>",
+          "<div class=\"diagram\">Working Directory\n       │\n       │ git add\n       ↓\nStaging Area\n       │\n       │ git commit\n       ↓\nLocal Repository\n       │\n       │ git push\n       ↓\nRemote Repository</div>",
+          "<p>Do not worry about memorizing all commands yet. We will learn each command separately in upcoming topics. For now, understand how changes move through the areas.</p>",
+
+          "<h3>1. Working Directory</h3>",
+          "<p>The <strong>Working Directory</strong> is the actual project folder where you create, edit, and delete files.</p>",
+          "<p>For example:</p>",
+          "<div class=\"diagram\">My-Website\n│\n├── .git\n├── index.html\n├── style.css\n└── script.js</div>",
+          "<p>When you open <code>index.html</code> and make changes, those changes happen in your Working Directory first.</p>",
+          "<div class=\"diagram\">index.html\n\nBefore change:\n<h1>Welcome</h1>\n\n        ↓ You edit the file\n\nAfter change:\n<h1>Welcome to My Website</h1></div>",
+          "<div class=\"definition-box\"><b>Working Directory:</b> The place where you actively work on and modify your project files.</div>",
+
+          "<h3>2. Staging Area</h3>",
+          "<p>The <strong>Staging Area</strong> is where you prepare selected changes before creating a commit.</p>",
+          "<p>Suppose you modify three files:</p>",
+          "<div class=\"diagram\">Working Directory\n│\n├── index.html   ← Modified\n├── style.css    ← Modified\n└── script.js    ← Modified</div>",
+          "<p>You may decide that only two of these changes are ready to be committed.</p>",
+          "<div class=\"diagram\">Working Directory              Staging Area\n│                              │\n├── index.html ───────────────→ Added\n├── style.css  ───────────────→ Added\n└── script.js                  Not added yet</div>",
+          "<p>This allows you to choose exactly which changes should be included in the next commit.</p>",
+          "<p>The commonly used command for moving changes to the Staging Area is:</p>",
+          "<div class=\"code-block\">git add</div>",
+          "<div class=\"definition-box\"><b>Staging Area:</b> A preparation area where you select changes that will be included in your next commit.</div>",
+
+          "<h3>3. Local Repository</h3>",
+          "<p>The <strong>Local Repository</strong> is where Git stores your committed project history on your computer.</p>",
+          "<p>After changes are placed in the Staging Area, you can create a commit.</p>",
+          "<div class=\"diagram\">Working Directory\n        ↓ git add\nStaging Area\n        ↓ git commit\nLocal Repository\n        ↓\nCommit History\n├── Commit 1 → Create website\n├── Commit 2 → Add login page\n└── Commit 3 → Update styling</div>",
+          "<p>A commit records a saved point in the project's Git history. The commonly used command is:</p>",
+          "<div class=\"code-block\">git commit -m \"Your commit message\"</div>",
+          "<div class=\"definition-box\"><b>Local Repository:</b> The Git-managed history stored on your computer where commits are saved.</div>",
+
+          "<h3>4. Remote Repository</h3>",
+          "<p>The <strong>Remote Repository</strong> is a repository stored on another system or server, commonly on an online platform such as GitHub.</p>",
+          "<p>After creating commits locally, you can send them to the remote repository.</p>",
+          "<div class=\"diagram\">Your Computer                         GitHub\n─────────────                         ──────\nLocal Repository                    Remote Repository\n      │                                      │\n      │ git push                             │\n      └─────────────────────────────────────→│\n                                             │\n                                      Commit history stored remotely</div>",
+          "<p>A commit does not automatically appear on GitHub just because you created it locally. You normally need to push the commit to the remote repository.</p>",
+          "<div class=\"definition-box\"><b>Remote Repository:</b> A repository stored remotely that can be used for sharing, synchronization, backup, and collaboration.</div>",
+
+          "<h3>One Complete Example</h3>",
+          "<p>Imagine you want to add a login button to your website.</p>",
+          "<div class=\"diagram\">STEP 1: Working Directory\nYou edit index.html\n\n<h1>Welcome</h1>\n<button>Login</button>\n\n        ↓\n\nSTEP 2: Staging Area\nYou select the change for the next commit\n\nindex.html → Staged\n\n        ↓\n\nSTEP 3: Local Repository\nYou create a commit\n\nCommit → \"Add login button\"\n\n        ↓\n\nSTEP 4: Remote Repository\nYou push the commit\n\nGitHub → \"Add login button\"</div>",
+
+          "<h3>Important: Changes Do Not Automatically Move</h3>",
+          "<p>This is one of the most important Git concepts. Changes do not automatically move from one area to another.</p>",
+          "<div class=\"diagram\">Edit File\n    ↓\nWorking Directory\n\n❌ Not automatically staged\n    ↓\nYou choose → git add\n    ↓\nStaging Area\n\n❌ Not automatically committed\n    ↓\nYou choose → git commit\n    ↓\nLocal Repository\n\n❌ Not automatically uploaded to GitHub\n    ↓\nYou choose → git push\n    ↓\nRemote Repository</div>",
+          "<p>You control when changes move through each stage.</p>",
+
+          "<h3>Important Difference</h3>",
+          "<table><tr><th>Area</th><th>Main Purpose</th><th>Example Action</th></tr><tr><td>Working Directory</td><td>Create and modify files</td><td>Edit <code>index.html</code></td></tr><tr><td>Staging Area</td><td>Select changes for the next commit</td><td><code>git add</code></td></tr><tr><td>Local Repository</td><td>Store committed history locally</td><td><code>git commit</code></td></tr><tr><td>Remote Repository</td><td>Store and share repository remotely</td><td><code>git push</code></td></tr></table>",
+
+          "<h3>Easy Way to Remember 🧠</h3>",
+          "<p>Think of sending a parcel:</p>",
+          "<div class=\"diagram\">Working Directory\n→ Your items are at home\n\nStaging Area\n→ You select and pack the items\n\nLocal Repository\n→ The parcel is officially recorded/saved\n\nRemote Repository\n→ The parcel is sent to another location</div>",
+          "<p>The exact analogy is not important. The key point is that changes move through separate stages, and each stage has a different purpose.</p>",
+
+          "<h3>Most Important Workflow</h3>",
+          "<div class=\"diagram\">CREATE / EDIT FILE\n        ↓\nWORKING DIRECTORY\n        ↓ git add\nSTAGING AREA\n        ↓ git commit\nLOCAL REPOSITORY\n        ↓ git push\nREMOTE REPOSITORY</div>",
+
+          "<div class=\"definition-box\"><b>One-Line Definition:</b> Git working areas are the different stages through which project changes move: Working Directory for editing, Staging Area for preparing changes, Local Repository for saving commits, and Remote Repository for sharing and synchronizing changes remotely.</div>"
+        ],
+        "practice": [
+          "<p class=\"practice-note\">No hands-on commands are required yet. Follow the journey of one change through Git's working areas:</p>",
+          "<div class=\"diagram\">You edit index.html\n        ↓\nWorking Directory\n        ↓\nYou select the change for commit\n        ↓\nStaging Area\n        ↓\nYou create a commit\n        ↓\nLocal Repository\n        ↓\nYou send the commit to GitHub\n        ↓\nRemote Repository</div>",
+          "<p class=\"practice-note\">Think about this situation: You edit <code>index.html</code>, run <code>git add</code>, and then run <code>git commit</code>. Where is the change at each stage? Also, if you do not run <code>git push</code>, will the commit automatically appear on GitHub?</p>",
+          "<div class=\"definition-box\"><b>Practice Goal:</b> Clearly remember the flow: <strong>Edit → Working Directory → Add → Staging Area → Commit → Local Repository → Push → Remote Repository.</strong></div>"
+        ],
+        "qna": [
+          {
+            "q": "Q1. What are the four main Git working areas?",
+            "a": "The four areas are the Working Directory, Staging Area, Local Repository, and Remote Repository."
+          },
+          {
+            "q": "Q2. Where do you normally edit your project files?",
+            "a": "You edit project files in the Working Directory."
+          },
+          {
+            "q": "Q3. What is the purpose of the Staging Area?",
+            "a": "The Staging Area is used to prepare and select changes that you want to include in your next commit."
+          },
+          {
+            "q": "Q4. What command commonly moves changes from the Working Directory to the Staging Area?",
+            "a": "The commonly used command is git add."
+          },
+          {
+            "q": "Q5. Where are commits stored after using git commit?",
+            "a": "Commits are stored in the Local Repository on your computer."
+          },
+          {
+            "q": "Q6. Does git commit automatically upload changes to GitHub?",
+            "a": "No. git commit saves changes to the Local Repository. A separate operation, commonly git push, is needed to send commits to a remote repository such as GitHub."
+          },
+          {
+            "q": "Q7. What is the correct basic flow of changes?",
+            "a": "Working Directory → Staging Area → Local Repository → Remote Repository."
+          },
+          {
+            "q": "Q8. Which command is commonly associated with each movement?",
+            "a": "git add moves selected changes toward the Staging Area, git commit saves staged changes as a commit in the Local Repository, and git push sends local commits to a configured Remote Repository."
+          }
+        ]
+      }
   ]
 }
