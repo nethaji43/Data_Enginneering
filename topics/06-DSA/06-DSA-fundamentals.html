@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DSA Basics — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#E3B341; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(227,179,65,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#E3B341; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .workflow, .section .practice-block{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .practice-block{margin-top:14px; margin-bottom:18px;}
+  .practice-block-label{font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); margin:0 0 8px;}
+  .practice-block .practice-list{margin:0;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:pointer;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#E3B341; border-color:#E3B341;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#E3B341;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  .workflow{padding:18px; background:var(--surface-2); border:1px solid var(--border); border-radius:10px; margin-top:14px; margin-bottom:18px;}
+  .wf-step{display:flex; align-items:center; gap:12px;}
+  .wf-dot{width:10px; height:10px; border-radius:50%; background:#E3B341; flex-shrink:0;}
+  .wf-text{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text);}
+  .wf-line{width:2px; height:16px; background:#E3B341; opacity:.35; margin-left:4px;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Foundation</b> &middot; Topic 6 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>DSA Basics</h1>
+      <p class="sub">Arrays, hashing, recursion, and the handful of patterns that show up in almost every coding problem. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/92</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search within DSA — e.g. two pointers, hashing, recursion..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 6;         // matches topic.n = 6 (Data Structures & Basic Algorithms) in index.html
+const CONTENT_SLUG = 'dsa'; // matches /content/dsa.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'DSA Fundamentals', important:true, items:[
+      {t:'What is DSA?'}, {t:'Why Data Structures are needed'}, {t:'What is an Algorithm?'},
+      {t:'Input and Output'}, {t:'Basic problem-solving approach'}, {t:'Brute-force approach'},
+      {t:'Optimized approach'}, {t:'Time Complexity basics'}, {t:'Space Complexity basics'}, {t:'Big O notation'},
+  ]},
+  { title:'Arrays & Python Lists', important:true, items:[
+      {t:'What is an Array?'}, {t:'Python List vs Array'}, {t:'Accessing elements'}, {t:'Traversing'},
+      {t:'Insertion'}, {t:'Deletion'}, {t:'Searching'}, {t:'Updating elements'}, {t:'Array/List time complexities'},
+    ], practice:['Find maximum/minimum','Find sum','Reverse a list','Find duplicates','Remove duplicates','Find second largest element']
+  },
+  { title:'Strings', important:true, items:[
+      {t:'String traversal'}, {t:'Indexing'}, {t:'Two-pointer basics'}, {t:'String searching basics'},
+      {t:'Character frequency counting'}, {t:'String manipulation'},
+    ], practice:['Reverse a string','Check palindrome','Count characters','Find duplicate characters'],
+    note:{type:'info', text:"Don't repeat basic Python string syntax here. Focus on solving problems using strings."}
+  },
+  { title:'Hashing — Very Important', important:true, items:[
+      {t:'What is Hashing?'}, {t:'Hash Table concept'}, {t:'Python Dictionary as a Hash Map'}, {t:'Python Set'},
+      {t:'Key-value lookup'}, {t:'Frequency counting'}, {t:'Duplicate detection'}, {t:'Hashing time complexity'},
+    ], practice:['Count frequency','Find duplicates','Find unique elements','Two Sum concept']
+  },
+  { title:'Searching Algorithms', items:[
+      {t:'Linear Search'}, {t:'Binary Search'}, {t:'When Binary Search can be used'}, {t:'Binary Search time complexity'},
+  ]},
+  { title:'Sorting Algorithms — Basic Understanding', items:[
+      {t:'Why Sorting is needed'}, {t:'Built-in Python `sort()`'}, {t:'`sorted()`'},
+      {t:'Bubble Sort — concept'}, {t:'Selection Sort — concept'}, {t:'Insertion Sort — concept'},
+      {t:'Merge Sort — basic concept'}, {t:'Quick Sort — basic concept'}, {t:'Sorting time complexities'},
+    ],
+    note:{type:'info', text:"Important: for your Data Engineering roadmap, you don't need to spend weeks implementing every sorting algorithm repeatedly. Focus mainly on the flow below."},
+    workflow:['Understand algorithm','Know time complexity','Know when to use it',"Use Python's built-in sorting"]
+  },
+  { title:'Recursion Basics', items:[
+      {t:'What is Recursion?'}, {t:'Base Case'}, {t:'Recursive Case'}, {t:'Recursion vs Iteration'},
+      {t:'Recursion space complexity'}, {t:'Simple recursive problems'},
+    ], practice:['Factorial','Fibonacci','Sum of numbers']
+  },
+  { title:'Stack', important:true, items:[
+      {t:'What is a Stack?'}, {t:'LIFO principle'}, {t:'Push'}, {t:'Pop'}, {t:'Peek'},
+      {t:'Stack using Python List'}, {t:'Stack applications'},
+    ], practice:['Balanced parentheses','Reverse using stack']
+  },
+  { title:'Queue', important:true, items:[
+      {t:'What is a Queue?'}, {t:'FIFO principle'}, {t:'Enqueue'}, {t:'Dequeue'},
+      {t:'Queue using `collections.deque`'}, {t:'Queue applications'},
+    ], note:{type:'info', text:'Understand this well because queue concepts become useful later in data streaming and message-processing systems.'}
+  },
+  { title:'Linked List — Basic Understanding', items:[
+      {t:'What is a Linked List?'}, {t:'Node'}, {t:'`next` pointer concept'}, {t:'Singly Linked List'},
+      {t:'Doubly Linked List — concept'}, {t:'Array vs Linked List'}, {t:'Basic operations'},
+    ], note:{type:'info', text:'You only need the fundamentals.'}
+  },
+  { title:'Trees — Introduction', items:[
+      {t:'What is a Tree?'}, {t:'Root, Parent, Child and Leaf'}, {t:'Binary Tree concept'},
+      {t:'Binary Search Tree concept'},
+      {t:'Tree traversal', tags:['DFS concept','BFS concept','Inorder','Preorder','Postorder']},
+    ], note:{type:'info', text:"Don't go deep into advanced tree algorithms yet."}
+  },
+  { title:'Graphs — Introduction', items:[
+      {t:'What is a Graph?'}, {t:'Vertex and Edge'}, {t:'Directed vs Undirected Graph'},
+      {t:'Weighted vs Unweighted Graph'},
+      {t:'Graph representation', tags:['Adjacency List','Adjacency Matrix']},
+      {t:'BFS basics'}, {t:'DFS basics'},
+    ], note:{type:'info', text:'Graphs are useful conceptually for understanding data dependencies and distributed systems, but advanced graph algorithms are not necessary now.'}
+  },
+  { title:'Problem-Solving Patterns', important:true,
+    intro:{type:'info', text:'This is one of the most useful sections.'},
+    items:[
+      {t:'Two Pointers'}, {t:'Sliding Window — basics'}, {t:'Frequency Counter'}, {t:'Prefix Sum — basics'},
+      {t:'Hash Map pattern'}, {t:'Stack pattern'}, {t:'Queue pattern'}, {t:'Binary Search pattern'},
+  ]},
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${sec.intro.text}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}</a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      row.querySelector('.check').addEventListener('click', ()=>toggleItem(it.n));
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    // Practice problems block — reuses the same practice-list/practice-item
+    // component that item.html uses, so it reads visually consistent.
+    if(sec.practice){
+      const pb = document.createElement('div');
+      pb.className = 'practice-block';
+      pb.innerHTML = `<p class="practice-block-label">&#9733; Practice Problems</p>
+        <ul class="practice-list">${sec.practice.map(p=>`<li class="practice-item">${p}</li>`).join('')}</ul>`;
+      secEl.appendChild(pb);
+    }
+
+    // Note before workflow here, since this content's explanatory line
+    // ("don't spend weeks on this, focus on...") comes before its diagram.
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      secEl.appendChild(n);
+    }
+
+    if(sec.workflow){
+      const wf = document.createElement('div');
+      wf.className = 'workflow';
+      wf.innerHTML = sec.workflow.map((step,i)=>`
+        <div class="wf-step"><span class="wf-dot"></span><span class="wf-text">${step}</span></div>
+        ${i < sec.workflow.length-1 ? '<div class="wf-line"></div>' : ''}
+      `).join('');
+      secEl.appendChild(wf);
+    }
+
+    if(!sec.note && !sec.workflow && !sec.practice){
+      secEl.style.paddingBottom = '2px';
+    } else {
+      secEl.style.paddingBottom = '18px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+function toggleItem(n){
+  if(progress[n]) delete progress[n]; else progress[n] = true;
+  deWriteStore(ITEMS_KEY, progress);
+  deSyncTopicToRoadmap(TOPIC_ID, TOTAL);
+  render();
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>
