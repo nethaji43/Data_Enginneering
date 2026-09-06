@@ -197,11 +197,10 @@ function render(){
         <span class="item-num">${it.n}</span>
         <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
         <span class="item-body">
-          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}</a>
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${it.t}${it.optional?'<span class="opt-tag">optional</span>':''}<span class="item-arrow">&rarr;</span></a>
           ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
         </span>
       `;
-      row.querySelector('.check').addEventListener('click', ()=>toggleItem(it.n));
       itemsWrap.appendChild(row);
     });
     secEl.appendChild(itemsWrap);

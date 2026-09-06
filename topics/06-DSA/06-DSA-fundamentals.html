@@ -117,7 +117,7 @@ const SECTIONS = [
   ]},
   { title:'Sorting Algorithms — Basic Understanding', items:[
       {t:'Why Sorting is needed'}, {t:'Built-in Python `sort()`'}, {t:'`sorted()`'},
-      {t:'Bubble Sort — concept'}, {t:'Selection Sort — concept'}, {t:'Insertion Sort — concept'},
+      {t:'Bubble Sort — concept'},
       {t:'Merge Sort — basic concept'}, {t:'Quick Sort — basic concept'}, {t:'Sorting time complexities'},
     ],
     note:{type:'info', text:"Important: for your Data Engineering roadmap, you don't need to spend weeks implementing every sorting algorithm repeatedly. Focus mainly on the flow below."},
@@ -146,7 +146,6 @@ const SECTIONS = [
   { title:'Trees — Introduction', items:[
       {t:'What is a Tree?'}, {t:'Root, Parent, Child and Leaf'}, {t:'Binary Tree concept'},
       {t:'Binary Search Tree concept'},
-      {t:'Tree traversal', tags:['DFS concept','BFS concept','Inorder','Preorder','Postorder']},
     ], note:{type:'info', text:"Don't go deep into advanced tree algorithms yet."}
   },
   { title:'Graphs — Introduction', items:[
@@ -210,11 +209,10 @@ function render(){
         <span class="item-num">${it.n}</span>
         <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
         <span class="item-body">
-          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}</a>
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${it.t}${it.optional?'<span class="opt-tag">optional</span>':''}<span class="item-arrow">&rarr;</span></a>
           ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
         </span>
       `;
-      row.querySelector('.check').addEventListener('click', ()=>toggleItem(it.n));
       itemsWrap.appendChild(row);
     });
     secEl.appendChild(itemsWrap);

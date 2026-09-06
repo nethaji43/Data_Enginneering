@@ -102,6 +102,8 @@ svg.ring{transform:rotate(-90deg);}
 
 .footer{margin-top:56px; padding-top:22px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;}
 .footer-note{font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint);}
+.item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+a.item-text:hover .item-arrow{opacity:1; color:#E3B341;}
 
 /* Rich explanation content — headings, code, diagrams, tables inside item.html */
 .explanation h3{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16px; margin:26px 0 10px; color:var(--text);}
