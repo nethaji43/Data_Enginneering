@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Python Foundations — Data Engineering Roadmap</title>
+<title>Python Virtual Environments & Package Management — Data Engineering Roadmap</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/style.css">
@@ -19,15 +19,16 @@
   .star{color:#E3B341; font-size:14px;}
   .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
 
-  .section .note{margin-left:20px; margin-right:20px;}
+  .section .note, .section .diagram{margin-left:20px; margin-right:20px;}
   .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
 
   .items{padding:6px 8px 16px;}
   .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
   .item:hover{background:var(--surface-2);}
   .check{
     width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
-    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
     transition:all .15s; background:none;
   }
   .item.done .check{background:#E3B341; border-color:#E3B341;}
@@ -40,18 +41,22 @@
   .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
   .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
   .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#E3B341;}
 </style>
 </head>
 <body>
 <div class="wrap narrow">
 
   <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
-  <p class="crumb"><b>Foundation</b> &middot; Topic 2 of 74</p>
+  <p class="crumb"><b>Foundation</b> &middot; Topic 7 of 74</p>
 
   <div class="hero">
     <div>
-      <h1>Python Foundations</h1>
-      <p class="sub">Core language, data structures, and the built-ins you'll lean on in every pipeline you write. Click any item to open its notes, practice, and Q&amp;A.</p>
+      <h1>Python Virtual Environments &amp; Package Management</h1>
+      <p class="sub">Isolating dependencies with venv, pip, and requirements.txt — the difference between "works on my machine" and actually reproducible. Click any item to open its notes, practice, and Q&amp;A.</p>
     </div>
     <div class="ring-wrap">
       <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
@@ -59,13 +64,13 @@
         <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
       </svg>
       <div>
-        <div class="ring-num" id="progressNum">0/77</div>
+        <div class="ring-num" id="progressNum">0/58</div>
         <div class="ring-label">LEARNED</div>
       </div>
     </div>
   </div>
 
-  <input class="search" id="search" type="text" placeholder="Search within Python — e.g. generators, decorators, kwargs..." style="margin-top:28px;" />
+  <input class="search" id="search" type="text" placeholder="Search — e.g. venv, requirements.txt, ModuleNotFoundError..." style="margin-top:28px;" />
 
   <div id="sections"></div>
 
@@ -77,180 +82,60 @@
 
 <script src="../../assets/common.js"></script>
 <script>
-const TOPIC_ID = 2;            // matches topic.n = 2 (Python) in index.html
-const CONTENT_SLUG = '02python'; // matches /content/python.json, used for item.html links
+const TOPIC_ID = 7;             // matches topic.n = 7 (Python Virtual Environments & Package Management) in index.html
+const CONTENT_SLUG = 'venv-pkg'; // matches /content/venv-pkg.json, used for item.html links
 const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
 
 const SECTIONS = [
-
-  { title:'Python Basics', items:[
-      {t:'Python Intro and Download'},
-      {t:'Python Interpreter and Running Python Code'},
-      {t:'`print()`'},
-      {t:'`input()`'},
-      {t:'Comments'},
-      {t:'Variables'},
-      {t:'Data Types', tags:['int','float','str','bool','None']},
-      {t:'Type Conversion'},
-      {t:'Python Syntax Basics'},
-      {t:'Operators', tags:[
-          'Arithmetic',
-          'Comparison',
-          'Logical',
-          'Assignment',
-          'Membership',
-          'Identity'
-      ]},
-      {t:'Truthy and Falsy Values'},
-      {t:'Conditional Statements', tags:['if','elif','else']},
-      {t:'Loops', tags:['for','while','range()']},
-      {t:'`break`, `continue`, `pass`'},
+  { title:'Package Management Fundamentals', items:[
+      {t:'What is a Python Package?'}, {t:'What is a Python Module?'}, {t:'Package vs Module'},
+      {t:'What is a Package Manager?'}, {t:'What is `pip`?'}, {t:'Why Package Management is Important'},
+      {t:'Python Package Index (PyPI)'},
   ]},
-
-  { title:'Data Structures', important:true, items:[
-      {t:'Lists'},
-      {t:'Tuples'},
-      {t:'Sets'},
-      {t:'Dictionaries'},
-      {t:'Mutable vs Immutable Objects'},
-      {t:'Accessing and Modifying Data'},
-      {t:'List, Tuple, Set and Dictionary Methods'},
-      {t:'Nested Lists and Dictionaries'},
-      {t:'Iterating Through Collections'},
-      {t:'Sequence Unpacking'},
+  { title:'Understanding Dependencies', important:true, items:[
+      {t:'What is a Dependency?'}, {t:'Direct Dependencies'}, {t:'Transitive Dependencies'},
+      {t:'Dependency Versions'}, {t:'Why Version Conflicts Happen'}, {t:'Dependency Management Basics'},
   ]},
-
-  { title:'Functions', important:true, items:[
-      {t:'Creating Functions'},
-      {t:'Parameters and Arguments'},
-      {t:'Return Values'},
-      {t:'Default Arguments'},
-      {t:'Keyword Arguments'},
-      {t:'`*args`'},
-      {t:'`**kwargs`'},
-      {t:'Variable Scope'},
-      {t:'Lambda Functions'},
-      {t:'Function Type Hints'},
+  { title:'Installing & Managing Packages', important:true, items:[
+      {t:'`pip install`'}, {t:'Installing a Specific Package'}, {t:'Upgrading Packages'},
+      {t:'Uninstalling Packages'}, {t:'Listing Installed Packages'}, {t:'Viewing Package Information'},
+      {t:'Checking Installed Package Versions'},
   ]},
-
-  { title:'Strings', items:[
-      {t:'Indexing'},
-      {t:'Slicing'},
-      {t:'String Methods'},
-      {t:'String Immutability'},
-      {t:'Escape Characters'},
-      {t:'f-Strings'},
-      {t:'Split and Join'},
-    ],
-    note:{
-      type:'info',
-      text:'Regular Expressions can be learned later, when you need them for data cleaning.'
-    }
+  { title:'Virtual Environment Fundamentals — Extremely Important', important:true, items:[
+      {t:'What is a Virtual Environment?'}, {t:'Why Virtual Environments are Needed'},
+      {t:'Global Python vs Project Environment'}, {t:'Benefits of Environment Isolation'},
+      {t:'When to Create a Virtual Environment'},
+  ]},
+  { title:'Using `venv` — Extremely Important', important:true, items:[
+      {t:'Creating a Virtual Environment'}, {t:'Virtual Environment Folder Structure — Basic Understanding'},
+      {t:'Activating a Virtual Environment'}, {t:'Deactivating a Virtual Environment'},
+      {t:'Installing Packages Inside a Virtual Environment'}, {t:'Checking Which Python is Being Used'},
+      {t:'Checking Which `pip` is Being Used'},
+  ]},
+  { title:'Requirements Management — Extremely Important', important:true, items:[
+      {t:'What is `requirements.txt`?'}, {t:'Why `requirements.txt` is Important'},
+      {t:'Creating `requirements.txt`'}, {t:'Installing Packages from `requirements.txt`'},
+      {t:'Pinning Package Versions'}, {t:'Updating Dependencies'},
+      {t:'Recreating an Environment from `requirements.txt`'},
+    ], example:'Developer A\n     \u2502\nrequirements.txt\n     \u2502\n     \u25bc\nDeveloper B / Server\n     \u2502\nSame package versions\n     \u25bc\nSame environment'
   },
-
-  { title:'Python File Handling — Basic Only', important:true, items:[
-      {t:'`open()`'},
-      {t:'File Modes', tags:['r','w','a']},
-      {t:'`with open()`'},
-      {t:'`read()`'},
-      {t:'`readline()`'},
-      {t:'`readlines()`'},
-      {t:'`write()`'},
-      {t:'File Paths'},
-      {t:'`pathlib`'},
-      {t:'Basic File Exceptions'},
-    ],
-    note:{
-      type:'warning',
-      text:"Stop here. Don't deeply learn CSV, JSON, Parquet, or Avro yet — those already have their own topics later in the roadmap."
-    }
-  },
-
-  { title:'Exception Handling', important:true, items:[
-      {t:'`try`'},
-      {t:'`except`'},
-      {t:'Multiple Exceptions'},
-      {t:'`else`'},
-      {t:'`finally`'},
-      {t:'Specific Exceptions'},
-      {t:'`raise`'},
+  { title:'Project Setup Best Practices', important:true, items:[
+      {t:'Recommended Python Project Structure'}, {t:'Where to Create the Virtual Environment'},
+      {t:'`.gitignore` and Virtual Environments'}, {t:'Why Not to Push `venv/` to GitHub'},
+      {t:'Committing `requirements.txt`'}, {t:'Reproducible Project Environments'},
   ]},
-
-  { title:'Modules & Packages', important:true, items:[
-      {t:'Importing Modules'},
-      {t:'Creating Your Own Modules'},
-      {t:'Packages Basics'},
-      {t:'`__init__.py` Basics'},
-      {t:'`__name__ == "__main__"`'},
-      {t:'Useful Standard Libraries', tags:['os','pathlib','datetime']},
+  { title:'Common Environment Problems', important:true, items:[
+      {t:'`ModuleNotFoundError`'}, {t:'Wrong Python Interpreter'}, {t:'Wrong Virtual Environment Activated'},
+      {t:'Package Installed in Global Environment'}, {t:'Package Version Conflicts'},
+      {t:'`pip` vs `pip3`'}, {t:'PATH-related Problems'}, {t:'How to Debug Environment Issues'},
   ]},
-
-  { title:'Built-in Functions & Comprehensions', important:true, items:[
-      {t:'List Comprehensions'},
-      {t:'Dictionary Comprehensions'},
-      {t:'Conditional Comprehensions'},
-      {t:'`enumerate()`'},
-      {t:'`zip()`'},
-      {t:'`sorted()`'},
-      {t:'`any()` and `all()`'},
-      {t:'`map()` Basics'},
-      {t:'`filter()` Basics'},
-  ]},
-
-  { title:'Iterators & Generators', items:[
-      {t:'Iterable vs Iterator'},
-      {t:'`iter()`'},
-      {t:'`next()`'},
-      {t:'Generators'},
-      {t:'`yield`'},
-      {t:'Generator Expressions'},
-    ],
-    note:{
-      type:'info',
-      text:'This becomes especially useful later when processing large amounts of data efficiently.'
-    }
+  { title:'Introduction to Modern Dependency Tools',
+    intro:{type:'info', text:'Learn only the basics:'},
+    items:[
+      {t:'What is Poetry?'}, {t:'What is Conda?'}, {t:'`venv` vs Conda — Basic Difference'},
+      {t:'When `venv` is Enough'}, {t:'When Conda May Be Useful'},
+    ], note:{type:'warning', text:'Do not deeply learn Poetry or Conda now. `venv + pip + requirements.txt` is enough for your current Data Engineering roadmap.'}
   },
-
-  { title:'Object-Oriented Programming — Basics', important:true, items:[
-      {t:'Classes and Objects'},
-      {t:'`__init__` Constructor'},
-      {t:'Instance Attributes'},
-      {t:'Instance Methods'},
-      {t:'Inheritance Basics'},
-    ],
-    note:{
-      type:'info',
-      text:'Learn the basics only. Advanced OOP is not required before moving forward in the Data Engineering roadmap.'
-    }
-  },
-
-  { title:'Logging — Python Basics', items:[
-      {t:'Why Logging Instead of Only `print()`'},
-      {t:'Log Levels', tags:[
-          'DEBUG',
-          'INFO',
-          'WARNING',
-          'ERROR',
-          'CRITICAL'
-      ]},
-      {t:'Basic `logging` Module'},
-      {t:'Logging to Files'},
-    ],
-    note:{
-      type:'info',
-      text:'Learn Python logging basics here. Production logging and pipeline monitoring are covered later in the roadmap.'
-    }
-  },
-
-  { title:'Date & Time', items:[
-      {t:'`datetime`'},
-      {t:'`timedelta`'},
-      {t:'Date Formatting'},
-      {t:'Date Parsing'},
-      {t:'Date Calculations'},
-      {t:'Time Zones Basics'},
-  ]},
-
 ];
 
 // flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
@@ -285,7 +170,7 @@ function render(){
       </div>`;
 
     if(sec.intro){
-      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${sec.intro.text}</span></div>`;
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
     }
 
     const itemsWrap = document.createElement('div');
@@ -299,18 +184,27 @@ function render(){
         <span class="item-num">${it.n}</span>
         <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
         <span class="item-body">
-          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${it.t}${it.optional?'<span class="opt-tag">optional</span>':''}<span class="item-arrow">&rarr;</span></a>
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
           ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
         </span>
       `;
+      // Checkbox is display-only here — the only place progress gets marked
+      // is the "Mark as learned" button inside item.html, so no click handler.
       itemsWrap.appendChild(row);
     });
     secEl.appendChild(itemsWrap);
 
+    if(sec.example){
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = sec.example;
+      secEl.appendChild(ex);
+    }
+
     if(sec.note){
       const n = document.createElement('div');
       n.className = `note note-${sec.note.type}`;
-      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${sec.note.text}</span>`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
       n.style.marginBottom = '18px';
       secEl.appendChild(n);
     } else {
@@ -327,13 +221,6 @@ function updateRing(){
   const done = Object.keys(progress).filter(k=>progress[k]).length;
   document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
   deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
-}
-
-function toggleItem(n){
-  if(progress[n]) delete progress[n]; else progress[n] = true;
-  deWriteStore(ITEMS_KEY, progress);
-  deSyncTopicToRoadmap(TOPIC_ID, TOTAL);
-  render();
 }
 
 document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });

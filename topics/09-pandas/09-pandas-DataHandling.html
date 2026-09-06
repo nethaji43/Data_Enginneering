@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pandas — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#39C5CF; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(57,197,207,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#39C5CF; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#39C5CF; border-color:#39C5CF;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#39C5CF;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#39C5CF;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Data Handling</b> &middot; Topic 9 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Pandas &#128060;</h1>
+      <p class="sub">DataFrames, grouping, and merging — the tool you'll reach for in almost every real ETL step. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/133</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. groupby, merge, apply..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 9;            // matches topic.n = 9 (Pandas) in index.html
+const CONTENT_SLUG = 'pandas'; // matches /content/pandas.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'Pandas Fundamentals', important:true, items:[
+      {t:'What is Pandas?'}, {t:'Why Pandas is Used'}, {t:'Pandas vs NumPy'}, {t:'What is a Series?'},
+      {t:'What is a DataFrame?'}, {t:'Series vs DataFrame'}, {t:'Rows, Columns and Index'},
+      {t:'Understanding DataFrame Structure'},
+  ]},
+  { title:'Creating Series & DataFrames', important:true, items:[
+      {t:'Creating a Series'}, {t:'Creating a DataFrame'}, {t:'Creating DataFrames from Dictionaries'},
+      {t:'Creating DataFrames from Lists'}, {t:'Creating DataFrames from NumPy Arrays'},
+      {t:'Understanding Indexes'}, {t:'Custom Indexes'},
+  ]},
+  { title:'Exploring & Understanding Data — Extremely Important', important:true, items:[
+      {t:'`head()`'}, {t:'`tail()`'}, {t:'`sample()`'}, {t:'`shape`'}, {t:'`columns`'}, {t:'`index`'},
+      {t:'`dtypes`'}, {t:'`info()`'}, {t:'`describe()`'}, {t:'`nunique()`'}, {t:'`value_counts()`'},
+    ], note:{type:'info', text:'This section is extremely important because in real Data Engineering work, the first step is often understanding the incoming data.'}
+  },
+  { title:'Selecting Data — Extremely Important', important:true, items:[
+      {t:'Selecting Columns'}, {t:'Selecting Multiple Columns'}, {t:'Selecting Rows'}, {t:'`loc`'},
+      {t:'`iloc`'}, {t:'Row and Column Selection'}, {t:'Selecting Using Conditions'},
+      {t:'Selecting Multiple Conditions'},
+  ]},
+  { title:'Indexing & Slicing', important:true, items:[
+      {t:'Default Index'}, {t:'Custom Index'}, {t:'Setting an Index'}, {t:'Resetting an Index'},
+      {t:'Indexing with `loc`'}, {t:'Indexing with `iloc`'}, {t:'Slicing Rows and Columns'},
+    ], note:{type:'info', text:'Focus here on how Pandas indexes data, not repeating NumPy indexing.'}
+  },
+  { title:'Filtering Data — Extremely Important', important:true, items:[
+      {t:'Boolean Filtering'}, {t:'Multiple Conditions'}, {t:'`isin()`'}, {t:'`between()`'},
+      {t:'`query()` Basics'}, {t:'String-based Filtering'}, {t:'Filtering Missing Values'},
+  ]},
+  { title:'Sorting & Ranking', important:true, items:[
+      {t:'`sort_values()`'}, {t:'`sort_index()`'}, {t:'Sorting Multiple Columns'},
+      {t:'Ascending and Descending'}, {t:'`rank()` Basics'},
+  ]},
+  { title:'Adding, Updating & Removing Data', important:true, items:[
+      {t:'Creating New Columns'}, {t:'Updating Column Values'}, {t:'Conditional Column Creation'},
+      {t:'`assign()` Basics'}, {t:'Renaming Columns'}, {t:'Dropping Columns'}, {t:'Dropping Rows'},
+  ]},
+  { title:'Applying Functions — Extremely Important', important:true, items:[
+      {t:'`apply()`'}, {t:'`map()`'}, {t:'`apply()` with Custom Functions'}, {t:'Lambda Functions in Pandas'},
+      {t:'Column-wise Operations'}, {t:'Row-wise Operations'}, {t:'Vectorized Operations vs `apply()`'},
+    ], note:{type:'info', text:'Important for Data Engineering: understand when `apply()` can be slow and when vectorized operations are better.'}
+  },
+  { title:'Grouping & Aggregation — Extremely Important', important:true, items:[
+      {t:'`groupby()`'}, {t:'Single Column Grouping'}, {t:'Multiple Column Grouping'}, {t:'Aggregate Functions'},
+      {t:'`agg()`'}, {t:'Multiple Aggregations'}, {t:'Named Aggregations'}, {t:'`transform()`'},
+      {t:'`filter()` with Groups'},
+    ], note:{type:'info', text:'This is one of the most important Pandas sections.'}
+  },
+  { title:'Combining Data — Extremely Important', important:true, items:[
+      {t:'`concat()`'}, {t:'Concatenating Rows'}, {t:'Concatenating Columns'}, {t:'`merge()`'},
+      {t:'Merge Types', tags:['Inner','Left','Right','Outer']},
+      {t:'Merge on Multiple Columns'}, {t:'Handling Duplicate Keys in Merges'}, {t:'`join()` Basics'},
+  ]},
+  { title:'Duplicate Handling', important:true, items:[
+      {t:'`duplicated()`'}, {t:'`drop_duplicates()`'}, {t:'Identifying Duplicate Rows'},
+      {t:'Identifying Duplicates Based on Specific Columns'}, {t:'Keeping First/Last Duplicate'},
+    ], note:{type:'info', text:'Keep this at the Pandas operation level. Your later Data Cleaning topic can focus on broader cleaning strategies and real-world data quality issues.'}
+  },
+  { title:'Missing Values — Pandas Operations — Extremely Important', important:true, items:[
+      {t:'Identifying Missing Values'}, {t:'`isna()`'}, {t:'`notna()`'}, {t:'`dropna()`'},
+      {t:'`fillna()`'}, {t:'Forward Fill'}, {t:'Backward Fill'},
+    ], note:{type:'info', text:'Again, learn the Pandas functionality here; deeper missing-data strategy belongs in your later Data Cleaning topic.'}
+  },
+  { title:'Data Types', important:true, items:[
+      {t:'Checking Data Types'}, {t:'`astype()`'}, {t:'Numeric Conversion Basics'},
+      {t:'String Conversion Basics'}, {t:'Datetime Conversion Basics'}, {t:'Categorical Data Basics'},
+  ]},
+  { title:'String Operations', important:true, items:[
+      {t:'`.str` Accessor'}, {t:'`lower()` / `upper()`'}, {t:'`strip()`'}, {t:'`contains()`'},
+      {t:'`replace()`'}, {t:'`split()`'}, {t:'Basic Pattern Matching'},
+    ], note:{type:'info', text:'Focus on Pandas column operations — not general Python string syntax.'}
+  },
+  { title:'Date & Time Operations', important:true, items:[
+      {t:'`pd.to_datetime()`'}, {t:'Date Extraction'}, {t:'Year, Month, Day'}, {t:'Date Filtering'},
+      {t:'Date Differences'}, {t:'Date Formatting'}, {t:'Datetime Index Basics'},
+  ]},
+  { title:'Reshaping Data', important:true, items:[
+      {t:'`pivot()`'}, {t:'`pivot_table()`'}, {t:'`melt()`'}, {t:'`stack()` Basics'}, {t:'`unstack()` Basics'},
+  ]},
+  { title:'Basic Input & Output', important:true, items:[
+      {t:'Basic `read_csv()`'}, {t:'Basic `to_csv()`'}, {t:'Basic `read_json()`'},
+      {t:'Basic `to_json()`'}, {t:'Basic Excel Reading/Writing'},
+    ], note:{type:'info', text:"Important: learn the Pandas commands here, but don't go deeply into CSV, JSON, Parquet, Avro internals. Those belong to your separate Data Formats topic in the 74-topic roadmap."}
+  },
+  { title:'Performance & Memory Basics — Extremely Important', important:true, items:[
+      {t:'Vectorization'}, {t:'Avoiding Unnecessary `apply()`'}, {t:'Choosing Appropriate Data Types'},
+      {t:'Memory Usage Basics'}, {t:'`memory_usage()`'}, {t:'Reading Large Files — Introduction'},
+      {t:'`chunksize` Basics'},
+    ], note:{type:'info', text:'This prepares you for later topics like PySpark and large-scale data processing.'}
+  },
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>

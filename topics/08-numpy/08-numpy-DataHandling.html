@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NumPy — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#39C5CF; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(57,197,207,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#39C5CF; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#39C5CF; border-color:#39C5CF;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#39C5CF;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#39C5CF;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Data Handling</b> &middot; Topic 8 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>NumPy</h1>
+      <p class="sub">Arrays, broadcasting, and vectorized operations — the foundation every other data library in Python builds on. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/106</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. broadcasting, reshape, boolean mask..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 8;           // matches topic.n = 8 (NumPy) in index.html
+const CONTENT_SLUG = 'numpy'; // matches /content/numpy.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'NumPy Fundamentals', important:true, items:[
+      {t:'What is NumPy?'}, {t:'Why NumPy is Used'}, {t:'NumPy vs Python Lists'},
+      {t:'What is an `ndarray`?'}, {t:'Array Dimensions'}, {t:'Array Shape'}, {t:'Array Size'},
+      {t:'Array Data Types (`dtype`)'},
+  ]},
+  { title:'Creating NumPy Arrays', important:true, items:[
+      {t:'Creating Arrays from Python Lists'}, {t:'`np.array()`'}, {t:'One-Dimensional Arrays'},
+      {t:'Two-Dimensional Arrays'}, {t:'Multi-Dimensional Arrays'}, {t:'`np.zeros()`'},
+      {t:'`np.ones()`'}, {t:'`np.full()`'}, {t:'`np.arange()`'}, {t:'`np.linspace()`'},
+      {t:'Identity Matrix — `np.eye()`'},
+  ]},
+  { title:'Array Properties', important:true, items:[
+      {t:'`.ndim`'}, {t:'`.shape`'}, {t:'`.size`'}, {t:'`.dtype`'}, {t:'`.itemsize`'}, {t:'`.nbytes`'},
+  ]},
+  { title:'Indexing & Slicing — Extremely Important', important:true, items:[
+      {t:'One-Dimensional Indexing'}, {t:'Two-Dimensional Indexing'}, {t:'Multi-Dimensional Indexing Basics'},
+      {t:'Array Slicing'}, {t:'Row Selection'}, {t:'Column Selection'}, {t:'Boolean Indexing'}, {t:'Fancy Indexing'},
+  ]},
+  { title:'Array Operations — Extremely Important', important:true, items:[
+      {t:'Element-wise Operations'}, {t:'Addition'}, {t:'Subtraction'}, {t:'Multiplication'},
+      {t:'Division'}, {t:'Floor Division'}, {t:'Modulus'}, {t:'Power Operations'}, {t:'Comparison Operations'},
+  ]},
+  { title:'Broadcasting — Extremely Important', important:true, items:[
+      {t:'What is Broadcasting?'}, {t:'Broadcasting Rules'}, {t:'Scalar Broadcasting'},
+      {t:'Array Broadcasting'}, {t:'Broadcasting with Different Shapes'}, {t:'Common Broadcasting Errors'},
+    ], note:{type:'info', text:'Very important: this is one of the major differences between using NumPy arrays and normal Python lists.'}
+  },
+  { title:'Aggregation Functions', important:true, items:[
+      {t:'`np.sum()`'}, {t:'`np.mean()`'}, {t:'`np.median()`'}, {t:'`np.min()`'}, {t:'`np.max()`'},
+      {t:'`np.std()`'}, {t:'`np.var()`'}, {t:'Using `axis`'},
+  ]},
+  { title:'Reshaping & Transforming Arrays — Extremely Important', important:true, items:[
+      {t:'`.reshape()`'}, {t:'`.flatten()`'}, {t:'`.ravel()`'}, {t:'Transpose'}, {t:'`.T`'},
+      {t:'`np.transpose()`'}, {t:'Adding Dimensions'}, {t:'Removing Dimensions'},
+      {t:'`np.expand_dims()`'}, {t:'`np.squeeze()`'},
+  ]},
+  { title:'Combining & Splitting Arrays', important:true, items:[
+      {t:'`np.concatenate()`'}, {t:'`np.vstack()`'}, {t:'`np.hstack()`'}, {t:'`np.stack()`'},
+      {t:'`np.split()`'}, {t:'`np.vsplit()`'}, {t:'`np.hsplit()`'},
+  ]},
+  { title:'Filtering & Conditional Operations — Extremely Important', important:true, items:[
+      {t:'Boolean Masks'}, {t:'Filtering Arrays'}, {t:'Multiple Conditions'},
+      {t:'`np.where()`'}, {t:'`np.select()` Basics'},
+    ], example:'Original Data\n     \u2193\nCondition\n     \u2193\nBoolean Mask\n     \u2193\nFiltered / Updated Data'
+  },
+  { title:'Missing & Invalid Values — Extremely Important', important:true, items:[
+      {t:'`np.nan`'}, {t:'`np.isnan()`'}, {t:'`np.isinf()`'}, {t:'Checking for Missing Values'},
+      {t:'Replacing Values'}, {t:'Handling `NaN` in Calculations'},
+    ], note:{type:'info', text:'This is particularly useful before moving to Pandas and Data Cleaning.'}
+  },
+  { title:'Sorting & Searching', important:true, items:[
+      {t:'`np.sort()`'}, {t:'`np.argsort()`'}, {t:'`np.unique()`'}, {t:'`np.argmax()`'},
+      {t:'`np.argmin()`'}, {t:'`np.where()` for Searching'},
+  ]},
+  { title:'Copy vs View', important:true, items:[
+      {t:'What is a View?'}, {t:'What is a Copy?'}, {t:'`.copy()`'},
+      {t:'How Changes Affect Original Data'}, {t:'Memory Implications'},
+    ], note:{type:'info', text:'Important: this prevents common NumPy bugs.'}
+  },
+  { title:'Random Numbers', important:true, items:[
+      {t:'Random Number Generation Basics'}, {t:'`np.random.default_rng()`'}, {t:'Random Integers'},
+      {t:'Random Floats'}, {t:'Random Sampling'}, {t:'Random Seed / Reproducibility'},
+    ], note:{type:'info', text:'Useful for testing and creating sample datasets.'}
+  },
+  { title:'Performance Basics', important:true, items:[
+      {t:'Why NumPy is Fast'}, {t:'Vectorization'}, {t:'Vectorization vs Python Loops'},
+      {t:'Avoiding Unnecessary Loops'}, {t:'Basic Memory Efficiency'},
+  ]},
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    if(sec.example){
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = sec.example;
+      secEl.appendChild(ex);
+    }
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>
