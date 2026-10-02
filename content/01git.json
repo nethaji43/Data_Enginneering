@@ -708,7 +708,7 @@
 
           "<h3>Step 1: Download Git</h3>",
           "<p>Download Git from the official Git website:</p>",
-          "<p>:contentReference[oaicite:0]{index=0}</p>",
+          "<p>Download Git from the <a href=\"https://git-scm.com/downloads\" target=\"_blank\" rel=\"noopener noreferrer\">official Git website</a>.</p>",
           "<p>The website provides installation options for different operating systems such as Windows, macOS, and Linux.</p>",
 
           "<h3>Step 2: Install Git on Windows</h3>",
@@ -796,7 +796,7 @@
 
           "<h3>The Command</h3>",
           "<div class=\"code-block\">git --version</div>",
-          "<p>This command asks Git to display version information. Git's official documentation states that <code>git --version</code> prints the Git suite version. :contentReference[oaicite:0]{index=0}</p>",
+          "<p>This command asks Git to display version information. Git's official documentation states that <code>git --version</code> prints the Git suite version. <a href=\"https://git-scm.com/docs/git#Documentation/git.txt---version\" target=\"_blank\" rel=\"noopener noreferrer\">Git documentation</a></p>",
 
           "<h3>How to Run the Command</h3>",
           "<p>You can open a terminal such as Command Prompt, PowerShell, Git Bash, or the VS Code integrated terminal.</p>",
@@ -831,7 +831,7 @@
           "<h3>git --version vs git version</h3>",
           "<p>You may also see:</p>",
           "<div class=\"code-block\">git version</div>",
-          "<p>Git documentation explains that <code>git --version</code> and <code>git version</code> are equivalent for displaying the Git version. :contentReference[oaicite:1]{index=1}</p>",
+          "<p>Git documentation explains that <code>git --version</code> and <code>git version</code> are equivalent for displaying the Git version. <a href=\"https://git-scm.com/docs/git#Documentation/git.txt---version\" target=\"_blank\" rel=\"noopener noreferrer\">Git documentation</a></p>",
           "<div class=\"definition-box\"><b>For this roadmap:</b> We will mainly use <code>git --version</code> because it is a clear and commonly used way to check whether Git is installed.</div>",
 
           "<h3>Important: You Can Run This Outside a Repository</h3>",

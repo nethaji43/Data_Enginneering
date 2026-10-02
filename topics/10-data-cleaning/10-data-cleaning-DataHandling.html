@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Data Cleaning &amp; Data Transformation — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#39C5CF; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(57,197,207,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .goal-note{margin-top:22px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#39C5CF; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#39C5CF; border-color:#39C5CF;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#39C5CF;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#39C5CF;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Data Handling</b> &middot; Topic 10 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Data Cleaning &amp; Data Transformation</h1>
+      <p class="sub">Profiling, fixing, standardizing, transforming, and validating data before it's trustworthy enough to build on. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/231</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note note-info goal-note">
+    <span class="note-icon">&#9432;</span>
+    <span><strong>Goal:</strong> Learn how to take raw, messy data &rarr; clean, standardized, transformed, validated data that can safely move into later Data Engineering pipelines.</span>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. profiling, duplicates, validation, ETL..." style="margin-top:20px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 10;                 // matches topic.n = 10 (Data Cleaning & Data Transformation) in index.html
+const CONTENT_SLUG = 'data-cleaning'; // matches /content/data-cleaning.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'10.1 Data Cleaning & Transformation Fundamentals', important:true, items:[
+      {t:'What is data cleaning?'}, {t:'What is data transformation?'}, {t:'Difference between cleaning and transformation'},
+      {t:'Why raw data is usually messy'},
+      {t:'Common data quality problems', tags:['Accuracy','Completeness','Consistency','Uniqueness','Validity','Integrity']},
+      {t:'Raw data vs cleaned data'}, {t:'Raw layer vs processed layer'},
+      {t:'Understand the source before modifying data'}, {t:'Identify business requirements before cleaning'},
+      {t:'Define cleaning rules'}, {t:'Define transformation rules'}, {t:'Cleaning vs validation'},
+      {t:'Cleaning vs standardization'}, {t:'Cleaning vs enrichment'},
+    ], note:{type:'info', text:'Data cleaning focuses primarily on correcting/removing bad data, while transformation changes the format, structure, or meaning of data for its target use.'}
+  },
+  { title:'10.2 Data Profiling', important:true,
+    intro:{type:'info', text:'Before cleaning anything, learn to inspect the data first.'},
+    items:[
+      {t:'What is data profiling?'}, {t:'Why profiling is important'}, {t:'Understand dataset structure'},
+      {t:'Check number of rows'}, {t:'Check number of columns'}, {t:'Inspect column names'},
+      {t:'Inspect data types'}, {t:'Identify missing values'}, {t:'Identify duplicate records'},
+      {t:'Check unique values'}, {t:'Check distinct counts'}, {t:'Check minimum and maximum values'},
+      {t:'Check common/frequent values'}, {t:'Identify unexpected values'}, {t:'Identify suspicious patterns'},
+      {t:'Identify inconsistent formats'}, {t:'Identify possible outliers'}, {t:'Profile before cleaning'},
+      {t:'Compare profile before vs after cleaning'},
+    ], example:'Practice: take a messy CSV and create a simple profiling report:\n\nRows: 10,000\nColumns: 12\n\nMissing:\nemail       320\nphone       145\ncity         87\n\nDuplicates:\ncustomer_id \u2192 42\n\nInvalid:\nage \u2192 13 records\ndate \u2192 27 records'
+  },
+  { title:'10.3 Missing Data — Extremely Important', important:true, items:[
+      {t:'What is missing data?', tags:['NULL','Empty string','NaN','"N/A"','"NA"','"null"','"unknown"']},
+      {t:'Difference between actual missing and placeholder values'}, {t:'Identify missing values'},
+      {t:'Count missing values'}, {t:'Find rows containing missing values'}, {t:'Understand why values are missing'},
+      {t:'Remove rows with missing values'}, {t:'Remove columns with excessive missing values'},
+      {t:'Fill missing values'}, {t:'Fill with default values'}, {t:'Forward fill'}, {t:'Backward fill'},
+      {t:'Fill based on business rules'}, {t:'Decide when not to fill missing values'}, {t:'Preserve meaningful NULLs'},
+    ], note:{type:'warning', text:'Important: never blindly replace every missing value with 0.'}
+  },
+  { title:'10.4 Duplicate Data — Extremely Important', important:true, items:[
+      {t:'What is a duplicate?'}, {t:'Exact duplicates'}, {t:'Partial duplicates'}, {t:'Duplicate business records'},
+      {t:'Why duplicates occur'}, {t:'Identify duplicates'}, {t:'Count duplicates'}, {t:'Identify duplicate keys'},
+      {t:'Choose the correct record to keep'}, {t:'Keep first record'}, {t:'Keep latest record'},
+      {t:'Keep record based on priority'}, {t:'Remove duplicates'}, {t:'Deduplication based on business rules'},
+      {t:'Difference between duplicate rows and duplicate business entities'},
+    ], example:'customer_id | name  | updated_date\n------------|-------|-------------\n101         | Ravi  | 2026-01-01\n101         | Ravi  | 2026-02-01',
+    note:{type:'info', text:'The correct solution may be to keep the latest record, rather than simply deleting one randomly.'}
+  },
+  { title:'10.5 Data Type Cleaning — Extremely Important', important:true, items:[
+      {t:'Why incorrect data types are a problem'}, {t:'Numeric stored as text'}, {t:'Date stored as text'},
+      {t:'Boolean stored as text'}, {t:'Integer vs float'}, {t:'String vs numeric'}, {t:'Detect incorrect types'},
+      {t:'Convert data types'}, {t:'Handle conversion failures'}, {t:'Handle invalid numeric values'},
+      {t:'Handle invalid dates'}, {t:'Standardize data types across datasets'},
+    ], example:'"100"\n"200"\n"300"\n\nshould potentially become:\n\n100\n200\n300'
+  },
+  { title:'10.6 Text/Data String Cleaning — Extremely Important', important:true, items:[
+      {t:'Remove leading spaces'}, {t:'Remove trailing spaces'}, {t:'Remove unnecessary spaces'}, {t:'Convert case'},
+      {t:'Uppercase standardization'}, {t:'Lowercase standardization'}, {t:'Remove unwanted characters'},
+      {t:'Handle special characters'}, {t:'Handle empty strings'}, {t:'Replace incorrect values'},
+      {t:'Find and replace'}, {t:'Split strings'}, {t:'Combine strings'}, {t:'Basic regular expressions'},
+      {t:'Standardize text values'},
+    ], example:'"  bengaluru "\n"BENGALURU"\n"bengaluru"\n" Bengaluru"\n\ncould be standardized to:\n\n"Bengaluru"'
+  },
+  { title:'10.7 Data Standardization — Extremely Important', important:true, items:[
+      {t:'What is standardization?'}, {t:'Standardize column names'}, {t:'Standardize text values'},
+      {t:'Standardize categories'}, {t:'Standardize boolean values'}, {t:'Standardize units'},
+      {t:'Standardize currency'}, {t:'Standardize date formats'}, {t:'Standardize naming conventions'},
+      {t:'Create consistent representations'}, {t:'Build reusable standardization rules'},
+    ], example:'M\nMale\nmale\nMALE\n\n\u2192\n\nMale'
+  },
+  { title:'10.8 Invalid Data & Business Rules — Extremely Important', important:true, items:[
+      {t:'What is invalid data?'}, {t:'Valid vs invalid values'}, {t:'Define allowed values'}, {t:'Range validation'},
+      {t:'Format validation'}, {t:'Pattern validation'}, {t:'Required-field validation'},
+      {t:'Cross-column validation'}, {t:'Business-rule validation'}, {t:'Identify impossible values'},
+      {t:'Correct invalid values when possible'}, {t:'Reject invalid records'}, {t:'Quarantine bad records'},
+      {t:'Separate valid and invalid datasets'},
+    ], example:'age = -25\n\nis clearly invalid.\n\nBut:\n\nage = 100\n\nmay require a business decision rather than automatic deletion.'
+  },
+  { title:'10.9 Outliers & Anomaly Basics', important:true, items:[
+      {t:'What is an outlier?'}, {t:'Outlier vs invalid value'}, {t:'Why outliers occur'},
+      {t:'Business context of outliers'}, {t:'Minimum/maximum checks'}, {t:'IQR concept'}, {t:'Z-score concept'},
+      {t:'Detect unusual values'}, {t:'Investigate before removing'}, {t:'When to keep an outlier'},
+      {t:'When to remove an outlier'}, {t:'When to flag an outlier'}, {t:'Business-rule-based anomaly handling'},
+    ], note:{type:'warning', text:"Important: an outlier isn't automatically bad data."}
+  },
+  { title:'10.10 Date & Time Cleaning — Extremely Important', important:true, items:[
+      {t:'Different date formats'}, {t:'Parse date values'}, {t:'Identify invalid dates'}, {t:'Handle missing dates'},
+      {t:'Standardize date formats'}, {t:'Date vs datetime'}, {t:'Timestamp validation'},
+      {t:'Handle conversion failures'}, {t:'Time-zone basics'}, {t:'Standardize timestamps'},
+      {t:'Compare dates correctly'}, {t:'Calculate date differences'},
+    ], example:'01/09/2026\n2026-09-01\nSep 1, 2026\n\nmay represent the same date but arrive in different formats.'
+  },
+  { title:'10.11 Transformation Fundamentals — Extremely Important', important:true, items:[
+      {t:'What is data transformation?'}, {t:'Cleaning vs transformation'}, {t:'Row-level transformation'},
+      {t:'Column-level transformation'}, {t:'Rename columns'}, {t:'Remove unnecessary columns'},
+      {t:'Filter records'}, {t:'Create derived columns'}, {t:'Mathematical transformations'},
+      {t:'Conditional transformations'}, {t:'Type transformations'}, {t:'Mapping transformations'},
+      {t:'Format transformations'},
+    ], note:{type:'info', text:'Transformation is a core ETL/ELT operation; common transformations include filtering, joining, aggregation, derivation, splitting and summarization.'}
+  },
+  { title:'10.12 Business Rule Transformations — Extremely Important', important:true, items:[
+      {t:'What is a business rule?'}, {t:'IF/ELSE transformations'}, {t:'Multiple conditions'},
+      {t:'Category creation'}, {t:'Value mapping'}, {t:'Lookup-based transformation'}, {t:'Status transformation'},
+      {t:'Derived business fields'}, {t:'Calculated fields'}, {t:'Conditional categorization'},
+      {t:'Combining multiple business rules'}, {t:'Handling unmatched mappings'},
+    ], example:'amount >= 100000 \u2192 "High"\namount >= 50000  \u2192 "Medium"\notherwise        \u2192 "Low"'
+  },
+  { title:'10.13 Combining & Reshaping Data', important:true, items:[
+      {t:'Combine datasets'}, {t:'Row-wise combination'}, {t:'Column-wise combination'}, {t:'Joining datasets'},
+      {t:'Choosing join keys'}, {t:'Handling unmatched records'}, {t:'One-to-one matching'},
+      {t:'One-to-many matching'}, {t:'Duplicate keys during joins'}, {t:'Wide vs long data'}, {t:'Pivot'},
+      {t:'Unpivot'}, {t:'Reshape data for target requirements'},
+    ], note:{type:'info', text:'This connects strongly with your Pandas Topic 9, but here the focus is why and when the transformation is required, not memorizing Pandas syntax.'}
+  },
+  { title:'10.14 Aggregation & Summarization', important:true, items:[
+      {t:'Why aggregation is needed'}, {t:'Grouping data'},
+      {t:'Aggregation Functions', tags:['Count','Sum','Average','Minimum','Maximum']},
+      {t:'Multiple aggregations'}, {t:'Multi-level aggregation'}, {t:'Detail vs summary data'},
+      {t:'Daily aggregation'}, {t:'Monthly aggregation'}, {t:'Business-level aggregation'},
+      {t:'Validate aggregated results'},
+    ], example:'Raw transactions\n       \u2193\nGroup by customer\n       \u2193\nSUM(amount)\n       \u2193\nCustomer summary'
+  },
+  { title:'10.15 Data Validation After Transformation — Extremely Important', important:true,
+    intro:{type:'info', text:'This is very important for Data Engineering.'},
+    items:[
+      {t:'Why validation is required'}, {t:'Validate row counts'}, {t:'Validate column counts'},
+      {t:'Validate schema'}, {t:'Validate data types'}, {t:'Validate NULL counts'}, {t:'Validate duplicate counts'},
+      {t:'Validate allowed values'}, {t:'Validate ranges'}, {t:'Validate business rules'},
+      {t:'Compare source vs target counts'}, {t:'Reconciliation'}, {t:'Validate aggregations'},
+      {t:'Validate transformed columns'}, {t:'Detect unexpected changes'}, {t:'Before vs after comparison'},
+    ], note:{type:'info', text:'A transformation should not simply produce output; you should be able to prove that the output is correct.'}
+  },
+  { title:'10.16 Bad Records & Error Handling — Extremely Important', important:true, items:[
+      {t:'What are bad records?'}, {t:'Identify bad records'}, {t:'Reject invalid records'},
+      {t:'Separate valid/invalid records'}, {t:'Quarantine records'}, {t:'Store rejection reason'},
+      {t:'Preserve original value'}, {t:'Track corrected values'}, {t:'Track failed transformations'},
+      {t:'Log processing errors'}, {t:'Understand recoverable vs unrecoverable errors'},
+    ], example:'Input\n \u2193\nCleaning\n \u2193\n \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n \u2502               \u2502\nValid          Invalid\n \u2193               \u2193\nOutput       Bad Records\n             + Reason'
+  },
+  { title:'10.17 Complete Data Cleaning Pipeline — Extremely Important', important:true, items:[
+      {t:'Understand the complete workflow'}, {t:'Define input rules'}, {t:'Define cleaning rules'},
+      {t:'Define transformation rules'}, {t:'Define validation rules'}, {t:'Define failure handling'},
+      {t:'Define output requirements'}, {t:'Maintain raw data'}, {t:'Make processing repeatable'},
+      {t:'Make transformations traceable'}, {t:'Document business rules'}, {t:'Test with known bad data'},
+      {t:'Compare input/output results'},
+    ], example:'Raw Data\n   \u2193\nProfile\n   \u2193\nIdentify Problems\n   \u2193\nClean\n   \u2193\nStandardize\n   \u2193\nTransform\n   \u2193\nValidate\n   \u2193\nSeparate Bad Records\n   \u2193\nLog Results\n   \u2193\nClean Output'
+  },
+  { title:'10.18 Practical Projects', important:true, items:[
+      {t:'Project 1 — Messy Customer Dataset', tags:['missing values','duplicates','incorrect data types','inconsistent names','invalid emails','inconsistent cities','invalid ages','date formats']},
+      {t:'Project 2 — Sales Data Cleaning', tags:['orders.csv','customers.csv','products.csv']},
+      {t:'Project 3 — Mini ETL Transformation'},
+    ], examples:[
+      'Project 2 flow:\n\nProfile\n  \u2193\nClean\n  \u2193\nStandardize\n  \u2193\nJoin\n  \u2193\nTransform\n  \u2193\nAggregate\n  \u2193\nValidate',
+      'Project 3 flow:\n\nRaw CSV\n   \u2193\nPython/Pandas\n   \u2193\nData Cleaning\n   \u2193\nTransformation\n   \u2193\nValidation\n   \u2193\nClean Parquet/CSV'
+    ],
+    note:{type:'info', text:'This prepares you for later ETL/ELT, data pipelines, Spark, warehouses and cloud data engineering. ETL/ELT systems rely heavily on cleaning, transformation and validation before data becomes useful to downstream systems.'}
+  },
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    // Some sections carry one diagram (sec.example), some carry more than
+    // one (sec.examples) — e.g. the two project-pipeline diagrams at the end.
+    const diagrams = sec.examples || (sec.example ? [sec.example] : []);
+    diagrams.forEach(txt=>{
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = txt;
+      secEl.appendChild(ex);
+    });
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>

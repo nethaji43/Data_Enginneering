@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Data Formats — CSV, JSON, Parquet, Avro — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#39C5CF; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(57,197,207,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#39C5CF; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram, .section .format-table{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+  .format-table{border-collapse:collapse; margin-top:14px; margin-bottom:18px; font-size:13.5px; width:calc(100% - 40px);}
+  .format-table th, .format-table td{border:1px solid var(--border); padding:8px 12px; text-align:left; vertical-align:top;}
+  .format-table th{background:var(--surface-2); font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-dim); font-weight:500;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#39C5CF; border-color:#39C5CF;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#39C5CF;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#39C5CF;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Data Handling</b> &middot; Topic 11 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Data Formats — CSV, JSON, Parquet, Avro</h1>
+      <p class="sub">Row vs columnar storage, schema, compression, and when to reach for which format. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/245</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. Parquet, schema evolution, compression..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 11;                // matches topic.n = 11 (Data Formats) in index.html
+const CONTENT_SLUG = 'data-formats'; // matches /content/data-formats.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'11.1 Data Format Fundamentals', items:[
+      {t:'What is a data format?'}, {t:'Why data formats are required'}, {t:'Structured vs semi-structured data'},
+      {t:'Row-oriented vs column-oriented formats'}, {t:'Human-readable vs machine-oriented formats'},
+      {t:'Text-based vs binary formats'}, {t:'Schema and data types'}, {t:'Serialization'}, {t:'Deserialization'},
+      {t:'Encoding'}, {t:'Compression'}, {t:'File extension vs actual format'}, {t:'How applications read and write data'},
+      {t:'Why format choice matters in Data Engineering'}, {t:'Data format in ETL/ELT pipelines'},
+  ]},
+  { title:'CSV Fundamentals', items:[
+      {t:'What is CSV?'}, {t:'Structure of a CSV file'}, {t:'Rows and columns'}, {t:'Header row'}, {t:'Delimiters'},
+      {t:'Comma-separated values'}, {t:'Other delimiters'}, {t:'Quoting'}, {t:'Escaping'}, {t:'Commas inside values'},
+      {t:'Newline characters inside values'}, {t:'Empty values'}, {t:'Missing values'}, {t:'Text values'},
+      {t:'Numeric values'}, {t:'Date values'}, {t:'CSV encoding'},
+    ], example:'id,name,city,amount\n101,Ravi,Bengaluru,5000\n102,Sita,Hyderabad,7500'
+  },
+  { title:'CSV Problems', items:[
+      {t:'Why CSV has no strong built-in schema'}, {t:'Type interpretation problems'}, {t:'Missing values'},
+      {t:'Inconsistent delimiters'}, {t:'Quoting problems'}, {t:'Encoding problems'}, {t:'Large CSV files'},
+      {t:'Corrupted rows'}, {t:'Different column counts'}, {t:'Header problems'},
+  ]},
+  { title:'CSV with Python/Pandas', items:[
+      {t:'Read CSV'}, {t:'Write CSV'}, {t:'Read selected columns'}, {t:'Handle missing values'},
+      {t:'Specify data types'}, {t:'Handle encoding'}, {t:'Handle delimiters'}, {t:'Handle large CSV files'},
+      {t:'Chunk-based reading concept'}, {t:'Validate CSV after writing'},
+  ]},
+  { title:'JSON Fundamentals', items:[
+      {t:'What is JSON?'}, {t:'Why JSON is widely used'}, {t:'JSON objects'}, {t:'JSON arrays'},
+      {t:'Key-value pairs'}, {t:'Strings'}, {t:'Numbers'}, {t:'Boolean'}, {t:'Null'}, {t:'Nested objects'},
+      {t:'Nested arrays'}, {t:'JSON hierarchy'},
+    ], example:'{\n  "id": 101,\n  "name": "Ravi",\n  "skills": ["Python", "SQL"],\n  "address": {\n    "city": "Bengaluru"\n  }\n}'
+  },
+  { title:'JSON Structure', items:[
+      {t:'Flat JSON'}, {t:'Nested JSON'}, {t:'Arrays of objects'}, {t:'Objects containing arrays'},
+      {t:'Deeply nested JSON'}, {t:'JSON schema concept'}, {t:'Optional fields'}, {t:'Missing fields'},
+      {t:'Different data types'}, {t:'Invalid JSON'},
+  ]},
+  { title:'JSON with Python/Pandas', items:[
+      {t:'Read JSON'}, {t:'Write JSON'}, {t:'Parse JSON'}, {t:'Convert JSON to Python objects'},
+      {t:'Convert Python objects to JSON'}, {t:'Read JSON with Pandas'}, {t:'Write JSON with Pandas'},
+      {t:'Handle nested JSON'}, {t:'Flatten nested JSON'}, {t:'Validate JSON structure'},
+  ]},
+  { title:'Parquet Fundamentals', important:true,
+    intro:{type:'info', text:'This is the highest-priority format in this topic for your Data Engineering goal.'},
+    items:[
+      {t:'What is Parquet?'}, {t:'Why Parquet was created'}, {t:'Parquet vs CSV'},
+      {t:'Row-oriented vs column-oriented storage'}, {t:'Why columnar storage is useful'}, {t:'Parquet schema'},
+      {t:'Parquet data types'}, {t:'Logical types'}, {t:'Metadata'}, {t:'Compression'}, {t:'Encoding'},
+    ], note:{type:'info', text:'Parquet stores data in column chunks within row groups, allowing readers to focus on the columns they need rather than reading the entire dataset.'}
+  },
+  { title:'Parquet Structure', important:true, items:[
+      {t:'File structure'}, {t:'Magic number'}, {t:'Row groups'}, {t:'Column chunks'}, {t:'Pages'},
+      {t:'File metadata'}, {t:'Column metadata'}, {t:'Schema metadata'}, {t:'How readers locate required columns'},
+    ], note:{type:'info', text:'You do not need to memorize the binary specification. Understand the architecture and why it provides efficient analytical access.'}
+  },
+  { title:'Parquet Performance Concepts', important:true, items:[
+      {t:'Column pruning'}, {t:'Why reading fewer columns is faster'}, {t:'Predicate pushdown concept'},
+      {t:'Compression'}, {t:'Encoding'}, {t:'Dictionary encoding concept'}, {t:'Row groups'},
+      {t:'Partitioning concept'}, {t:'Storage efficiency'}, {t:'Analytical query performance'},
+    ], note:{type:'info', text:'Parquet supports multiple encodings and compression at the page/column level, including dictionary encoding and other encodings defined by its specification.'}
+  },
+  { title:'Parquet with Python/Pandas', important:true, items:[
+      {t:'Write DataFrame to Parquet'}, {t:'Read Parquet'}, {t:'Read selected columns'}, {t:'Inspect Parquet schema'},
+      {t:'Check Parquet metadata'}, {t:'Choose compression'}, {t:'Convert CSV \u2192 Parquet'},
+      {t:'Convert JSON \u2192 Parquet'}, {t:'Validate converted Parquet'}, {t:'Understand partitioned Parquet datasets'},
+  ]},
+  { title:'Avro Fundamentals', items:[
+      {t:'What is Apache Avro?'}, {t:'Why Avro exists'}, {t:'Avro vs JSON'}, {t:'Avro vs Parquet'},
+      {t:'Schema-based serialization'}, {t:'Avro schema'}, {t:'Primitive types'}, {t:'Complex types'},
+      {t:'Records'}, {t:'Arrays'}, {t:'Maps'}, {t:'Enums'}, {t:'Unions'}, {t:'Fixed types'},
+    ], note:{type:'info', text:"Apache Avro's specification defines schemas and supports primitive and complex types; its common object-container format stores the schema with the data."}
+  },
+  { title:'Avro Serialization', items:[
+      {t:'Serialization'}, {t:'Deserialization'}, {t:'Binary encoding'}, {t:'JSON encoding'},
+      {t:'Why binary encoding is commonly used'}, {t:'Avro object container files'}, {t:'Avro file blocks'},
+      {t:'Compression concept'},
+  ]},
+  { title:'Schema Evolution', items:[
+      {t:'What is schema evolution?'}, {t:'Why schemas change'}, {t:'Adding fields'}, {t:'Removing fields'},
+      {t:'Changing fields'}, {t:'Default values'}, {t:'Backward compatibility concept'},
+      {t:'Forward compatibility concept'}, {t:'Compatibility problems'}, {t:'Why schema evolution matters in Data Engineering'},
+    ], note:{type:'info', text:"You don't need deep Avro implementation details here; understand schema + serialization + evolution."}
+  },
+  { title:'11.6 Compression', items:[
+      {t:'What is compression?'}, {t:'Why compression is used'}, {t:'Lossless compression'}, {t:'Lossy vs lossless'},
+      {t:'Compression ratio'}, {t:'Compression vs CPU usage'}, {t:'Compression vs storage'},
+      {t:'Compression vs read/write speed'}, {t:'Gzip'}, {t:'Snappy'}, {t:'ZIP basics'}, {t:'Choosing compression'},
+      {t:'Compression in Parquet'}, {t:'Compression in Avro'},
+  ]},
+  { title:'11.7 Schema', important:true,
+    intro:{type:'info', text:'This section is important because schema appears differently across CSV, JSON, Parquet and Avro.'},
+    items:[
+      {t:'What is a schema?'}, {t:'Why schema matters'}, {t:'Column names'}, {t:'Data types'},
+      {t:'Nullable vs non-nullable'}, {t:'Required fields'}, {t:'Optional fields'}, {t:'Schema validation'},
+      {t:'Schema mismatch'}, {t:'Schema changes'}, {t:'Schema evolution'}, {t:'Schema-on-read'},
+      {t:'Schema-on-write'}, {t:'Explicit vs inferred schema'},
+  ]},
+  { title:'11.8 Compare the Four Formats', items:[
+      {t:'CSV vs JSON'}, {t:'CSV vs Parquet'}, {t:'CSV vs Avro'}, {t:'JSON vs Parquet'}, {t:'JSON vs Avro'},
+      {t:'Parquet vs Avro'}, {t:'Row vs column orientation'}, {t:'Human readability'}, {t:'File size'},
+      {t:'Compression'}, {t:'Schema support'}, {t:'Nested data support'}, {t:'Data type support'},
+      {t:'Read performance'}, {t:'Write performance'}, {t:'Analytics suitability'}, {t:'Streaming suitability'},
+      {t:'Data exchange suitability'},
+    ], table:{
+      head:['Format','Main characteristic','Typical use'],
+      rows:[
+        ['CSV','Simple tabular text','Data exchange, simple datasets'],
+        ['JSON','Flexible nested structure','APIs, semi-structured data'],
+        ['Parquet','Columnar + analytical efficiency','Data lakes, analytics'],
+        ['Avro','Schema-based serialization','Data exchange/streaming systems'],
+      ]
+    }, note:{type:'info', text:"Don't memorize the table blindly. Understand why each format fits its use case."}
+  },
+  { title:'11.9 Choosing the Correct Format', items:[
+      {t:'When to use CSV'}, {t:'When to use JSON'}, {t:'When to use Parquet'}, {t:'When to use Avro'},
+      {t:'Format for human readability'}, {t:'Format for APIs'}, {t:'Format for analytics'},
+      {t:'Format for large datasets'}, {t:'Format for schema enforcement'}, {t:'Format for schema evolution'},
+      {t:'Format for data exchange'}, {t:'Format for storage efficiency'}, {t:'Format for downstream processing'},
+    ], example:'Simple report exchange:\nCSV\n\nAPI response:\nJSON\n\nLarge analytical dataset:\nParquet\n\nSchema-based serialized/event data:\nAvro',
+    note:{type:'info', text:'These are general use-case patterns, not absolute rules.'}
+  },
+  { title:'11.10 Data Format Conversion', items:[
+      {t:'CSV \u2192 JSON'}, {t:'JSON \u2192 CSV'}, {t:'CSV \u2192 Parquet'}, {t:'JSON \u2192 Parquet'}, {t:'CSV \u2192 Avro concept'},
+      {t:'Parquet \u2192 CSV'}, {t:'Parquet \u2192 JSON'}, {t:'Understand conversion risks'}, {t:'Data type preservation'},
+      {t:'Missing-value preservation'}, {t:'Schema preservation'}, {t:'Precision issues'},
+      {t:'Nested-data conversion problems'}, {t:'Validate after conversion'},
+  ]},
+  { title:'11.11 Data Format Best Practices', items:[
+      {t:'Choose format based on workload'}, {t:"Don't use CSV for everything"}, {t:'Preserve data types'},
+      {t:'Validate schema'}, {t:'Validate files before processing'}, {t:'Handle encoding correctly'},
+      {t:'Use compression appropriately'}, {t:'Avoid unnecessary format conversions'}, {t:'Preserve raw source data'},
+      {t:'Use columnar formats for analytical workloads'}, {t:'Consider schema evolution'},
+      {t:'Validate converted data'}, {t:'Document format assumptions'},
+  ]},
+  { title:'11.12 Practical Projects', items:[
+      {t:'Project 1 — Format Comparison (CSV \u2192 JSON, Parquet, Avro)', tags:['file size','schema','readability','data types','compression','read/write behavior']},
+      {t:'Project 2 — CSV \u2192 Parquet Pipeline'},
+      {t:'Project 3 — Nested JSON \u2192 Parquet'},
+    ], examples:[
+      'Project 2 flow:\n\nCSV\n \u2193\nRead\n \u2193\nValidate\n \u2193\nConvert\n \u2193\nParquet\n \u2193\nRead selected columns\n \u2193\nValidate',
+      'Project 3 input:\n\n{\n  "customer_id": 101,\n  "name": "Ravi",\n  "address": {\n    "city": "Bengaluru",\n    "pincode": 560001\n  }\n}',
+      'Project 3 flow:\n\nNested JSON\n     \u2193\nParse\n     \u2193\nFlatten / transform\n     \u2193\nStructured Data\n     \u2193\nParquet'
+    ]
+  },
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    const diagrams = sec.examples || (sec.example ? [sec.example] : []);
+    diagrams.forEach(txt=>{
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = txt;
+      secEl.appendChild(ex);
+    });
+
+    if(sec.table){
+      const tbl = document.createElement('table');
+      tbl.className = 'format-table';
+      tbl.innerHTML = `<thead><tr>${sec.table.head.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${sec.table.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
+      secEl.appendChild(tbl);
+    }
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>
