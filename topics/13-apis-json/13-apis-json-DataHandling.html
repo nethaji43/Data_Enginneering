@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>APIs &amp; JSON — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#39C5CF; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(57,197,207,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#39C5CF; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#39C5CF; border-color:#39C5CF;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#39C5CF;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#39C5CF;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Data Handling</b> &middot; Topic 13 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>APIs &amp; JSON</h1>
+      <p class="sub">HTTP, authentication, pagination, retries, and turning API responses into Parquet. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/271</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. pagination, authentication, retries..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 13;             // matches topic.n = 13 (APIs & JSON) in index.html
+const CONTENT_SLUG = 'apis-json'; // matches /content/apis-json.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'13.1 API Fundamentals', items:[
+      {t:'What is an API?'}, {t:'Why APIs are used'}, {t:'API as an interface between applications'},
+      {t:'Client and server'}, {t:'API request'}, {t:'API response'}, {t:'API endpoint'}, {t:'Resource'},
+      {t:'URL'}, {t:'Base URL'}, {t:'Endpoint path'}, {t:'API documentation'}, {t:'Request \u2192 response lifecycle'},
+      {t:'Public APIs'}, {t:'Private APIs'}, {t:'Internal APIs'}, {t:'Third-party APIs'},
+      {t:'APIs in Data Engineering'}, {t:'API as a data source'}, {t:'API as a data ingestion method'},
+    ], example:'Data Source / Application\n          \u2193\n        API\n          \u2193\n   HTTP Request\n          \u2193\n       Server\n          \u2193\n   HTTP Response\n          \u2193\n      JSON Data\n          \u2193\n   Python Processing\n          \u2193\n       Storage',
+    note:{type:'info', text:'HTTP uses a client-server request/response model, which is the foundation for many APIs.'}
+  },
+  { title:'13.2 HTTP Fundamentals', items:[
+      {t:'What is HTTP?'}, {t:'HTTP vs HTTPS'}, {t:'Request'}, {t:'Response'}, {t:'Request URL'},
+      {t:'HTTP method'}, {t:'Request headers'}, {t:'Request body'}, {t:'Response headers'}, {t:'Response body'},
+      {t:'Status code'}, {t:'Content-Type'}, {t:'`application/json`'}, {t:'HTTP request lifecycle'},
+      {t:'Stateless nature of HTTP'},
+  ]},
+  { title:'13.3 HTTP Methods', noteFirst:true, items:[
+      {t:'`GET`'}, {t:'`POST`'}, {t:'`PUT`'}, {t:'`PATCH`'}, {t:'`DELETE`'}, {t:'`HEAD` concept'},
+      {t:'`OPTIONS` concept'}, {t:'GET vs POST'}, {t:'PUT vs PATCH'}, {t:'Safe methods'}, {t:'Idempotent methods'},
+    ], note:{type:'info', text:'For the core Data Engineering use case, focus heavily on GET, then understand POST/PUT/PATCH/DELETE conceptually. HTTP defines these methods with different intended semantics; for example, GET retrieves a representation while POST submits data to a resource.'},
+    example:'GET /users\n\nPOST /users\nContent-Type: application/json\n\n{\n    "name": "Ravi",\n    "city": "Bengaluru"\n}'
+  },
+  { title:'13.4 URLs & Endpoints', items:[
+      {t:'What is a URL?'}, {t:'API base URL'}, {t:'Endpoint'}, {t:'Resource path'}, {t:'Path parameters'},
+      {t:'Query parameters'}, {t:'Multiple query parameters'}, {t:'URL encoding'}, {t:'Endpoint versioning'},
+      {t:'API version'}, {t:'Resource naming'},
+    ], example:'https://api.example.com/v1/users/101\n\nBreak it down:\nhttps://\napi.example.com\n/v1\n/users\n/101'
+  },
+  { title:'13.5 Query Parameters', items:[
+      {t:'What are query parameters?'}, {t:'`?`'}, {t:'`&`'}, {t:'Key-value parameters'}, {t:'Filtering'},
+      {t:'Searching'}, {t:'Sorting'}, {t:'Pagination parameters'}, {t:'Date parameters'}, {t:'Multiple parameters'},
+      {t:'URL encoding'},
+    ], example:'/users?city=Bengaluru\n\n/orders?status=completed&limit=100'
+  },
+  { title:'13.6 Path Parameters', items:[
+      {t:'What are path parameters?'}, {t:'Resource identifiers'}, {t:'Path vs query parameters'},
+      {t:'Single resource retrieval'}, {t:'Nested resource paths'},
+    ], example:'/users/101\n\nHere, 101 identifies the specific user.'
+  },
+  { title:'13.7 Request Headers', noteFirst:true, items:[
+      {t:'What are HTTP headers?'}, {t:'Why headers are used'}, {t:'`Content-Type`'}, {t:'`Accept`'},
+      {t:'`Authorization`'}, {t:'`User-Agent`'}, {t:'Custom headers'}, {t:'Request headers vs response headers'},
+      {t:'JSON content type'},
+    ], note:{type:'info', text:'HTTP headers carry additional information about the HTTP message and resource.'},
+    example:'GET /users\nAccept: application/json\nAuthorization: Bearer <token>'
+  },
+  { title:'13.8 API Responses', items:[
+      {t:'Response body'}, {t:'Response status'}, {t:'Response headers'}, {t:'JSON response'}, {t:'Empty response'},
+      {t:'Error response'}, {t:'Response structure'}, {t:'Nested response'}, {t:'List response'},
+      {t:'Single-object response'}, {t:'Metadata in response'},
+    ], example:'{\n    "data": [\n        {\n            "id": 101,\n            "name": "Ravi"\n        },\n        {\n            "id": 102,\n            "name": "Sita"\n        }\n    ],\n    "total": 2\n}'
+  },
+  { title:'13.9 HTTP Status Codes', noteFirst:true, items:[
+      {t:'What status codes mean'}, {t:'2xx success'}, {t:'3xx redirection'}, {t:'4xx client errors'},
+      {t:'5xx server errors'}, {t:'`200 OK`'}, {t:'`201 Created`'}, {t:'`204 No Content`'},
+      {t:'`400 Bad Request`'}, {t:'`401 Unauthorized`'}, {t:'`403 Forbidden`'}, {t:'`404 Not Found`'},
+      {t:'`405 Method Not Allowed`'}, {t:'`408 Request Timeout`'}, {t:'`409 Conflict`'},
+      {t:'`429 Too Many Requests`'}, {t:'`500 Internal Server Error`'}, {t:'`502 Bad Gateway`'},
+      {t:'`503 Service Unavailable`'},
+    ], note:{type:'info', text:"HTTP status codes are grouped into five classes: informational, successful, redirection, client error, and server error. You don't need to memorize every one."},
+    example:'For Data Engineering, know these particularly well:\n\n200 \u2192 Success\n201 \u2192 Created\n204 \u2192 Success, no response body\n400 \u2192 Bad request\n401 \u2192 Authentication required/failed\n403 \u2192 Forbidden\n404 \u2192 Not found\n429 \u2192 Too many requests\n500 \u2192 Server error\n502 \u2192 Bad gateway\n503 \u2192 Service unavailable'
+  },
+  { title:'13.10 Calling APIs with Python', items:[
+      {t:'Why Python is used for API ingestion'}, {t:'`requests` library'}, {t:'Install `requests`'},
+      {t:'`requests.get()`'}, {t:'`requests.post()`'}, {t:'Response object'}, {t:'`response.status_code`'},
+      {t:'`response.headers`'}, {t:'`response.text`'}, {t:'`response.json()`'}, {t:'Request parameters'},
+      {t:'Request headers'}, {t:'Request body'}, {t:'Request timeout'}, {t:'Basic exception handling'},
+    ], example:'import requests\n\nurl = "https://api.example.com/users"\nresponse = requests.get(url, timeout=30)\nprint(response.status_code)\n\ndata = response.json()\nprint(data)'
+  },
+  { title:'13.11 Working with JSON API Responses', items:[
+      {t:'Parse JSON response'}, {t:'JSON object \u2192 Python dictionary'}, {t:'JSON array \u2192 Python list'},
+      {t:'Access nested values'}, {t:'Loop through records'}, {t:'Extract selected fields'},
+      {t:'Handle missing fields'}, {t:'Handle nested objects'}, {t:'Handle arrays inside objects'},
+      {t:'Flatten API response'}, {t:'Convert API response to DataFrame'}, {t:'Validate expected fields'},
+    ], example:'data = response.json()\n\nfor user in data["users"]:\n    print(user["id"])\n    print(user["name"])',
+    note:{type:'info', text:'The important concept is that parsing JSON converts the response into Python data structures that your program can process.'}
+  },
+  { title:'13.12 API Authentication', items:[
+      {t:'Why APIs require authentication'}, {t:'Authentication vs authorization'}, {t:'API keys'},
+      {t:'Bearer tokens'}, {t:'Basic authentication concept'}, {t:'OAuth concept'}, {t:'Access tokens'},
+      {t:'Refresh tokens concept'}, {t:'Authorization headers'}, {t:'Environment variables for secrets'},
+      {t:'Never hardcode API keys'}, {t:'`.env` concept'}, {t:'Secret management basics'},
+    ], example:'headers = {\n    "Authorization": f"Bearer {token}"\n}\n\nresponse = requests.get(\n    url,\n    headers=headers,\n    timeout=30\n)'
+  },
+  { title:'13.13 Pagination', important:true,
+    intro:{type:'info', text:'Very important for Data Engineering.'},
+    items:[
+      {t:'What is pagination?'}, {t:'Why APIs paginate results'}, {t:'Page-based pagination'},
+      {t:'Offset-based pagination'}, {t:'Limit/offset'}, {t:'Cursor-based pagination'}, {t:'Next-page URL'},
+      {t:'Page size'}, {t:'Detect last page'}, {t:'Loop through pages'}, {t:'Combine records from multiple pages'},
+      {t:'Avoid duplicate records across pages'},
+    ], example:'API\n \u2193\nPage 1 \u2192 100 records\n \u2193\nPage 2 \u2192 100 records\n \u2193\nPage 3 \u2192 100 records\n \u2193\nPage 4 \u2192 35 records\n \u2193\nComplete dataset',
+    note:{type:'info', text:'This is one of the most important skills for API-based data ingestion.'}
+  },
+  { title:'13.14 API Rate Limits', items:[
+      {t:'What is rate limiting?'}, {t:'Why APIs impose limits'}, {t:'Requests per second'},
+      {t:'Requests per minute'}, {t:'`429 Too Many Requests`'}, {t:'Rate-limit headers'},
+      {t:'Waiting between requests'}, {t:'Retry-after concept'}, {t:'Avoid unnecessary API calls'},
+      {t:'Batch requests when supported'},
+  ]},
+  { title:'13.15 API Error Handling', items:[
+      {t:'Network errors'}, {t:'Timeout errors'}, {t:'Connection errors'}, {t:'HTTP errors'}, {t:'Invalid JSON'},
+      {t:'Missing fields'}, {t:'Authentication errors'}, {t:'Rate-limit errors'}, {t:'Server errors'},
+      {t:'Retryable vs non-retryable errors'}, {t:'Logging API failures'}, {t:'Record failed requests'},
+      {t:'Continue vs stop processing'},
+  ]},
+  { title:'13.16 Retries & Backoff', items:[
+      {t:'Why retries are required'}, {t:'Temporary failures'}, {t:'Retry count'}, {t:'Fixed delay'},
+      {t:'Exponential backoff'}, {t:'Retry only appropriate errors'}, {t:'Avoid infinite retries'},
+      {t:'Timeout + retry'}, {t:'Retry-after header'}, {t:'Failure logging'},
+    ], example:'Request\n   \u2193\nFailed?\n   \u2193\nWait\n   \u2193\nRetry\n   \u2193\nFailed?\n   \u2193\nIncrease delay\n   \u2193\nRetry'
+  },
+  { title:'13.17 API Data Extraction', items:[
+      {t:'Identify API endpoint'}, {t:'Read API documentation'}, {t:'Understand parameters'}, {t:'Authenticate'},
+      {t:'Send request'}, {t:'Check response'}, {t:'Parse JSON'}, {t:'Extract required fields'},
+      {t:'Handle pagination'}, {t:'Handle rate limits'}, {t:'Handle errors'}, {t:'Store extracted data'},
+  ]},
+  { title:'13.18 API → Pandas',
+    intro:{type:'info', text:'This connects your previous topics without repeating them.'},
+    items:[
+      {t:'API response \u2192 Python object'}, {t:'Python object \u2192 DataFrame'}, {t:'Normalize nested JSON'},
+      {t:'Select required columns'}, {t:'Basic transformation'}, {t:'Validate records'}, {t:'Save as CSV'},
+      {t:'Save as JSON'}, {t:'Save as Parquet'}, {t:'Preserve raw API response'},
+    ], examples:[
+      'import requests\nimport pandas as pd\n\nresponse = requests.get(\n    "https://api.example.com/users",\n    timeout=30\n)\n\ndata = response.json()\ndf = pd.DataFrame(data["users"])\ndf.to_parquet("users.parquet")',
+      'The important workflow:\n\nAPI\n \u2193\nJSON\n \u2193\nPython\n \u2193\nPandas\n \u2193\nParquet'
+    ]
+  },
+  { title:'13.19 API Data Ingestion Pipeline', items:[
+      {t:'API as source'}, {t:'Extract'}, {t:'Parse'}, {t:'Validate'}, {t:'Transform'}, {t:'Store'},
+      {t:'Track failures'}, {t:'Logging'}, {t:'Incremental extraction'}, {t:'Full extraction'},
+      {t:'Re-running extraction'}, {t:'Avoid duplicate data'},
+    ], example:'Complete flow:\n\n              API\n               \u2193\n        Authentication\n               \u2193\n          API Request\n               \u2193\n           Response\n               \u2193\n        Status Check\n               \u2193\n          Parse JSON\n               \u2193\n        Pagination Loop\n               \u2193\n           Validation\n               \u2193\n        Transformation\n               \u2193\n          Parquet\n               \u2193\n        Data Storage'
+  },
+  { title:'13.20 Incremental API Extraction', important:true,
+    intro:{type:'info', text:'This is an important Data Engineering concept.'},
+    items:[
+      {t:'Full API extraction'}, {t:'Incremental extraction'}, {t:'Why full extraction is inefficient'},
+      {t:'Date-based extraction'}, {t:'`updated_at` filtering'}, {t:'Last processed timestamp'},
+      {t:'Last processed ID'}, {t:'Watermark concept'}, {t:'Handling late-arriving records'},
+      {t:'Handling updated records'}, {t:'Avoiding duplicate extraction'},
+    ], example:'First run:\n2026-01-01 \u2192 2026-10-01\n\nNext run:\n2026-10-01 \u2192 current',
+    note:{type:'info', text:'Instead of downloading the entire dataset every time.'}
+  },
+  { title:'13.21 API Documentation', items:[
+      {t:'Why API documentation matters'}, {t:'Base URL'}, {t:'Endpoints'}, {t:'HTTP methods'}, {t:'Parameters'},
+      {t:'Request headers'}, {t:'Authentication'}, {t:'Request body'}, {t:'Response structure'},
+      {t:'Status codes'}, {t:'Rate limits'}, {t:'Pagination'}, {t:'Examples'}, {t:'Versioning'}, {t:'Deprecation'},
+    ], note:{type:'info', text:'Learn to read API documentation before writing extraction code.'}
+  },
+  { title:'13.22 Tools for API Testing', items:[
+      {t:'Postman'}, {t:'cURL'}, {t:'Browser/API documentation'}, {t:'Python `requests`'},
+      {t:'Compare Postman vs Python'}, {t:'Inspect request'}, {t:'Inspect response'}, {t:'Test headers'},
+      {t:'Test parameters'}, {t:'Test authentication'},
+    ], note:{type:'info', text:'You already have Postman in your technical background, so this section should become practical rather than theoretical.'}
+  },
+  { title:'13.23 Practical Projects', items:[
+      {t:'Project 1 — Simple API Extraction', tags:['endpoint','GET','status code','JSON','Python requests']},
+      {t:'Project 2 — Paginated API Extractor'},
+      {t:'Project 3 — API \u2192 Parquet Pipeline', tags:['timeout','retries','error handling','logging']},
+      {t:'Project 4 — Incremental API Pipeline'},
+    ], examples:[
+      'Project 1 flow:\n\nAPI\n \u2193\nGET request\n \u2193\nJSON\n \u2193\nPython\n \u2193\nPrint selected fields',
+      'Project 2 flow:\n\nAPI\n \u2193\nPage 1\n \u2193\nPage 2\n \u2193\nPage 3\n \u2193\n...\n \u2193\nCombine records\n \u2193\nDataFrame\n \u2193\nParquet',
+      'Project 3 flow:\n\nAPI\n \u2193\nAuthentication\n \u2193\nRequest\n \u2193\nPagination\n \u2193\nJSON\n \u2193\nValidation\n \u2193\nPandas\n \u2193\nParquet',
+      'Project 4 flow:\n\nAPI\n \u2193\nFilter by updated date\n \u2193\nExtract new/changed records\n \u2193\nValidate\n \u2193\nTransform\n \u2193\nParquet\n \u2193\nSave last watermark'
+    ], note:{type:'info', text:'Project 2 is much more valuable for your Data Engineering preparation than simply making ten GET requests. Project 4 gives you an early introduction to the concepts used later in real data pipelines.'}
+  },
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    const diagrams = sec.examples || (sec.example ? [sec.example] : []);
+    const renderDiagrams = ()=> diagrams.forEach(txt=>{
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = txt;
+      secEl.appendChild(ex);
+    });
+    const renderNote = ()=>{
+      if(!sec.note) return;
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    };
+
+    // A few sections (e.g. HTTP Methods, Request Headers, Status Codes) have
+    // their explanatory note BEFORE the example/diagram in the source text,
+    // rather than after — noteFirst preserves that original ordering.
+    if(sec.noteFirst){ renderNote(); renderDiagrams(); }
+    else{ renderDiagrams(); renderNote(); }
+
+    if(!sec.note){ secEl.style.paddingBottom = '2px'; }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>

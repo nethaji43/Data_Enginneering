@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Working with Files — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#39C5CF; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(57,197,207,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#39C5CF; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#39C5CF; border-color:#39C5CF;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#39C5CF;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#39C5CF;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Data Handling</b> &middot; Topic 12 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Working with Files</h1>
+      <p class="sub">Paths, discovery, batch processing, and safe file operations — the filesystem layer underneath every pipeline. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/203</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. pathlib, glob, batch processing..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 12;        // matches topic.n = 12 (Working with Files) in index.html
+const CONTENT_SLUG = 'files'; // matches /content/files.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'12.1 File System Fundamentals', items:[
+      {t:'What is a file?'}, {t:'What is a directory?'}, {t:'File system basics'}, {t:'File path'},
+      {t:'Absolute path'}, {t:'Relative path'}, {t:'Current working directory'}, {t:'Parent directory'},
+      {t:'Root directory'}, {t:'File name'}, {t:'File extension'}, {t:'Hidden files'}, {t:'File vs directory'},
+      {t:'File metadata'}, {t:'Why file management matters in Data Engineering'},
+      {t:'Files as data pipeline inputs'}, {t:'Files as data pipeline outputs'},
+  ]},
+  { title:'12.2 Paths with pathlib', items:[
+      {t:'What is `pathlib`?'}, {t:'Why `pathlib` is preferred for modern Python path handling'},
+      {t:'Import `Path`'}, {t:'Create a `Path`'}, {t:'Relative paths with `Path`'}, {t:'Absolute paths with `Path`'},
+      {t:'Path joining'}, {t:'Parent paths'}, {t:'File name from a path'}, {t:'File suffix'}, {t:'File stem'},
+      {t:'Resolve a path'}, {t:'Check whether path exists'}, {t:'Check whether path is a file'},
+      {t:'Check whether path is a directory'},
+    ], example:'from pathlib import Path\n\nfile_path = Path("data") / "sales.csv"\nprint(file_path)\nprint(file_path.exists())\nprint(file_path.is_file())',
+    note:{type:'info', text:'`pathlib.Path` provides filesystem-aware operations including checking existence/type, reading and writing files, creating directories, and manipulating paths.'}
+  },
+  { title:'12.3 Directory Operations', items:[
+      {t:'Create a directory'}, {t:'Create nested directories'}, {t:'`mkdir()`'}, {t:'`parents=True`'},
+      {t:'`exist_ok=True`'}, {t:'List directory contents'}, {t:'`iterdir()`'}, {t:'Identify files inside a directory'},
+      {t:'Identify subdirectories'}, {t:'Traverse directory structure'}, {t:'Check empty directories'},
+      {t:'Create input/output directories programmatically'},
+    ], example:'from pathlib import Path\n\ndata_dir = Path("data")\ndata_dir.mkdir(exist_ok=True)\nfor item in data_dir.iterdir():\n    print(item)'
+  },
+  { title:'12.4 Reading & Writing Files',
+    intro:{type:'info', text:'You already learned basic file handling in Python, so this section is application-oriented, not a repetition of Python fundamentals.'},
+    items:[
+      {t:'Open files using paths'}, {t:'Read text files'}, {t:'Write text files'}, {t:'Append to files'},
+      {t:'Read bytes'}, {t:'Write bytes'}, {t:'Encoding'}, {t:'UTF-8'}, {t:'Newline handling'},
+      {t:'`Path.read_text()`'}, {t:'`Path.write_text()`'}, {t:'`Path.read_bytes()`'}, {t:'`Path.write_bytes()`'},
+      {t:'Safe file handling'}, {t:'Handle file-not-found errors'}, {t:'Handle permission errors'},
+    ], note:{type:'info', text:'`pathlib` directly supports text and binary reading/writing as well as opening files.'}
+  },
+  { title:'12.5 File Discovery', important:true,
+    intro:{type:'info', text:'This is very important for Data Engineering.'},
+    items:[
+      {t:'Find files in a directory'}, {t:'Find files by extension'}, {t:'Find all CSV files'},
+      {t:'Find all JSON files'}, {t:'Find all Parquet files'}, {t:'Find files recursively'},
+      {t:'Search nested directories'}, {t:'`glob()`'}, {t:'Recursive glob patterns'}, {t:'`rglob()`'},
+      {t:'Filter discovered files'}, {t:'Build a list of input files'},
+    ], example:'from pathlib import Path\n\ndata_dir = Path("data")\ncsv_files = list(data_dir.glob("*.csv"))\nfor file in csv_files:\n    print(file)',
+    note:{type:'info', text:'`Path.glob()` and `Path.rglob()` are designed for matching files against patterns, including recursive directory searches.'}
+  },
+  { title:'12.6 File Patterns', items:[
+      {t:'What is a file pattern?'}, {t:'`*.csv`'}, {t:'`*.json`'}, {t:'`*.parquet`'}, {t:'Prefix matching'},
+      {t:'Suffix matching'}, {t:'Wildcards'}, {t:'Recursive patterns'}, {t:'Multiple file patterns'},
+      {t:'Date-based filenames'}, {t:'Partition-style filenames'},
+    ], example:'sales_2026-09-01.csv\nsales_2026-09-02.csv\nsales_2026-09-03.csv',
+    note:{type:'info', text:'Learn to discover these programmatically instead of manually specifying every file.'}
+  },
+  { title:'12.7 File Metadata', items:[
+      {t:'What is file metadata?'}, {t:'File size'}, {t:'Creation/modification time'}, {t:'Last modified time'},
+      {t:'File type'}, {t:'File permissions basics'}, {t:'Check file existence'}, {t:'Check file size'},
+      {t:'Identify empty files'}, {t:'Compare file metadata'}, {t:'Use `stat()`'},
+    ], example:'from pathlib import Path\n\nfile = Path("sales.csv")\nprint(file.exists())\nprint(file.stat().st_size)'
+  },
+  { title:'12.8 Copying & Moving Files', items:[
+      {t:'Why files need to be copied'}, {t:'Copy a file'}, {t:'Copy a directory'}, {t:'Move a file'},
+      {t:'Move a directory'}, {t:'Rename files'}, {t:'Rename files based on a pattern'},
+      {t:'Preserve directory structure'}, {t:'Handle destination conflicts'}, {t:'`shutil.copy()`'},
+      {t:'`shutil.copytree()`'}, {t:'`shutil.move()`'}, {t:'Safe copying practices'},
+    ], note:{type:'info', text:"Python's `shutil` module provides high-level file and directory operations, including copying, moving and archiving."}
+  },
+  { title:'12.9 Deleting Files & Directories', important:true, items:[
+      {t:'Delete a file'}, {t:'Delete an empty directory'}, {t:'Delete directory trees'}, {t:'`Path.unlink()`'},
+      {t:'`Path.rmdir()`'}, {t:'`shutil.rmtree()`'}, {t:'Check before deleting'}, {t:'Avoid accidental deletion'},
+      {t:'Handle missing files'}, {t:'Safe cleanup operations'},
+    ], note:{type:'warning', text:'Important: understand the difference between deleting one file and recursively deleting an entire directory.'}
+  },
+  { title:'12.10 File Permissions & Access', items:[
+      {t:'Read permission'}, {t:'Write permission'}, {t:'Execute permission concept'}, {t:'Permission errors'},
+      {t:'Access denied'}, {t:'Read-only files'}, {t:'File ownership concept'},
+      {t:'Cross-platform permission differences'}, {t:'Handling permission-related failures'},
+    ], note:{type:'info', text:"You don't need deep Linux administration here because that is already covered in Topic 4 — Linux / Command Line."}
+  },
+  { title:'12.11 Temporary Files & Directories', items:[
+      {t:'What is a temporary file?'}, {t:'Why temporary files are useful'}, {t:'Temporary directories'},
+      {t:'`tempfile`'}, {t:'Temporary file lifecycle'}, {t:'Automatically cleaning temporary files'},
+      {t:'Temporary storage during processing'}, {t:'Avoid unnecessary permanent intermediate files'},
+    ], note:{type:'info', text:"Python's filesystem library includes `tempfile` specifically for generating temporary files and directories."}
+  },
+  { title:'12.12 Batch File Processing', important:true,
+    intro:{type:'info', text:'This is where the topic becomes much more relevant to Data Engineering.'},
+    items:[
+      {t:'What is batch file processing?'}, {t:'Discover input files'}, {t:'Process multiple files'},
+      {t:'Process files one by one'}, {t:'Combine multiple files'}, {t:'Track processed files'},
+      {t:'Handle failed files'}, {t:'Continue processing after one failure'}, {t:'Generate output files'},
+      {t:'Create output directories'}, {t:'Move processed files'}, {t:'Archive processed files'},
+      {t:'Avoid processing the same file twice'},
+    ], examples:[
+      'data/\n\u251c\u2500\u2500 input/\n\u2502   \u251c\u2500\u2500 sales_01.csv\n\u2502   \u251c\u2500\u2500 sales_02.csv\n\u2502   \u2514\u2500\u2500 sales_03.csv\n\u2502\n\u251c\u2500\u2500 processed/\n\u2502\n\u2514\u2500\u2500 output/',
+      'Pipeline:\n\ninput files\n     \u2193\ndiscover\n     \u2193\nprocess\n     \u2193\nvalidate\n     \u2193\noutput\n     \u2193\narchive processed files'
+    ]
+  },
+  { title:'12.13 Large File Handling', items:[
+      {t:'Why large files are a problem'}, {t:'Memory limitations'}, {t:'Read files incrementally'},
+      {t:'Process line by line'}, {t:'Chunk-based processing concept'}, {t:'Avoid loading unnecessary data'},
+      {t:'Streaming vs loading everything'}, {t:'Large CSV processing concept'}, {t:'Large JSON processing concept'},
+      {t:'Large text-file processing'}, {t:'File size considerations'},
+    ], note:{type:'info', text:"Don't go deeply into distributed processing here. That belongs to later topics such as Spark/Big Data."}
+  },
+  { title:'12.14 File Validation', items:[
+      {t:'Check whether file exists'}, {t:'Check expected extension'}, {t:'Check file size'},
+      {t:'Detect empty files'}, {t:'Validate filename pattern'}, {t:'Validate expected file count'},
+      {t:'Validate basic file readability'}, {t:'Validate expected columns'},
+      {t:'Detect corrupted/unreadable files'}, {t:'Separate valid and invalid files'},
+    ], example:'Expected:\nsales_YYYY-MM-DD.csv\n\nReceived:\nsales_2026-10-02.csv     \u2713\nsales_2026-10-03.csv     \u2713\nsales_backup.csv         \u2717\nempty.csv                \u2717'
+  },
+  { title:'12.15 File Naming & Organization', items:[
+      {t:'Why naming conventions matter'}, {t:'Consistent file names'}, {t:'Date-based filenames'},
+      {t:'Timestamp-based filenames'}, {t:'Versioned filenames'}, {t:'Input/output folder structure'},
+      {t:'Raw/processed/archive directories'}, {t:'Avoid ambiguous filenames'},
+      {t:'Avoid overwriting important files'}, {t:'Organize files for pipelines'},
+    ], example:'project/\n\u2502\n\u251c\u2500\u2500 raw/\n\u251c\u2500\u2500 processed/\n\u251c\u2500\u2500 output/\n\u251c\u2500\u2500 archive/\n\u2514\u2500\u2500 logs/'
+  },
+  { title:'12.16 File Archiving', items:[
+      {t:'What is archiving?'}, {t:'Why processed files are archived'}, {t:'Move processed files'},
+      {t:'Archive directory structure'}, {t:'ZIP concept'}, {t:'Creating archives'}, {t:'Extracting archives'},
+      {t:'`shutil.make_archive()`'}, {t:'Archive naming conventions'}, {t:'Archive retention concept'},
+    ], note:{type:'info', text:'This is basic file archiving, not advanced backup/storage administration.'}
+  },
+  { title:'12.17 Error Handling for File Operations', items:[
+      {t:'`FileNotFoundError`'}, {t:'`PermissionError`'}, {t:'`IsADirectoryError`'}, {t:'`NotADirectoryError`'},
+      {t:'`FileExistsError`'}, {t:'`OSError`'}, {t:'Catching specific exceptions'}, {t:'Logging file failures'},
+      {t:'Continue vs stop processing'}, {t:'Record failed filenames'}, {t:'Record failure reasons'},
+  ]},
+  { title:'12.18 Practical Data Engineering Workflow', items:[
+      {t:'Walk through the complete workflow end-to-end'},
+    ], examples:[
+      'Input Directory\n       \u2193\nDiscover Files\n       \u2193\nValidate Files\n       \u2193\nProcess Each File\n       \u2193\nClean / Transform\n       \u2193\nValidate Output\n       \u2193\nWrite Output File\n       \u2193\nMove to Processed\n       \u2193\nArchive',
+      'raw/\n   sales_01.csv\n   sales_02.csv\n   sales_03.csv\n\n        \u2193\n\ndiscover *.csv\n\n        \u2193\n\nread each file\n\n        \u2193\n\nclean / transform\n\n        \u2193\n\nwrite Parquet\n\n        \u2193\n\nprocessed/\n   sales_01.parquet\n   sales_02.parquet\n   sales_03.parquet\n\n        \u2193\n\narchive original CSVs'
+    ]
+  },
+  { title:'12.19 Practical Projects', items:[
+      {t:'Project 1 — File Organizer'},
+      {t:'Project 2 — Batch CSV Processor'},
+      {t:'Project 3 — File-Based ETL'},
+    ], examples:[
+      'Project 1:\n\nDownloads/\n    image.jpg\n    data.csv\n    report.pdf\n    data.json\n\n\u2192 organized into \u2192\n\nDownloads/\n\u251c\u2500\u2500 images/\n\u251c\u2500\u2500 csv/\n\u251c\u2500\u2500 json/\n\u2514\u2500\u2500 pdf/',
+      'Project 2:\n\ninput/\n   sales_01.csv\n   sales_02.csv\n   sales_03.csv\n\n        \u2193\n\ndiscover files\n\n        \u2193\n\nprocess each CSV\n\n        \u2193\n\ncombine / transform\n\n        \u2193\n\noutput/\n   sales_processed.parquet',
+      'Project 3:\n\nraw/\n   daily_sales_01.csv\n   daily_sales_02.csv\n   daily_sales_03.csv\n\n        \u2193\n   File Discovery\n        \u2193\n   File Validation\n        \u2193\n   Data Cleaning\n        \u2193\n   Transformation\n        \u2193\n   Validation\n        \u2193\n   Parquet Output\n        \u2193\n   Archive Raw Files'
+    ], note:{type:'info', text:'This combines Topics 10, 11 and 12 without teaching the same theory again.'}
+  },
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    const diagrams = sec.examples || (sec.example ? [sec.example] : []);
+    diagrams.forEach(txt=>{
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = txt;
+      secEl.appendChild(ex);
+    });
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>
