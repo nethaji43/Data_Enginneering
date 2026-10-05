@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Web Scraping Basics — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#39C5CF; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(57,197,207,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#39C5CF; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#39C5CF; border-color:#39C5CF;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#39C5CF;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#39C5CF;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Data Handling</b> &middot; Topic 14 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Web Scraping Basics</h1>
+      <p class="sub">HTML, Beautiful Soup, pagination, and responsible scraping — for when there's no API or downloadable dataset. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/228</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. BeautifulSoup, pagination, robots.txt..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 14;               // matches topic.n = 14 (Web Scraping Basics) in index.html
+const CONTENT_SLUG = 'web-scraping'; // matches /content/web-scraping.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'14.1 Web Scraping Fundamentals', items:[
+      {t:'What is web scraping?'}, {t:'Why web scraping is used'}, {t:'Web scraping vs API'},
+      {t:'Web scraping vs manual copying'}, {t:'Web scraping in Data Engineering'}, {t:'Website as a data source'},
+      {t:'HTML as the source document'}, {t:'Requesting a web page'}, {t:'Downloading HTML'}, {t:'Parsing HTML'},
+      {t:'Extracting required information'}, {t:'Transforming extracted information'}, {t:'Storing scraped data'},
+    ], example:'Website\n   \u2193\nHTTP Request\n   \u2193\nHTML Response\n   \u2193\nHTML Parser\n   \u2193\nExtract Data\n   \u2193\nClean / Transform\n   \u2193\nCSV / JSON / Parquet'
+  },
+  { title:'14.2 HTML Fundamentals', items:[
+      {t:'What is HTML?'}, {t:'HTML document structure'}, {t:'HTML elements'}, {t:'HTML tags'},
+      {t:'Opening and closing tags'}, {t:'Attributes'}, {t:'`id` attribute'}, {t:'`class` attribute'},
+      {t:'Nested elements'}, {t:'Parent and child elements'}, {t:'Sibling elements'}, {t:'Text content'},
+      {t:'Links'}, {t:'Images'}, {t:'Tables'}, {t:'Lists'}, {t:'Forms'}, {t:'HTML source code'}, {t:'DOM concept'},
+    ], note:{type:'info', text:"You don't need to become a frontend developer. Learn enough HTML to identify the data you want to extract."}
+  },
+  { title:'14.3 Inspecting a Web Page', items:[
+      {t:'Browser Developer Tools'}, {t:'Inspect Element'}, {t:'View page source'}, {t:'Identify HTML elements'},
+      {t:'Identify element classes'}, {t:'Identify IDs'}, {t:'Identify attributes'}, {t:'Find repeated elements'},
+      {t:'Find table structures'}, {t:'Find links'}, {t:'Identify the container holding the required data'},
+      {t:'Understand page structure'},
+    ], example:'<div class="product">\n    <h2>Python Course</h2>\n    <span class="price">\u20b9499</span>\n</div>\n\nYou should be able to recognize:\nproduct \u2192 container\nh2      \u2192 name\nprice   \u2192 price'
+  },
+  { title:'14.4 HTTP Requests for Scraping', noteFirst:true, items:[
+      {t:'Sending HTTP requests'}, {t:'`GET` request'}, {t:'Response status'}, {t:'Response content'},
+      {t:'Response headers'}, {t:'`User-Agent`'}, {t:'Request timeout'}, {t:'Request exceptions'},
+      {t:'HTTP status codes'}, {t:'Handling failed requests'}, {t:'`requests` library'}, {t:'Basic `urllib` concept'},
+    ], note:{type:'info', text:"Python's `urllib.request` can fetch URLs and work with HTTP requests, including headers and responses."},
+    example:'import requests\n\nurl = "https://example.com"\nresponse = requests.get(\n    url,\n    timeout=30\n)\nprint(response.status_code)\nprint(response.text)'
+  },
+  { title:'14.5 Beautiful Soup', noteFirst:true, items:[
+      {t:'What is Beautiful Soup?'}, {t:'Why HTML parsers are needed'}, {t:'Install Beautiful Soup'},
+      {t:'Import `BeautifulSoup`'}, {t:'Create a soup object'}, {t:'Parse HTML'}, {t:'Find elements'},
+      {t:'Find one element'}, {t:'Find multiple elements'}, {t:'Search by tag'}, {t:'Search by class'},
+      {t:'Search by ID'}, {t:'Search by attributes'}, {t:'Extract text'}, {t:'Extract attributes'},
+      {t:'Extract links'}, {t:'Navigate parent/child elements'},
+    ], note:{type:'info', text:'Beautiful Soup parses an HTML document and provides methods for navigating and searching the resulting structure.'},
+    example:'import requests\nfrom bs4 import BeautifulSoup\n\nurl = "https://example.com"\nresponse = requests.get(url, timeout=30)\n\nsoup = BeautifulSoup(\n    response.text,\n    "html.parser"\n)\n\ntitle = soup.find("h1")\nprint(title.get_text(strip=True))'
+  },
+  { title:'14.6 Selecting Elements', items:[
+      {t:'Select by tag'}, {t:'Select by class'}, {t:'Select by ID'}, {t:'CSS selectors'},
+      {t:'Attribute selectors'}, {t:'Nested selectors'}, {t:'`find()`'}, {t:'`find_all()`'}, {t:'`select()`'},
+      {t:'`select_one()`'}, {t:'Choosing stable selectors'}, {t:'Avoiding fragile selectors'},
+    ], example:'products = soup.select(".product")\n\nfor product in products:\n    name = product.select_one(".name")\n    price = product.select_one(".price")\n    print(name.get_text(strip=True))\n    print(price.get_text(strip=True))'
+  },
+  { title:'14.7 Extracting Data', items:[
+      {t:'Extract text'}, {t:'Strip whitespace'}, {t:'Extract `href`'}, {t:'Extract `src`'},
+      {t:'Extract image URLs'}, {t:'Extract links'}, {t:'Extract attributes'}, {t:'Extract table data'},
+      {t:'Extract list data'}, {t:'Extract repeated records'}, {t:'Handle missing elements'},
+      {t:'Handle missing attributes'}, {t:'Convert extracted data into dictionaries'}, {t:'Build a list of records'},
+    ], example:'records = [\n    {\n        "name": "Product A",\n        "price": 500,\n        "url": "..."\n    },\n    {\n        "name": "Product B",\n        "price": 700,\n        "url": "..."\n    }\n]',
+    note:{type:'info', text:'This structure can then be passed to Pandas.'}
+  },
+  { title:'14.8 Scraping HTML Tables', items:[
+      {t:'Identify HTML tables'}, {t:'Table rows'}, {t:'Table headers'}, {t:'Table cells'},
+      {t:'Extract table headers'}, {t:'Extract table rows'}, {t:'Handle missing cells'},
+      {t:'Convert table to list of dictionaries'}, {t:'Convert table to DataFrame'},
+      {t:'Validate row/column counts'},
+    ], example:'For simple static HTML tables, Pandas can sometimes read tables directly:\n\nimport pandas as pd\n\ntables = pd.read_html(url)\ndf = tables[0]',
+    note:{type:'info', text:'The important concept is recognizing when a page contains structured HTML that can be extracted directly.'}
+  },
+  { title:'14.9 Links & Multiple Pages', items:[
+      {t:'Extract links'}, {t:'Extract `href`'}, {t:'Relative URLs'}, {t:'Absolute URLs'},
+      {t:'Convert relative \u2192 absolute URL'}, {t:'Follow links'}, {t:'Scrape multiple pages'},
+      {t:'Build a list of URLs'}, {t:'Process URLs one by one'}, {t:'Handle broken links'},
+      {t:'Avoid duplicate URLs'},
+    ], example:'Page 1\n \u251c\u2500\u2500 Product A\n \u251c\u2500\u2500 Product B\n \u2514\u2500\u2500 Product C\n\n        \u2193\n\nExtract product URLs\n\n        \u2193\n\nVisit each product page\n\n        \u2193\n\nExtract details'
+  },
+  { title:'14.10 Pagination', items:[
+      {t:'What is web-page pagination?'}, {t:'Page numbers'}, {t:'`?page=1`'}, {t:'Next-page links'},
+      {t:'Detect next page'}, {t:'Loop through pages'}, {t:'Stop when no next page exists'},
+      {t:'Avoid infinite loops'}, {t:'Collect records from all pages'}, {t:'Validate total records'},
+    ], example:'/page/1\n   \u2193\n/page/2\n   \u2193\n/page/3\n   \u2193\n/page/4\n   \u2193\nNo next page'
+  },
+  { title:'14.11 Dynamic Websites', important:true, items:[
+      {t:'Static HTML vs dynamic HTML'}, {t:'Server-rendered pages'}, {t:'JavaScript-rendered content'},
+      {t:'Why requests may not see dynamic content'}, {t:'Browser vs HTTP request'},
+      {t:'Identify data loaded after page load'}, {t:'Check Network tab'}, {t:'Look for API requests'},
+      {t:'Prefer an API when available'}, {t:'Browser automation concept'},
+    ], note:{type:'warning', text:"This is an important boundary: don't immediately use Selenium just because a page is dynamic. First check whether the website loads the data through an API — that connects directly to Topic 13, APIs & JSON."}
+  },
+  { title:'14.12 Selenium / Browser Automation — Basic Concept', items:[
+      {t:'What is browser automation?'}, {t:'Why Selenium is used'}, {t:'Browser vs HTTP client'},
+      {t:'Opening a browser'}, {t:'Finding elements'}, {t:'Clicking elements'}, {t:'Entering values'},
+      {t:'Waiting for content'}, {t:'Extracting rendered content'}, {t:'When browser automation is necessary'},
+      {t:'Why browser automation is slower'}, {t:'Prefer direct HTTP/API when possible'},
+    ], note:{type:'info', text:"For your roadmap, don't go deep into Selenium automation here. You only need to understand when it is required."}
+  },
+  { title:'14.13 Handling Real-World Scraping Problems', items:[
+      {t:'Missing elements'}, {t:'Changed HTML structure'}, {t:'Broken selectors'}, {t:'Empty responses'},
+      {t:'HTTP errors'}, {t:'Timeouts'}, {t:'Connection errors'}, {t:'Duplicate records'},
+      {t:'Inconsistent page structures'}, {t:'Missing fields'}, {t:'Unexpected HTML'}, {t:'Encoding issues'},
+      {t:'Website changes'}, {t:'Scraper maintenance'},
+  ]},
+  { title:'14.14 Request Rate & Responsible Scraping', important:true,
+    intro:{type:'info', text:'This is important.'},
+    items:[
+      {t:'Why request rate matters'}, {t:'Avoid excessive requests'}, {t:'Delays between requests'},
+      {t:'Respect website policies'}, {t:'Check `robots.txt`'}, {t:'Understand crawl rules'},
+      {t:'Respect rate limits'}, {t:'Identify whether scraping is permitted'}, {t:'Avoid bypassing access controls'},
+      {t:'Avoid overwhelming servers'}, {t:'Cache data where appropriate'},
+    ], example:'from urllib.robotparser import RobotFileParser\n\nrp = RobotFileParser(\n    "https://example.com/robots.txt"\n)\nrp.read()\n\nallowed = rp.can_fetch(\n    "*",\n    "https://example.com/products"\n)\nprint(allowed)',
+    note:{type:'info', text:"Python provides `urllib.robotparser.RobotFileParser` to inspect robots.txt rules and determine whether a user agent can fetch a URL under those rules. robots.txt is one signal about crawling rules — it isn't a substitute for checking a site's terms or other applicable restrictions."}
+  },
+  { title:'14.15 User-Agent & Headers', items:[
+      {t:'What is `User-Agent`?'}, {t:'Why websites inspect `User-Agent`'}, {t:'Sending headers'},
+      {t:'`Accept` headers'}, {t:'Custom request headers'}, {t:'Session headers'}, {t:'Avoid misleading identity'},
+      {t:'Respect website requirements'},
+    ], example:'headers = {\n    "User-Agent": "MyDataCollector/1.0"\n}\n\nresponse = requests.get(\n    url,\n    headers=headers,\n    timeout=30\n)'
+  },
+  { title:'14.16 Sessions', items:[
+      {t:'What is an HTTP session?'}, {t:'Why sessions are useful'}, {t:'Persistent headers'},
+      {t:'Persistent cookies'}, {t:'Reusing connections'}, {t:'`requests.Session()`'}, {t:'Session-based scraping'},
+    ], example:'import requests\n\nsession = requests.Session()\nresponse = session.get(\n    url,\n    timeout=30\n)'
+  },
+  { title:'14.17 Cookies — Basic Understanding', items:[
+      {t:'What are cookies?'}, {t:'Why websites use cookies'}, {t:'Session cookies'},
+      {t:'Cookies and login sessions'}, {t:'Reading cookies conceptually'}, {t:'Sending cookies conceptually'},
+      {t:'When cookies affect scraping'},
+    ], note:{type:'info', text:'No need for advanced authentication bypass techniques.'}
+  },
+  { title:'14.18 Scraping → Pandas',
+    intro:{type:'info', text:'This connects your previous topics.'},
+    items:[
+      {t:'Extract HTML data'}, {t:'Create Python records'}, {t:'Convert records to DataFrame'},
+      {t:'Inspect scraped DataFrame'}, {t:'Apply cleaning'}, {t:'Apply transformations'}, {t:'Validate records'},
+      {t:'Save CSV'}, {t:'Save JSON'}, {t:'Save Parquet'},
+    ], example:'Complete flow:\n\nWebsite\n   \u2193\nrequests\n   \u2193\nHTML\n   \u2193\nBeautifulSoup\n   \u2193\nExtract records\n   \u2193\nPython list/dict\n   \u2193\nPandas\n   \u2193\nCleaning\n   \u2193\nParquet'
+  },
+  { title:'14.19 Scraping Pipeline Design', items:[
+      {t:'Identify source'}, {t:'Inspect website'}, {t:'Check API availability'}, {t:'Check scraping rules'},
+      {t:'Identify required fields'}, {t:'Design selectors'}, {t:'Fetch pages'}, {t:'Parse HTML'},
+      {t:'Extract records'}, {t:'Validate records'}, {t:'Handle failures'}, {t:'Store raw data'},
+      {t:'Clean data'}, {t:'Transform data'}, {t:'Save output'}, {t:'Log scraping results'},
+  ]},
+  { title:'14.20 Practical Projects', items:[
+      {t:'Project 1 — Product Listing Scraper', tags:['Product Name','Price','Rating','Product URL']},
+      {t:'Project 2 — Multi-Page Scraper', tags:['pagination','missing fields','duplicate detection','request delays','error handling']},
+      {t:'Project 3 — Web \u2192 Data Engineering Pipeline'},
+    ], examples:[
+      'Project 1 flow:\n\nWebsite\n \u2193\nrequests\n \u2193\nBeautifulSoup\n \u2193\nExtract\n \u2193\nDataFrame\n \u2193\nValidate\n \u2193\nParquet\n\n(output: products.csv, products.parquet)',
+      'Project 2 flow:\n\nPage 1\n \u2193\nPage 2\n \u2193\nPage 3\n \u2193\n...\n \u2193\nAll records\n \u2193\nDataFrame\n \u2193\nParquet',
+      'Project 3 flow:\n\nWebsite\n    \u2193\nScraper\n    \u2193\nRaw Data\n    \u2193\nData Cleaning\n    \u2193\nTransformation\n    \u2193\nValidation\n    \u2193\nParquet\n    \u2193\nReady for Analytics'
+    ], note:{type:'info', text:'Project 3 combines Topic 10 + Topic 11 + Topic 12 + Topic 14 without repeating the underlying concepts.'}
+  },
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    const diagrams = sec.examples || (sec.example ? [sec.example] : []);
+    const renderDiagrams = ()=> diagrams.forEach(txt=>{
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = txt;
+      secEl.appendChild(ex);
+    });
+    const renderNote = ()=>{
+      if(!sec.note) return;
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    };
+
+    // A few sections (HTTP Requests for Scraping, Beautiful Soup) have their
+    // explanatory note BEFORE the example in the source text, not after.
+    if(sec.noteFirst){ renderNote(); renderDiagrams(); }
+    else{ renderDiagrams(); renderNote(); }
+
+    if(!sec.note){ secEl.style.paddingBottom = '2px'; }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>

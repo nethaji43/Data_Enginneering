@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Database Design — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#A371F7; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(163,113,247,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#A371F7; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#A371F7; border-color:#A371F7;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#A371F7;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#A371F7;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Database & Data Concepts</b> &middot; Topic 16 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Database Design</h1>
+      <p class="sub">Business requirements \u2192 entities \u2192 relationships \u2192 tables \u2192 keys \u2192 normalization \u2192 physical schema. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/277</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. ER diagram, normalization, grain..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 16;                // matches topic.n = 16 (Database Design) in index.html
+const CONTENT_SLUG = 'database-design'; // matches /content/database-design.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'16.1 Database Design Fundamentals', items:[
+      {t:'What is database design?'}, {t:'Why database design matters'}, {t:'Poor database design problems'},
+      {t:'Requirements \u2192 database model'}, {t:'Business requirements vs technical design'},
+      {t:'Identify what data needs to be stored'}, {t:'Identify entities'}, {t:'Identify attributes'},
+      {t:'Identify relationships'}, {t:'Identify business rules'}, {t:'Define data ownership'},
+      {t:'Define required vs optional data'}, {t:'Define uniqueness requirements'}, {t:'Define data lifecycle'},
+      {t:'Design before creating tables'},
+    ], example:'Business Requirements\n        \u2193\n    Identify Entities\n        \u2193\n   Identify Attributes\n        \u2193\n Identify Relationships\n        \u2193\n       ER Model\n        \u2193\n    Logical Design\n        \u2193\n   Normalization\n        \u2193\n  Physical Database\n        \u2193\n      Tables'
+  },
+  { title:'16.2 Entities', items:[
+      {t:'What is an entity?'}, {t:'Entity vs table'}, {t:'Identifying real-world entities'}, {t:'Strong entities'},
+      {t:'Weak entities'}, {t:'Entity naming'}, {t:'Entity boundaries'}, {t:'Entity vs attribute'},
+      {t:'Entity vs transaction'}, {t:'Identifying independent entities'},
+    ], example:'E-commerce System \u2014 potential entities:\n\nCustomer\nProduct\nOrder\nPayment\nAddress'
+  },
+  { title:'16.3 Attributes', items:[
+      {t:'What is an attribute?'}, {t:'Identifying attributes'}, {t:'Simple attributes'},
+      {t:'Composite attributes'}, {t:'Single-valued attributes'}, {t:'Multi-valued attributes'},
+      {t:'Derived attributes'}, {t:'Stored vs derived attributes'}, {t:'Required attributes'},
+      {t:'Optional attributes'}, {t:'Attribute naming'}, {t:'Choosing appropriate data types'},
+      {t:'Avoiding unnecessary attributes'}, {t:'Avoiding overloaded columns'},
+    ], example:'Customer\n---------\ncustomer_id\nfirst_name\nlast_name\nemail\nphone\ndate_of_birth'
+  },
+  { title:'16.4 Keys in Database Design',
+    intro:{type:'info', text:'You already learned key definitions in Topic 5. Here focus on choosing keys during design.'},
+    items:[
+      {t:'Identify candidate keys'}, {t:'Choose primary key'}, {t:'Natural key'}, {t:'Surrogate key'},
+      {t:'Natural vs surrogate key'}, {t:'Single-column primary key'}, {t:'Composite primary key'},
+      {t:'Foreign key design'}, {t:'Unique keys'}, {t:'Alternate keys'}, {t:'Stable vs changing keys'},
+      {t:'Key naming conventions'}, {t:'Key data types'}, {t:'Key size considerations'},
+    ], note:{type:'info', text:"A primary key uniquely identifies a row; a foreign key connects a child table to a referenced parent key."}
+  },
+  { title:'16.5 Relationships', items:[
+      {t:'What is a relationship?'}, {t:'One-to-one relationship'}, {t:'One-to-many relationship'},
+      {t:'Many-to-many relationship'}, {t:'Self-referencing relationship'}, {t:'Parent-child relationship'},
+      {t:'Optional relationship'}, {t:'Mandatory relationship'}, {t:'Relationship direction'},
+      {t:'Relationship naming'}, {t:'Relationship constraints'}, {t:'Identify relationship from business requirements'},
+    ], example:'Customer\n   \u2502\n   \u2502 1\n   \u2502\n   \u2502 many\n   \u2193\nOrders\n\nOne customer can have many orders.'
+  },
+  { title:'16.6 Many-to-Many Relationships', items:[
+      {t:'Why many-to-many relationships need special handling'}, {t:'Junction table'}, {t:'Associative table'},
+      {t:'Bridge table'}, {t:'Composite keys in junction tables'}, {t:'Foreign keys in junction tables'},
+      {t:'Additional attributes in junction tables'}, {t:'Many-to-many \u2192 two one-to-many relationships'},
+    ], example:'Students\n   \u2502\n   \u2502\n   \u2193\nStudent_Course\n   \u2191\n   \u2502\nCourses\n\nStudent_Course resolves the many-to-many relationship.',
+    note:{type:'info', text:'A relational design commonly uses an intermediary/associative table for many-to-many relationships.'}
+  },
+  { title:'16.7 ER Diagrams', items:[
+      {t:'What is an ER diagram?'}, {t:'Purpose of ER diagrams'}, {t:'Entity representation'},
+      {t:'Attribute representation'}, {t:'Relationship representation'}, {t:'Primary key notation'},
+      {t:'Foreign key notation'}, {t:'Cardinality'}, {t:'Optionality'}, {t:"Crow's Foot notation"},
+      {t:'One-to-one notation'}, {t:'One-to-many notation'}, {t:'Many-to-many notation'},
+      {t:'Self-referencing relationships'}, {t:'Reading an ER diagram'}, {t:'Creating an ER diagram'},
+    ], example:'\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  CUSTOMER    \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 PK customer_id\u2502\n\u2502 name         \u2502\n\u2502 email        \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n       \u2502\n       \u2502 1\n       \u2502\n       \u2502 N\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u25bc\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502    ORDER     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 PK order_id  \u2502\n\u2502 FK customer_id\n\u2502 order_date   \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518'
+  },
+  { title:'16.8 Business Requirements → ER Model', items:[
+      {t:'Read business requirements'}, {t:'Extract nouns as potential entities'},
+      {t:'Extract properties as potential attributes'}, {t:'Extract relationships from business rules'},
+      {t:'Identify cardinality'}, {t:'Identify optionality'}, {t:'Identify unique identifiers'},
+      {t:'Identify constraints'}, {t:'Identify transaction entities'}, {t:'Identify lookup/reference entities'},
+      {t:'Validate model against requirements'},
+    ], example:'Requirement:\n"A customer can place multiple orders. Each order belongs to exactly one customer."\n\nDesign:\nCustomer 1 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 N Order'
+  },
+  { title:'16.9 Normalization for Design',
+    intro:{type:'info', text:'Topic 5 introduced normalization. Here you apply it while designing.'},
+    items:[
+      {t:'Why normalization matters'}, {t:'Identify repeating data'}, {t:'Identify redundancy'},
+      {t:'Functional dependency concept'}, {t:'Partial dependency'}, {t:'Transitive dependency'},
+      {t:'`1NF`'}, {t:'`2NF`'}, {t:'`3NF`'}, {t:'Normalize a table step-by-step'},
+      {t:'Identify normalization problems'}, {t:'Insert anomaly'}, {t:'Update anomaly'}, {t:'Delete anomaly'},
+      {t:'Validate normalized design'},
+    ], note:{type:'info', text:'Normalization aims to reduce redundancy and avoid insert, update, and delete anomalies.'}
+  },
+  { title:'16.10 Functional Dependencies', items:[
+      {t:'What is functional dependency?'}, {t:'Determinant'}, {t:'Dependent attribute'},
+      {t:'Full functional dependency'}, {t:'Partial dependency'}, {t:'Transitive dependency'},
+      {t:'Identify dependencies from business rules'}, {t:'Use dependencies for normalization'},
+      {t:'Dependency violations'},
+    ], example:'customer_id \u2192 customer_name\n\nMeaning: a customer ID determines the customer\'s name.'
+  },
+  { title:'16.11 Denormalization', items:[
+      {t:'What is denormalization?'}, {t:'Why denormalize?'}, {t:'Normalized vs denormalized'},
+      {t:'Reduce joins'}, {t:'Duplicate selected data intentionally'}, {t:'Performance considerations'},
+      {t:'Read-heavy workloads'}, {t:'Reporting requirements'}, {t:'Risks of denormalization'},
+      {t:'Maintaining duplicated data'}, {t:'When NOT to denormalize'},
+    ], note:{type:'info', text:'Normalized relational designs are generally aimed at reducing redundancy and supporting updates, while denormalized structures can be useful when query performance or simpler access patterns are more important.'}
+  },
+  { title:'16.12 Constraints in Database Design', items:[
+      {t:'Primary key constraints'}, {t:'Foreign key constraints'}, {t:'Unique constraints'}, {t:'`NOT NULL`'},
+      {t:'`DEFAULT`'}, {t:'`CHECK`'}, {t:'Referential integrity'}, {t:'Business-rule constraints'},
+      {t:'Choosing where to enforce rules'}, {t:'Constraint naming'}, {t:'Constraint dependencies'},
+    ], example:'CREATE TABLE orders (\n    order_id NUMBER PRIMARY KEY,\n    customer_id NUMBER NOT NULL,\n    order_date DATE NOT NULL,\n\n    CONSTRAINT fk_order_customer\n        FOREIGN KEY (customer_id)\n        REFERENCES customers(customer_id)\n);'
+  },
+  { title:'16.13 Data Types in Design', items:[
+      {t:'Choosing numeric types'}, {t:'Integer vs decimal'}, {t:'Choosing string length'},
+      {t:'Date vs timestamp'}, {t:'Boolean representation'}, {t:'Currency representation'},
+      {t:'Precision and scale'}, {t:'Avoiding inappropriate data types'}, {t:'Consistent types across related tables'},
+      {t:'Data type impact on storage'}, {t:'Data type impact on joins'},
+  ]},
+  { title:'16.14 Table Design', items:[
+      {t:'Table naming conventions'}, {t:'Column naming conventions'}, {t:'Singular vs plural table names'},
+      {t:'Primary key naming'}, {t:'Foreign key naming'}, {t:'Avoiding ambiguous names'},
+      {t:'Avoiding reserved words'}, {t:'Column ordering'}, {t:'Required columns'}, {t:'Audit columns'},
+      {t:'Created timestamp'}, {t:'Updated timestamp'}, {t:'Active/status columns'},
+    ], example:'customers\n---------\ncustomer_id\nfirst_name\nlast_name\nemail\ncreated_at\nupdated_at'
+  },
+  { title:'16.15 Audit & Metadata Columns', items:[
+      {t:'Why audit columns are useful'}, {t:'`created_at`'}, {t:'`updated_at`'}, {t:'`created_by`'},
+      {t:'`updated_by`'}, {t:'Status columns'}, {t:'Source-system identifier'}, {t:'Source-system timestamp'},
+      {t:'Load timestamp'}, {t:'Batch/load ID'},
+    ], note:{type:'info', text:'These become particularly useful later when you build ETL and data pipelines.'}
+  },
+  { title:'16.16 Slowly Changing Data — Basic Design', items:[
+      {t:'Why business data changes'}, {t:'Current-value storage'}, {t:'Historical-value storage'},
+      {t:'Effective start date'}, {t:'Effective end date'}, {t:'Active/current flag'}, {t:'Version number'},
+      {t:'Basic SCD Type 1 concept'}, {t:'Basic SCD Type 2 concept'}, {t:'When historical tracking is required'},
+    ], note:{type:'info', text:"Don't go deep into implementing SCD pipelines here; that belongs naturally with your later Data Warehousing/ETL topics."}
+  },
+  { title:'16.17 Physical Database Design', items:[
+      {t:'Logical vs physical design'}, {t:'Logical schema'}, {t:'Physical schema'}, {t:'Tables'}, {t:'Columns'},
+      {t:'Data types'}, {t:'Constraints'}, {t:'Indexes'}, {t:'Storage considerations'}, {t:'Partitioning concept'},
+      {t:'Physical design tradeoffs'},
+    ], note:{type:'info', text:'The physical model translates the logical design into actual database structures; modeling tools can also support forward engineering from a model to database scripts and reverse engineering from existing databases.'}
+  },
+  { title:'16.18 Index Design',
+    intro:{type:'info', text:'You already learned what indexes are in Topic 5 and performance in Topic 15. Here the question is: which indexes should I design when creating the database?'},
+    items:[
+      {t:'Identify frequently searched columns'}, {t:'Index primary keys'}, {t:'Foreign-key indexing considerations'},
+      {t:'Index frequently filtered columns'}, {t:'Index join columns'}, {t:'Composite indexes'},
+      {t:'Index column order'}, {t:'Avoid unnecessary indexes'}, {t:'Write-heavy vs read-heavy tradeoff'},
+      {t:'Index design review'},
+  ]},
+  { title:'16.19 Schema Design Review', items:[
+      {t:'Check entity completeness'}, {t:'Check missing relationships'}, {t:'Check duplicate attributes'},
+      {t:'Check primary keys'}, {t:'Check foreign keys'}, {t:'Check cardinality'}, {t:'Check nullable columns'},
+      {t:'Check data types'}, {t:'Check normalization'}, {t:'Check constraints'}, {t:'Check naming conventions'},
+      {t:'Check indexes'}, {t:'Check business rules'}, {t:'Check future requirements'},
+  ]},
+  { title:'16.20 Database Modeling Tools', items:[
+      {t:'What is a database modeling tool?'}, {t:'ER diagram tools'}, {t:'MySQL Workbench'},
+      {t:'Draw.io / diagrams.net'}, {t:'dbdiagram.io concept'}, {t:'Create tables visually'},
+      {t:'Create relationships'}, {t:'Generate SQL from a model'}, {t:'Reverse engineer an existing database'},
+      {t:'Compare model vs database'},
+    ], note:{type:'info', text:'Tools such as MySQL Workbench support graphical modeling, EER diagrams, foreign-key relationships, forward engineering, and reverse engineering.'}
+  },
+  { title:'16.21 Forward & Reverse Engineering', items:[
+      {t:'What is forward engineering?'}, {t:'Model \u2192 SQL'}, {t:'SQL \u2192 database'}, {t:'What is reverse engineering?'},
+      {t:'Existing database \u2192 model'}, {t:'Compare schema versions'}, {t:'Schema synchronization concept'},
+      {t:'Schema migration concept'}, {t:'Risks of changing production schema'},
+  ]},
+  { title:'16.22 Database Design for Different Workloads', items:[
+      {t:'OLTP design'}, {t:'Transaction-oriented systems'}, {t:'Read/write balance'},
+      {t:'Normalized OLTP design'}, {t:'Analytical workloads'}, {t:'Reporting workloads'},
+      {t:'Read-heavy systems'}, {t:'OLTP vs analytical design'}, {t:"Why one design doesn't fit every workload"},
+    ], note:{type:'info', text:'A normalized ER model is commonly associated with OLTP, while dimensional models are designed to make analytical querying easier and support business analysis.'}
+  },
+  { title:'16.23 Introduction to Dimensional Design',
+    intro:{type:'info', text:'This should be only an introduction here because Data Warehousing will be a later topic.'},
+    items:[
+      {t:'What is dimensional modeling?'}, {t:'Fact table'}, {t:'Dimension table'}, {t:'Measures'},
+      {t:'Dimensions'}, {t:'Grain'}, {t:'Star schema'}, {t:'Snowflake schema'}, {t:'Fact vs dimension'},
+      {t:'Basic star schema design'}, {t:'OLTP vs star schema'},
+    ], note:{type:'info', text:'A star schema typically has a central fact table connected to multiple dimension tables; the grain defines the level of detail stored in the fact table.'}
+  },
+  { title:'16.24 Grain', important:true,
+    intro:{type:'info', text:'This is extremely important for Data Engineering.'},
+    items:[
+      {t:'What is grain?'}, {t:'Define grain before designing a fact table'}, {t:'One row per customer'},
+      {t:'One row per order'}, {t:'One row per order item'}, {t:'One row per daily product'},
+      {t:'Why incorrect grain causes duplication'}, {t:'Grain and aggregation'}, {t:'Grain and joins'},
+      {t:'Grain validation'},
+    ], example:'Sales Fact\n\nGrain: one row = one product in one order\n\nThen:\nOrder 1001\n \u251c\u2500\u2500 Product A\n \u251c\u2500\u2500 Product B\n \u2514\u2500\u2500 Product C\n\nmeans three fact rows, not one.'
+  },
+  { title:'16.25 Practical Database Design Projects', items:[
+      {t:'Project 1 — E-Commerce Database', tags:['entities','attributes','PKs','FKs','relationships','cardinality','constraints','ER diagram','SQL DDL']},
+      {t:'Project 2 — Employee Management Database', tags:['self-referencing employee \u2192 manager','department \u2192 employees','employee \u2192 attendance','employee \u2192 salary history']},
+      {t:'Project 3 — Data Engineering Project (dimensional model)', tags:['grain','dimensions','measures','keys','relationships','business rules','schema']},
+    ], examples:[
+      'Project 1 design:\n\nCustomer\n    \u2193\n  Orders\n    \u2193\nOrder Items\n    \u2193\n Products',
+      'Project 3 design:\n\n                    Customer\n                       \u2502\n                       \u2502\nProduct \u2500\u2500\u2500\u2500\u2500\u2500\u2500 Sales Fact \u2500\u2500\u2500\u2500\u2500\u2500\u2500 Date\n                       \u2502\n                       \u2502\n                    Store'
+    ], note:{type:'info', text:'Project 3 gives you an early introduction to dimensional modeling before the dedicated warehouse topic.'}
+  },
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    const diagrams = sec.examples || (sec.example ? [sec.example] : []);
+    diagrams.forEach(txt=>{
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = txt;
+      secEl.appendChild(ex);
+    });
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>

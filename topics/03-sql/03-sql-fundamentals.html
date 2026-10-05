@@ -81,67 +81,159 @@ const TOPIC_ID = 3;         // matches topic.n = 3 (SQL) in index.html
 const CONTENT_SLUG = 'sql'; // matches /content/sql.json, used for item.html links
 const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
 
+
 const SECTIONS = [
   { title:'SQL Fundamentals', important:true, items:[
-      {t:'What is SQL'}, {t:'Database, Table, Row and Column'}, {t:'Schema basics'}, {t:'Data Types'},
-      {t:'`SELECT`'}, {t:'`FROM`'}, {t:'`DISTINCT`'}, {t:'Column Aliases using `AS`'}, {t:'`LIMIT` / `TOP`'},
+      {t:'What is SQL'},
+      {t:'Database, Table, Row and Column'},
+      {t:'Schema basics'},
+      {t:'Data Types'},
+      {t:'`SELECT`'},
+      {t:'`FROM`'},
+      {t:'`DISTINCT`'},
+      {t:'Column Aliases using `AS`'},
+      {t:'`LIMIT` / `TOP` / `FETCH` / `OFFSET`'},
   ]},
+
   { title:'Filtering Data', important:true, items:[
       {t:'`WHERE`'},
       {t:'Comparison Operators', tags:['=','!= / <>','>','<','>=','<=']},
-      {t:'`AND`'}, {t:'`OR`'}, {t:'`NOT`'}, {t:'`IN`'}, {t:'`BETWEEN`'}, {t:'`LIKE`'},
+      {t:'`AND`'},
+      {t:'`OR`'},
+      {t:'`NOT`'},
+      {t:'`IN`'},
+      {t:'`BETWEEN`'},
+      {t:'`LIKE`'},
       {t:'Wildcards', tags:['%','_']},
-      {t:'`IS NULL`'}, {t:'`IS NOT NULL`'},
+      {t:'`IS NULL`'},
+      {t:'`IS NOT NULL`'},
   ]},
+
   { title:'Sorting & Basic Results', items:[
-      {t:'`ORDER BY`'}, {t:'`ASC`'}, {t:'`DESC`'}, {t:'Multiple Column Sorting'},
+      {t:'`ORDER BY`'},
+      {t:'`ASC`'},
+      {t:'`DESC`'},
+      {t:'Multiple Column Sorting'},
   ]},
+
   { title:'Aggregate Functions', important:true, items:[
-      {t:'`COUNT()`'}, {t:'`SUM()`'}, {t:'`AVG()`'}, {t:'`MIN()`'}, {t:'`MAX()`'},
-      {t:'`GROUP BY`'}, {t:'`HAVING`'},
+      {t:'`COUNT()` — `COUNT(*)` vs `COUNT(column)`'},
+      {t:'`SUM()`'},
+      {t:'`AVG()`'},
+      {t:'`MIN()`'},
+      {t:'`MAX()`'},
+      {t:'`GROUP BY`'},
+      {t:'`HAVING`'},
+      {t:'`DISTINCT` with Aggregate Functions'},
   ]},
+
   { title:'SQL Joins — Extremely Important', important:true, items:[
-      {t:'Why Joins are Used'}, {t:'`INNER JOIN`'}, {t:'`LEFT JOIN`'}, {t:'`RIGHT JOIN`'},
-      {t:'`FULL OUTER JOIN`'}, {t:'`CROSS JOIN`'}, {t:'`SELF JOIN`'}, {t:'Join Multiple Tables'},
-      {t:'Understanding Duplicate Rows in Joins'}, {t:'Understanding Missing Matches in Joins'},
+      {t:'Why Joins are Used'},
+      {t:'`INNER JOIN`'},
+      {t:'`LEFT JOIN`'},
+      {t:'`RIGHT JOIN`'},
+      {t:'`FULL OUTER JOIN`'},
+      {t:'`CROSS JOIN`'},
+      {t:'`SELF JOIN`'},
+      {t:'Join Multiple Tables'},
+      {t:'`ON` vs `WHERE` in JOINs'},
+      {t:'Understanding Duplicate Rows in Joins'},
+      {t:'Understanding Missing Matches in Joins'},
   ]},
+
   { title:'Set Operations', items:[
-      {t:'`UNION`'}, {t:'`UNION ALL`'}, {t:'`INTERSECT`'}, {t:'`EXCEPT`'},
-    ], note:{type:'info', text:"Learn database-specific alternatives later, if a particular database doesn't support all of these."}
+      {t:'`UNION`'},
+      {t:'`UNION ALL`'},
+      {t:'`INTERSECT`'},
+      {t:'`EXCEPT`'},
+    ],
+    note:{
+      type:'info',
+      text:"Learn database-specific alternatives later, if a particular database doesn't support all of these."
+    }
   },
+
   { title:'SQL Data Manipulation (DML)', important:true, items:[
-      {t:'`INSERT`'}, {t:'`UPDATE`'}, {t:'`DELETE`'},
+      {t:'`INSERT`'},
+      {t:'`UPDATE`'},
+      {t:'`DELETE`'},
   ]},
+
   { title:'SQL Table & Database Basics (DDL)', items:[
-      {t:'`CREATE DATABASE`'}, {t:'`CREATE TABLE`'}, {t:'`ALTER TABLE`'},
-      {t:'`DROP TABLE`'}, {t:'`TRUNCATE TABLE`'},
+      {t:'`CREATE DATABASE`'},
+      {t:'`CREATE TABLE`'},
+      {t:'`ALTER TABLE`'},
+      {t:'`DROP TABLE`'},
+      {t:'`TRUNCATE TABLE`'},
   ]},
+
   { title:'Constraints & Keys', important:true, items:[
-      {t:'`PRIMARY KEY`'}, {t:'`FOREIGN KEY`'}, {t:'`UNIQUE`'},
-      {t:'`NOT NULL`'}, {t:'`DEFAULT`'}, {t:'`CHECK`'},
+      {t:'`PRIMARY KEY`'},
+      {t:'`FOREIGN KEY`'},
+      {t:'`UNIQUE`'},
+      {t:'`NOT NULL`'},
+      {t:'`DEFAULT`'},
+      {t:'`CHECK`'},
   ]},
+
   { title:'Subqueries', important:true, items:[
-      {t:'Scalar Subqueries'}, {t:'Multi-row Subqueries'}, {t:'Correlated Subqueries'},
-      {t:'Subqueries with `IN`'}, {t:'Subqueries with `EXISTS`'},
+      {t:'Scalar Subqueries'},
+      {t:'Multi-row Subqueries'},
+      {t:'Correlated Subqueries'},
+      {t:'Subqueries with `IN`'},
+      {t:'Subqueries with `EXISTS`'},
+      {t:'`EXISTS` vs `IN`'},
   ]},
+
   { title:'Common Table Expressions (CTEs)', important:true, items:[
-      {t:'What is a CTE'}, {t:'`WITH`'}, {t:'Multiple CTEs'}, {t:'CTE vs Subquery'},
+      {t:'What is a CTE'},
+      {t:'`WITH`'},
+      {t:'Multiple CTEs'},
+      {t:'CTE vs Subquery'},
   ]},
+
   { title:'Window Functions — Extremely Important for Data Engineering', important:true, items:[
-      {t:'What is a Window Function'}, {t:'`OVER()`'}, {t:'`PARTITION BY`'},
-      {t:'`ROW_NUMBER()`'}, {t:'`RANK()`'}, {t:'`DENSE_RANK()`'},
-      {t:'`LAG()`'}, {t:'`LEAD()`'}, {t:'Running Total'}, {t:'Moving Average'},
+      {t:'What is a Window Function'},
+      {t:'`OVER()`'},
+      {t:'`PARTITION BY`'},
+      {t:'`ROW_NUMBER()`'},
+      {t:'`RANK()`'},
+      {t:'`DENSE_RANK()`'},
+      {t:'`LAG()`'},
+      {t:'`LEAD()`'},
+      {t:'Running Total'},
+      {t:'Moving Average'},
   ]},
+
   { title:'Conditional & NULL Handling', important:true, items:[
-      {t:'`CASE WHEN`'}, {t:'`COALESCE()`'}, {t:'`NULLIF()`'}, {t:'Handling `NULL` Values'},
+      {t:'`CASE WHEN`'},
+      {t:'`COALESCE()`'},
+      {t:'`NULLIF()`'},
+      {t:'Handling `NULL` Values'},
   ]},
+
   { title:'String Functions', items:[
-      {t:'`CONCAT()`'}, {t:'`UPPER()`'}, {t:'`LOWER()`'}, {t:'`TRIM()`'},
-      {t:'`LENGTH()` / `LEN()`'}, {t:'`SUBSTRING()`'}, {t:'`REPLACE()`'},
+      {t:'`CONCAT()`'},
+      {t:'`UPPER()`'},
+      {t:'`LOWER()`'},
+      {t:'`TRIM()`'},
+      {t:'`LENGTH()` / `LEN()`'},
+      {t:'`SUBSTRING()`'},
+      {t:'`REPLACE()`'},
   ]},
+
   { title:'Date & Time Functions', items:[
-      {t:'Current Date/Time'}, {t:'Extracting Year, Month and Day'}, {t:'Date Formatting'},
-      {t:'Date Arithmetic'}, {t:'Date Difference'},
+      {t:'Current Date/Time'},
+      {t:'Extracting Year, Month and Day'},
+      {t:'Date Formatting'},
+      {t:'Date Arithmetic'},
+      {t:'Date Difference'},
+  ]},
+
+  { title:'SQL Query Concepts', important:true, items:[
+      {t:'SQL Query Execution Order'},
+      {t:'Logical Query Processing Order'},
+      {t:'Understanding `FROM` → `WHERE` → `GROUP BY` → `HAVING` → `SELECT` → `ORDER BY`'},
   ]},
 ];
 

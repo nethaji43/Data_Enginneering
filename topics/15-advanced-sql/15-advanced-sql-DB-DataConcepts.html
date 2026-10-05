@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Advanced SQL — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#A371F7; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(163,113,247,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#A371F7; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#A371F7; border-color:#A371F7;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#A371F7;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#A371F7;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Database & Data Concepts</b> &middot; Topic 15 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Advanced SQL</h1>
+      <p class="sub">Beyond fundamentals: complex analytical SQL, recursive queries, execution plans, query optimization, and production SQL thinking. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/327</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note note-info" style="margin-top:22px;">
+    <span class="note-icon">&#9432;</span>
+    <span><strong>Goal:</strong> Topic 3 already covers SQL fundamentals. This topic builds on that with complex analytical SQL, advanced query patterns, recursive queries, query performance, and production-oriented SQL thinking — not a repeat of the basics.</span>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. window functions, CTE, execution plan..." style="margin-top:20px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 15;              // matches topic.n = 15 (Advanced SQL) in index.html
+const CONTENT_SLUG = 'advanced-sql'; // matches /content/advanced-sql.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'15.1 Advanced SQL Mindset', items:[
+      {t:'What makes SQL advanced?'}, {t:'Basic SQL vs advanced SQL'}, {t:'Analytical SQL vs transactional SQL'},
+      {t:'Multi-step SQL logic'}, {t:'Breaking complex problems into steps'}, {t:'Reusing intermediate results'},
+      {t:'Thinking in sets instead of loops'}, {t:'SQL execution order'}, {t:'Logical query processing order'},
+      {t:'Writing readable complex SQL'}, {t:'Choosing between multiple SQL approaches'}, {t:'Correctness vs performance'},
+    ], example:'Basic SQL\n   \u2193\nJoins + Aggregations\n   \u2193\nSubqueries + CTEs\n   \u2193\nWindow Functions\n   \u2193\nAdvanced Analytical Patterns\n   \u2193\nQuery Optimization\n   \u2193\nProduction SQL'
+  },
+  { title:'15.2 Advanced Subqueries',
+    intro:{type:'info', text:'You already learned basic subqueries in Topic 3. Here we go deeper.'},
+    items:[
+      {t:'Subquery execution concepts'}, {t:'Scalar subqueries'}, {t:'Multi-row subqueries'},
+      {t:'Correlated subqueries'}, {t:'Correlated vs non-correlated subqueries'}, {t:'Subqueries in `SELECT`'},
+      {t:'Subqueries in `FROM`'}, {t:'Subqueries in `WHERE`'}, {t:'Subqueries with `EXISTS`'},
+      {t:'Subqueries with `NOT EXISTS`'}, {t:'`IN` vs `EXISTS`'}, {t:'Subquery vs `JOIN`'},
+      {t:'Subquery vs CTE'}, {t:'Rewriting subqueries'}, {t:'Identify inefficient correlated subqueries'},
+  ]},
+  { title:'15.3 Advanced CTEs',
+    intro:{type:'info', text:'Your SQL fundamentals already introduced CTEs. Now learn to use them for complex query design.'},
+    items:[
+      {t:'Multi-step CTEs'}, {t:'Multiple CTEs'}, {t:'CTE dependency chains'}, {t:'CTE for transformation stages'},
+      {t:'CTE for aggregation'}, {t:'CTE for filtering'}, {t:'CTE for ranking'}, {t:'CTE + window functions'},
+      {t:'CTE + joins'}, {t:'CTE vs subquery'}, {t:'CTE readability'}, {t:'CTE maintainability'},
+      {t:'CTE performance considerations'}, {t:'CTE materialization concept'},
+    ], note:{type:'info', text:'A CTE is a named intermediate result scoped to a query; importantly, a CTE is not automatically faster than a subquery — the optimizer and database engine determine how it is executed.'}
+  },
+  { title:'15.4 Recursive CTEs',
+    intro:{type:'info', text:'This is a genuinely advanced area.'},
+    items:[
+      {t:'What is recursion in SQL?'}, {t:'Recursive CTE'}, {t:'Anchor query'}, {t:'Recursive query'},
+      {t:'Recursive termination'}, {t:'`WITH RECURSIVE`'}, {t:'Hierarchical data'}, {t:'Parent-child relationships'},
+      {t:'Organizational hierarchy'}, {t:'Category hierarchy'}, {t:'Bill of materials'}, {t:'Tree traversal'},
+      {t:'Hierarchy levels'}, {t:'Preventing infinite recursion'}, {t:'Recursive CTE limitations'},
+    ], example:'WITH RECURSIVE employee_tree AS (\n    SELECT\n        employee_id,\n        employee_name,\n        manager_id,\n        0 AS level\n    FROM employees\n    WHERE manager_id IS NULL\n\n    UNION ALL\n\n    SELECT\n        e.employee_id,\n        e.employee_name,\n        e.manager_id,\n        t.level + 1\n    FROM employees e\n    JOIN employee_tree t\n        ON e.manager_id = t.employee_id\n)\nSELECT *\nFROM employee_tree;',
+    note:{type:'info', text:'Recursive CTEs are commonly used for hierarchical structures such as organizational charts and category trees.'}
+  },
+  { title:'15.5 Advanced Window Functions', important:true,
+    intro:{type:'info', text:'This should be one of your highest-priority sections.'},
+    items:[
+      {t:'Window function review'}, {t:'`OVER()`'}, {t:'`PARTITION BY`'}, {t:'`ORDER BY` inside `OVER`'},
+      {t:'Window frames'}, {t:'`ROWS`'}, {t:'`RANGE`'}, {t:'`UNBOUNDED PRECEDING`'}, {t:'`CURRENT ROW`'},
+      {t:'N `PRECEDING`'}, {t:'N `FOLLOWING`'},
+  ]},
+  { title:'Ranking', important:true, items:[
+      {t:'`ROW_NUMBER()`'}, {t:'`RANK()`'}, {t:'`DENSE_RANK()`'}, {t:'`NTILE()`'}, {t:'Ranking within groups'},
+      {t:'Top N per group'}, {t:'Bottom N per group'}, {t:'Ranking with ties'},
+  ]},
+  { title:'Offset Functions', important:true, items:[
+      {t:'`LAG()`'}, {t:'`LEAD()`'}, {t:'Previous-row comparison'}, {t:'Next-row comparison'},
+      {t:'Difference between current and previous'}, {t:'Month-over-month comparison'}, {t:'Day-over-day comparison'},
+  ]},
+  { title:'Value Functions', items:[
+      {t:'`FIRST_VALUE()`'}, {t:'`LAST_VALUE()`'}, {t:'`NTH_VALUE()` concept'},
+  ]},
+  { title:'Window Aggregations', important:true, items:[
+      {t:'Running total'}, {t:'Running average'}, {t:'Moving average'}, {t:'Cumulative count'},
+      {t:'Percentage of total'}, {t:'Group-level comparison'}, {t:'Windowed `SUM()`'}, {t:'Windowed `AVG()`'},
+      {t:'Windowed `MIN()`'}, {t:'Windowed `MAX()`'},
+    ], note:{type:'info', text:'Window functions calculate across related rows while retaining the individual rows, unlike GROUP BY, which collapses rows into groups.'}
+  },
+  { title:'15.6 Advanced Window Patterns', items:[
+      {t:'Top N per group'}, {t:'Latest record per group'}, {t:'First record per group'}, {t:'Previous event'},
+      {t:'Next event'}, {t:'Running totals'}, {t:'Moving averages'}, {t:'Duplicate detection'},
+      {t:'Deduplication with `ROW_NUMBER`'}, {t:'Change detection'}, {t:'Gap detection'},
+      {t:'Time-series comparison'}, {t:'Customer activity analysis'}, {t:'Ranking within categories'},
+      {t:'Percentile-based analysis'},
+    ], example:'WITH ranked_orders AS (\n    SELECT\n        customer_id,\n        order_id,\n        order_date,\n        amount,\n        ROW_NUMBER() OVER (\n            PARTITION BY customer_id\n            ORDER BY order_date DESC\n        ) AS rn\n    FROM orders\n)\nSELECT *\nFROM ranked_orders\nWHERE rn = 1;',
+    note:{type:'info', text:'This pattern is extremely useful for latest-record extraction and deduplication.'}
+  },
+  { title:'15.7 Advanced Aggregations', items:[
+      {t:'Multiple aggregation levels'}, {t:'Conditional aggregation'}, {t:'`SUM(CASE WHEN...)`'},
+      {t:'Conditional counting'}, {t:'Distinct aggregation'}, {t:'Aggregating after joins'},
+      {t:'Aggregation before joins'}, {t:'Multi-level aggregation'}, {t:'Aggregation with window functions'},
+      {t:'Group-level vs row-level calculations'},
+  ]},
+  { title:'15.8 GROUPING SETS / ROLLUP / CUBE', items:[
+      {t:'What is `GROUPING SETS`?'}, {t:'Multiple grouping levels'}, {t:'`ROLLUP`'},
+      {t:'Hierarchical aggregation'}, {t:'`CUBE`'}, {t:'Multi-dimensional aggregation'},
+      {t:'Difference between `GROUP BY` and `GROUPING SETS`'}, {t:'When to use `ROLLUP`'},
+      {t:'When to use `CUBE`'}, {t:'Reporting use cases'},
+    ], example:'SELECT\n    region,\n    product,\n    SUM(sales) AS total_sales\nFROM sales\nGROUP BY ROLLUP(region, product);',
+    note:{type:'info', text:'These are useful when one query needs to produce multiple aggregation levels.'}
+  },
+  { title:'15.9 Advanced Joins',
+    intro:{type:'info', text:'You already learned standard joins in Topic 3. Here we focus on problem-solving patterns.'},
+    items:[
+      {t:'Revisit join cardinality'}, {t:'One-to-one joins'}, {t:'One-to-many joins'}, {t:'Many-to-many joins'},
+      {t:'Join explosion'}, {t:'Duplicate rows caused by joins'}, {t:'Pre-aggregation before joining'},
+      {t:'Joining aggregated datasets'}, {t:'Self-join patterns'}, {t:'Anti-joins'}, {t:'Semi-joins'},
+      {t:'`EXISTS` as a semi-join'}, {t:'`NOT EXISTS` as an anti-join'}, {t:'Multiple joins'},
+      {t:'Complex join conditions'},
+  ]},
+  { title:'15.10 LATERAL / APPLY Concepts', items:[
+      {t:'What is a lateral join?'}, {t:'Why lateral joins exist'}, {t:'Lateral subquery'}, {t:'`LATERAL`'},
+      {t:'Database-specific `CROSS APPLY` concept'}, {t:'Correlated subquery vs lateral join'},
+      {t:'Top-N-per-group pattern'}, {t:'When lateral joins are useful'},
+    ], note:{type:'info', text:'This should be concept + basic practice, not a huge section. Lateral joins allow a subquery in the FROM clause to reference columns from preceding tables.'}
+  },
+  { title:'15.11 Advanced CASE & Conditional Logic', items:[
+      {t:'Complex `CASE`'}, {t:'Nested `CASE`'}, {t:'Multiple conditions'}, {t:'Conditional aggregation'},
+      {t:'Conditional categorization'}, {t:'Business-rule transformations'}, {t:'NULL handling inside `CASE`'},
+      {t:'Avoiding overlapping conditions'}, {t:'Testing edge cases'},
+  ]},
+  { title:'15.12 Advanced NULL Handling', items:[
+      {t:'NULL behavior'}, {t:'NULL in comparisons'}, {t:'NULL in aggregations'}, {t:'NULL in joins'},
+      {t:'`COALESCE`'}, {t:'`NULLIF`'}, {t:'NULL-safe logic'}, {t:'Missing vs zero'}, {t:'Missing vs empty string'},
+      {t:'Avoiding accidental NULL filtering'},
+  ]},
+  { title:'15.13 Advanced Date & Time SQL', items:[
+      {t:'Date arithmetic'}, {t:'Timestamp arithmetic'}, {t:'Date differences'}, {t:'Time differences'},
+      {t:'Date truncation'}, {t:'Week/month/quarter analysis'}, {t:'Rolling time windows'},
+      {t:'Period-over-period comparison'}, {t:'Previous-period analysis'}, {t:'Time-series aggregation'},
+      {t:'Gaps between events'}, {t:'Session-style calculations'},
+  ]},
+  { title:'15.14 Gap & Island Problems',
+    intro:{type:'info', text:'This is a useful advanced SQL pattern.'},
+    items:[
+      {t:'What are gaps?'}, {t:'What are islands?'}, {t:'Consecutive records'}, {t:'Detect missing dates'},
+      {t:'Detect continuous periods'}, {t:'Group consecutive events'}, {t:'Identify user sessions'},
+      {t:'Identify activity streaks'}, {t:'Combine `LAG()` + cumulative logic'}, {t:'Solve gaps-and-islands problems'},
+    ], example:'Jan 1\nJan 2\nJan 3\nJan 7\nJan 8\n\nGroup 1 \u2192 Jan 1\u2013Jan 3\nGroup 2 \u2192 Jan 7\u2013Jan 8'
+  },
+  { title:'15.15 Query Execution Fundamentals',
+    intro:{type:'info', text:'Now move from "Does my SQL return the correct answer?" to "How does the database execute my SQL?"'},
+    items:[
+      {t:'SQL parsing'}, {t:'Query planning'}, {t:'Query optimization'}, {t:'Execution plan'}, {t:'Table scan'},
+      {t:'Index scan'}, {t:'Join operations'}, {t:'Sort operations'}, {t:'Aggregation operations'},
+      {t:'Estimated vs actual cost'}, {t:'Query execution stages'},
+  ]},
+  { title:'15.16 EXPLAIN & Execution Plans', items:[
+      {t:'What is `EXPLAIN`?'}, {t:'Why execution plans matter'}, {t:'Read a basic execution plan'},
+      {t:'Scan operations'}, {t:'Join operations'}, {t:'Sort operations'}, {t:'Aggregate operations'},
+      {t:'Estimated rows'}, {t:'Actual rows'}, {t:'Cost'}, {t:'Execution time'}, {t:'Identify expensive operations'},
+      {t:'Compare two execution plans'}, {t:'`EXPLAIN ANALYZE` concept'},
+    ], note:{type:'info', text:'Reading execution plans is a core part of query optimization because it lets you see how the database intends to execute — or, with the appropriate command, actually executes — a query.'}
+  },
+  { title:'15.17 Query Optimization', items:[
+      {t:'What is query optimization?'}, {t:'Why queries become slow'}, {t:'Reduce unnecessary columns'},
+      {t:'Avoid unnecessary `SELECT *`'}, {t:'Filter data early where appropriate'}, {t:'Reduce unnecessary rows'},
+      {t:'Avoid unnecessary joins'}, {t:'Avoid duplicate calculations'}, {t:'Optimize subqueries'},
+      {t:'Optimize joins'}, {t:'Optimize aggregations'}, {t:'Avoid unnecessary sorting'},
+      {t:'Understand indexing impact'}, {t:'Compare alternative query approaches'},
+      {t:'Measure before and after optimization'},
+  ]},
+  { title:'15.18 Indexes & SQL Performance',
+    intro:{type:'info', text:'Database Fundamentals already introduced what an index is. Here we learn how indexes affect query performance.'},
+    items:[
+      {t:'Index review'}, {t:'B-tree index concept'}, {t:'Composite indexes'}, {t:'Index column order'},
+      {t:'Indexes on filtering columns'}, {t:'Indexes on join columns'}, {t:'Indexes and sorting'},
+      {t:'Index tradeoffs'}, {t:'Too many indexes'}, {t:'Index selectivity'}, {t:'When indexes may not help'},
+      {t:'Functions on indexed columns'}, {t:'Implicit type conversions'}, {t:'Index usage through execution plans'},
+    ], note:{type:'warning', text:"Don't turn this into a DBA course."}
+  },
+  { title:'15.19 SQL Anti-Patterns', items:[
+      {t:'`SELECT *`'}, {t:'Unnecessary `DISTINCT`'}, {t:'Excessive nested queries'},
+      {t:'Correlated subqueries on large datasets'}, {t:'Functions preventing index usage'},
+      {t:'Implicit type conversion'}, {t:'Unnecessary sorting'}, {t:'Joining before filtering when inappropriate'},
+      {t:'Accidental many-to-many joins'}, {t:'Duplicate row multiplication'}, {t:'Repeating expensive expressions'},
+      {t:'Ignoring NULL behavior'}, {t:'Ignoring execution plans'},
+  ]},
+  { title:'15.20 MERGE & Advanced Data Modification', items:[
+      {t:'What is `MERGE`?'}, {t:'Insert-or-update concept'}, {t:'Upsert concept'}, {t:'Match conditions'},
+      {t:'`WHEN MATCHED`'}, {t:'`WHEN NOT MATCHED`'}, {t:'Slowly changing data concept'}, {t:'`MERGE` use cases'},
+      {t:'`MERGE` risks'}, {t:'Database-specific syntax differences'},
+    ], note:{type:'warning', text:'Important: MERGE syntax differs between databases, so learn the concept first.'}
+  },
+  { title:'15.21 Views & Materialized Views', items:[
+      {t:'What is a view?'}, {t:'Why views are used'}, {t:'View vs table'}, {t:'View vs CTE'},
+      {t:'View vs subquery'}, {t:'What is a materialized view?'}, {t:'Materialized view vs normal view'},
+      {t:'Refreshing materialized views'}, {t:'When materialized views help'}, {t:'Performance considerations'},
+    ], note:{type:'info', text:'Keep this at a practical level because deeper warehouse concepts come later.'}
+  },
+  { title:'15.22 Dynamic SQL — Basic Concept', items:[
+      {t:'What is dynamic SQL?'}, {t:'Static vs dynamic SQL'}, {t:'Why dynamic SQL is used'},
+      {t:'Dynamic table/column selection'}, {t:'Parameterized queries'}, {t:'SQL injection risk'},
+      {t:'Safe dynamic SQL'}, {t:'When dynamic SQL should be avoided'},
+    ], note:{type:'info', text:'No need to become an advanced PL/SQL developer here.'}
+  },
+  { title:'15.23 Advanced SQL Problem-Solving Patterns', items:[
+      {t:'Top N per group'}, {t:'Latest record per entity'}, {t:'Second-highest value'}, {t:'Find duplicates'},
+      {t:'Remove duplicates'}, {t:'Find missing records'}, {t:'Find consecutive records'},
+      {t:'Compare current vs previous'}, {t:'Running totals'}, {t:'Moving averages'}, {t:'Percentage of total'},
+      {t:'Ranking'}, {t:'First/last event'}, {t:'Customer retention patterns'}, {t:'Time-series comparison'},
+      {t:'Hierarchical data'}, {t:'Sessionization basics'},
+  ]},
+  { title:'15.24 Real Data Engineering SQL Patterns', items:[
+      {t:'Deduplicate incoming data'}, {t:'Select latest record'}, {t:'Incremental extraction'},
+      {t:'Identify changed records'}, {t:'Compare source and target'}, {t:'Reconciliation queries'},
+      {t:'Data quality checks'}, {t:'Row-count validation'}, {t:'Duplicate validation'}, {t:'NULL validation'},
+      {t:'Referential-integrity checks'}, {t:'Aggregate reconciliation'}, {t:'Detect unexpected changes'},
+      {t:'Build transformation SQL'}, {t:'Build staging queries'}, {t:'Build reporting queries'},
+  ]},
+  { title:'15.25 Advanced SQL Projects', items:[
+      {t:'Project 1 — Customer Analytics (customers, orders, products, payments)', tags:['first purchase','latest purchase','total spending','customer ranking','previous purchase','month-over-month spending','top customers by region','inactive customers']},
+      {t:'Project 2 — Sales Analytics (CTEs + window functions + aggregation + date logic)', tags:['Daily Sales','Monthly Sales','Running Sales','Previous Month','Growth %','Top Products','Top Products per Category']},
+      {t:'Project 3 — Deduplication Pipeline'},
+      {t:'Project 4 — Query Optimization'},
+    ], examples:[
+      'Project 3 input:\n\ncustomer_id | updated_at  | name | email          | city\n101         | 2026-09-01  | Ravi | ravi@gmail.com | ...\n101         | 2026-09-15  | Ravi | ravi@gmail.com | ...\n101         | 2026-09-30  | Ravi | ravi@gmail.com | ...\n\nProduce latest record per customer using:\nROW_NUMBER() + PARTITION BY + ORDER BY',
+      'Project 4 flow:\n\nOriginal Query\n      \u2193\nEXPLAIN\n      \u2193\nIdentify Bottleneck\n      \u2193\nRewrite Query\n      \u2193\nEXPLAIN Again\n      \u2193\nCompare'
+    ], note:{type:'info', text:"Project 4's rewrite-and-compare approach is much more valuable than simply memorizing optimization tips."}
+  },
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    const diagrams = sec.examples || (sec.example ? [sec.example] : []);
+    diagrams.forEach(txt=>{
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = txt;
+      secEl.appendChild(ex);
+    });
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>
