@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Data Warehousing — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#A371F7; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(163,113,247,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#A371F7; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#A371F7; border-color:#A371F7;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#A371F7;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#A371F7;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Database & Data Concepts</b> &middot; Topic 20 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Data Warehousing</h1>
+      <p class="sub">How organizations collect, integrate, organize, store, and serve data for analytics and decision-making. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/134</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note note-info" style="margin-top:22px;">
+    <span class="note-icon">&#9432;</span>
+    <span><strong>Goal:</strong> Data warehousing is a core Data Engineering topic. You've already covered Database Fundamentals, Database Design, Normalization, Data Modeling, and OLTP vs OLAP. This topic builds on those foundations with practical, job-oriented learning, while avoiding unnecessary duplication.</span>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. staging, incremental load, idempotent, partitioning..." style="margin-top:20px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 20;                     // matches topic.n = 20 (Data Warehousing) in index.html
+const CONTENT_SLUG = 'data-warehousing'; // matches /content/data-warehousing.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'20.1 Data Warehouse Fundamentals', items:[
+      {t:'What is a Data Warehouse?'}, {t:'Why organizations need data warehouses'},
+      {t:'Data warehouse vs operational database'}, {t:'Data warehouse vs data lake'},
+      {t:'Data warehouse vs data lakehouse — introduction'}, {t:'Historical data and analytical workloads'},
+      {t:'Subject-oriented, integrated, time-variant and non-volatile characteristics'},
+      {t:'Enterprise reporting and business intelligence use cases'},
+      {t:'Examples of data warehouses in retail, banking and manufacturing'},
+      {t:'Typical responsibilities of a data engineer in a warehouse project'},
+  ]},
+  { title:'20.2 Data Warehouse Architecture', important:true, items:[
+      {t:'Overview of data warehouse architecture'}, {t:'Source systems and source data'},
+      {t:'Data ingestion layer'}, {t:'Raw data storage layer'}, {t:'Staging layer'},
+      {t:'Transformation and integration layer'}, {t:'Data warehouse storage layer'},
+      {t:'Data marts and presentation layer'}, {t:'BI tools, dashboards and analytical consumers'},
+      {t:'End-to-end flow from source to report'},
+      {t:'Single-tier, two-tier and three-tier architecture — conceptual overview'},
+      {t:'Separation of storage and compute — introduction'}, {t:'Logical architecture vs physical architecture'},
+    ], example:'Source systems\n(applications, databases, files and APIs)\n        \u2193\nIngestion and staging\n(extract, land and retain incoming data)\n        \u2193\nTransformation and integration\n(clean, standardize, combine and validate)\n        \u2193\nWarehouse and data marts\n(curated data ready for analysis)\n        \u2193\nAnalytics and BI\n(reports, dashboards and business decisions)'
+  },
+  { title:'20.3 Data Warehouse Types and Approaches', items:[
+      {t:'Enterprise Data Warehouse (EDW)'}, {t:'Departmental data warehouses'},
+      {t:'Data marts and their purpose'}, {t:'Dependent vs independent data marts'},
+      {t:'Top-down vs bottom-up warehouse development'}, {t:'Inmon vs Kimball approaches — high-level comparison'},
+      {t:'Centralized vs decentralized analytical data'},
+      {t:'Choosing an approach based on business requirements'},
+  ]},
+  { title:'20.4 Warehouse Data Organization', items:[
+      {t:'Raw, staging, integrated and presentation data'}, {t:'Raw data vs transformed data'},
+      {t:'Landing tables and staging tables'}, {t:'Naming conventions for warehouse objects'},
+      {t:'Organizing data by source, subject and business domain'}, {t:'Source-to-target mapping'},
+      {t:'Data lineage: tracing data from source to report'}, {t:'Metadata and data dictionaries'},
+      {t:'Data catalog fundamentals'}, {t:'Why reproducibility and retaining raw inputs matter'},
+  ]},
+  { title:'20.5 Data Integration and Warehouse Loading', items:[
+      {t:'Full load vs incremental load'}, {t:'Initial historical data loading'}, {t:'Periodic data refreshes'},
+      {t:'Batch loading patterns'}, {t:'Append, overwrite and upsert loading strategies'},
+      {t:'Handling new, changed and deleted source records'}, {t:'Source-to-target column mapping'},
+      {t:'Data type conversion during loading'}, {t:'Deduplication and reconciliation during integration'},
+      {t:'Late-arriving data — introductory concepts'}, {t:'Handling failed or partially completed loads'},
+      {t:'Idempotent loads — why rerunning a pipeline should not create duplicate results'},
+    ], note:{type:'info', text:'Scope boundary: learn warehouse-specific loading strategies here. Detailed API ingestion, CDC implementation, orchestration tools and streaming architectures should stay in their dedicated roadmap topics.'}
+  },
+  { title:'20.6 Dimensional Modeling in a Warehouse', items:[
+      {t:'Purpose of dimensional modeling in analytical systems'},
+      {t:'How dimensions and facts support business reporting'}, {t:'Choosing the grain of an analytical table'},
+      {t:'Fact and dimension table relationships'}, {t:'Star schema in warehouse implementation'},
+      {t:'Snowflake schema in warehouse implementation'}, {t:'Transaction fact tables'},
+      {t:'Periodic snapshot fact tables'}, {t:'Accumulating snapshot fact tables'},
+      {t:'Conformed dimensions across business processes'}, {t:'Surrogate keys and warehouse key management'},
+      {t:'Historical dimension changes — implementation overview'},
+      {t:'Multiple fact tables and shared dimensions'},
+      {t:'Building models for sales, inventory and finance reporting'},
+    ], note:{type:'info', text:'Avoid duplication: your Data Modeling topic already covers the concepts behind facts, dimensions, grain, star schemas, snowflake schemas and SCDs. Focus here on how those concepts are applied within a working warehouse.'}
+  },
+  { title:'20.7 Warehouse Storage and Performance', items:[
+      {t:'Row-oriented vs column-oriented storage'}, {t:'Why columnar storage suits analytical queries'},
+      {t:'Compression in analytical systems'}, {t:'Partitioning large warehouse tables'},
+      {t:'Clustering and data organization — conceptual overview'}, {t:'Partition pruning and data scanning'},
+      {t:'Query execution cost and data volume'}, {t:'Materialized views and precomputed aggregates'},
+      {t:'Summary tables and aggregate tables'}, {t:'Balancing storage cost and query performance'},
+      {t:'Warehouse workload management — introduction'}, {t:'Common causes of slow analytical queries'},
+  ]},
+  { title:'20.8 Data Quality, Reliability and Governance', items:[
+      {t:'Why data quality matters in a warehouse'}, {t:'Completeness, accuracy, consistency and validity'},
+      {t:'Uniqueness and referential integrity checks'}, {t:'Source-to-target record-count reconciliation'},
+      {t:'Reconciliation of business totals, such as sales amounts'},
+      {t:'Handling nulls and unexpected source values'}, {t:'Detecting duplicate records'},
+      {t:'Schema changes and source-data drift'}, {t:'Data freshness and load-completion checks'},
+      {t:'Audit columns and load metadata'}, {t:'Access control and least-privilege principles'},
+      {t:'Sensitive data protection and masking'}, {t:'Data retention and deletion requirements'},
+      {t:'Monitoring failed warehouse jobs'},
+  ]},
+  { title:'20.9 Warehouse Platforms and Cloud Concepts', items:[
+      {t:'Traditional on-premises data warehouses'}, {t:'Cloud data warehouse fundamentals'},
+      {t:'Managed warehouse services vs self-managed databases'}, {t:'Compute and storage separation'},
+      {t:'Scaling compute for different workloads'}, {t:'Concurrency and workload isolation'},
+      {t:'Usage-based pricing and cost awareness'}, {t:'Snowflake — architecture overview'},
+      {t:'Google BigQuery — architecture overview'}, {t:'Amazon Redshift — architecture overview'},
+      {t:'Microsoft Fabric Warehouse — overview'}, {t:'Comparing platforms based on workload, cost and ecosystem'},
+    ], note:{type:'info', text:'You do not need to master every platform at this stage. Learn the shared concepts first, then practice with one platform in later projects.'}
+  },
+  { title:'20.10 Warehouse Operations and Maintenance', items:[
+      {t:'Warehouse load schedules and refresh frequency'}, {t:'Dependencies between data-loading steps'},
+      {t:'Monitoring load status and completion'}, {t:'Retry and recovery strategies'},
+      {t:'Backfills and historical reloads'}, {t:'Handling late-arriving records'},
+      {t:'Schema evolution and backward compatibility'}, {t:'Data retention and archival'},
+      {t:'Warehouse cost monitoring'}, {t:'Incident investigation and root-cause analysis'},
+      {t:'Documenting pipeline assumptions and dependencies'},
+  ]},
+  { title:'20.11 Practical Projects', items:[
+      {t:'Project 1 — E-commerce Sales Warehouse', tags:['Beginner']},
+      {t:'Project 2 — Inventory Warehouse', tags:['Intermediate']},
+      {t:'Project 3 — End-to-End Warehouse Pipeline', tags:['Portfolio project']},
+    ], examples:[
+      'Project 1 tasks:\n\n- Load customers, products, orders and order items\n- Create staging and analytical tables\n- Build a sales fact table and relevant dimensions\n- Calculate revenue by month, product and region\n- Validate totals against the source records',
+      'Project 2 tasks:\n\n- Ingest inventory snapshots and transaction records\n- Design a model for stock movement and daily inventory\n- Identify duplicate or missing records\n- Reconcile stock quantities and report discrepancies',
+      'Project 3 tasks:\n\n- Ingest data from a database and a CSV file\n- Store raw inputs and transform staging data\n- Load warehouse tables incrementally\n- Add quality checks, logging and failure handling\n- Document architecture, lineage and refresh strategy\n- Publish analytical SQL queries and sample results'
+    ]
+  },
+  { title:'20.12 Interview Preparation', items:[
+      {t:'What is a data warehouse, and why is it needed?'}, {t:'Explain the main layers of warehouse architecture'},
+      {t:'Data warehouse vs database vs data lake vs lakehouse'}, {t:'Data warehouse vs data mart'},
+      {t:'Inmon vs Kimball approaches'}, {t:'Staging tables vs warehouse tables'}, {t:'Full load vs incremental load'},
+      {t:'Append vs overwrite vs upsert'}, {t:'Why is idempotency important in data pipelines?'},
+      {t:'Why are dimensional models useful for analytics?'},
+      {t:'How do partitioning and columnar storage help performance?'},
+      {t:'How do you validate that warehouse data matches its source?'},
+      {t:'How would you handle a failed warehouse load?'},
+      {t:'How would you design a warehouse for daily sales reporting?'},
+      {t:'How do you control warehouse costs?'},
+  ]},
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    const diagrams = sec.examples || (sec.example ? [sec.example] : []);
+    diagrams.forEach(txt=>{
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = txt;
+      secEl.appendChild(ex);
+    });
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>
