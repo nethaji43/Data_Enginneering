@@ -1491,6 +1491,1461 @@
               "a": "No. The output depends on which databases exist, the MySQL version and configuration, and the privileges of the connected account."
             }
           ]
+        },
+        {
+          "n": 11,
+          "title": "USE Database",
+          "explanation": [
+            "<h3>1. Introduction</h3>",
+            "<p>The <code>USE</code> statement in MySQL selects an existing database as the default database for the current session. After selecting a database, you can refer to its tables without writing the database name before every table name.</p>",
+            "<p>In the previous topic, you learned how to list databases using <code>SHOW DATABASES</code>. Now, you will learn how to select one of those databases before working with its tables.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> <code>USE database_name;</code> selects an existing database as the default database for the current MySQL session. It does not create a database or insert data.</div>",
+            "<h3>2. Basic Syntax</h3>",
+            "<p>The syntax is simple:</p>",
+            "<div class=\"code-block\"><pre><code>USE database_name;</code></pre></div>",
+            "<p>Replace <code>database_name</code> with the name of an existing database that your account is permitted to access.</p>",
+            "<h3>3. Select Your First Database</h3>",
+            "<p>Suppose you have already created a database named <code>de_practice</code>. Select it using:</p>",
+            "<div class=\"code-block\"><pre><code>USE de_practice;</code></pre></div>",
+            "<p>If the database exists and your account has the required access, MySQL selects it as the default database for the current session.</p>",
+            "<p>You can then run queries against tables in that database without specifying the database name each time.</p>",
+            "<h3>4. Verify the Selected Database</h3>",
+            "<p>Use the <code>DATABASE()</code> function to check which database is currently selected.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DATABASE();</code></pre></div>",
+            "<p>Expected result after running <code>USE de_practice;</code>:</p>",
+            "<table><tr><th>DATABASE()</th></tr><tr><td>de_practice</td></tr></table>",
+            "<p>The result depends on your current session. If no default database is selected, <code>SELECT DATABASE();</code> returns <code>NULL</code>.</p>",
+            "<h3>5. Complete Workflow: Create, List, and Select</h3>",
+            "<p>Here is a complete example that combines the commands from the previous topics.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\n\nSHOW DATABASES;\n\nUSE de_practice;\n\nSELECT DATABASE();</code></pre></div>",
+            "<p>What happens in this sequence?</p>",
+            "<ol><li><code>CREATE DATABASE IF NOT EXISTS</code> ensures that the database exists without failing just because it already exists.</li><li><code>SHOW DATABASES</code> lists databases visible to your account.</li><li><code>USE de_practice</code> selects the database for the current session.</li><li><code>SELECT DATABASE()</code> confirms the current default database.</li></ol>",
+            "<div class=\"diagram\"><pre><code>MySQL Server\n     |\n     v\nCREATE DATABASE\n     |\n     v\nSHOW DATABASES\n     |\n     v\nUSE de_practice\n     |\n     v\nSELECT DATABASE()\n     |\n     v\nConfirm Selected Database</code></pre></div>",
+            "<h3>6. Why Do We Need USE?</h3>",
+            "<p>Imagine that your MySQL Server contains multiple databases:</p>",
+            "<table><tr><th>Database</th><th>Purpose</th></tr><tr><td><code>sales_db</code></td><td>Sales information</td></tr><tr><td><code>inventory_db</code></td><td>Product and stock information</td></tr><tr><td><code>de_practice</code></td><td>Data Engineering practice</td></tr></table>",
+            "<p>If you want to work with tables in <code>inventory_db</code>, you can select that database first.</p>",
+            "<div class=\"code-block\"><pre><code>USE inventory_db;</code></pre></div>",
+            "<p>After selecting it, a query such as <code>SELECT * FROM products;</code> refers to the <code>products</code> table in the selected database, assuming the table exists and your account has permission to read it.</p>",
+            "<p>Without a default database, a query that references a table without qualifying its database name may fail with an error indicating that no database is selected.</p>",
+            "<h3>7. USE vs Fully Qualified Table Names</h3>",
+            "<p>You do not always have to select a default database. You can also refer to a table using its fully qualified name, which includes the database name.</p>",
+            "<p><b>Method 1: Select a database first</b></p>",
+            "<div class=\"code-block\"><pre><code>USE sales_db;\n\nSELECT * FROM orders;</code></pre></div>",
+            "<p><b>Method 2: Specify the database in the query</b></p>",
+            "<div class=\"code-block\"><pre><code>SELECT * FROM sales_db.orders;</code></pre></div>",
+            "<p>Both methods identify the <code>orders</code> table in <code>sales_db</code>, provided the table exists and you have the necessary privileges.</p>",
+            "<table><tr><th>Method</th><th>Advantage</th></tr><tr><td><code>USE sales_db;</code></td><td>Convenient when executing multiple queries against the same database.</td></tr><tr><td><code>sales_db.orders</code></td><td>Explicitly identifies the database and table, which is useful when working across databases.</td></tr></table>",
+            "<h3>8. What Happens If the Database Does Not Exist?</h3>",
+            "<p>If you execute:</p>",
+            "<div class=\"code-block\"><pre><code>USE unknown_db;</code></pre></div>",
+            "<p>and the database does not exist or is unavailable to your account, MySQL reports an error. The statement does not create the missing database automatically.</p>",
+            "<p>Check the available databases first:</p>",
+            "<div class=\"code-block\"><pre><code>SHOW DATABASES;</code></pre></div>",
+            "<p>If the database is missing, verify its spelling, confirm that you are connected to the intended server, and check your account's privileges. Create the database only if you are authorized to do so.</p>",
+            "<h3>9. USE and the MySQL Workbench Interface</h3>",
+            "<p>You can select a database using either SQL or the Workbench interface.</p>",
+            "<p><b>Using SQL:</b></p>",
+            "<div class=\"code-block\"><pre><code>USE de_practice;</code></pre></div>",
+            "<p><b>Using the Workbench interface:</b></p>",
+            "<ol><li>Open a working MySQL connection.</li><li>Locate the Schemas panel.</li><li>Find the database you want to use.</li><li>Double-click the database name if your Workbench version supports this selection behavior.</li><li>Check the active schema indicator or execute <code>SELECT DATABASE();</code> to confirm the selection.</li></ol>",
+            "<p>The exact interface behavior can vary by Workbench version. Running <code>SELECT DATABASE();</code> is a reliable way to check the current session's default database.</p>",
+            "<h3>10. Database Selection Is Session-Specific</h3>",
+            "<p>The database selected with <code>USE</code> applies to the current connection session. If you open another Workbench connection or session, do not assume that it has the same default database selected.</p>",
+            "<div class=\"diagram\"><pre><code>Connection A\n     |\n     +---- USE sales_db\n     |       Current database: sales_db\n     |\nConnection B\n     |\n     +---- No database selected\n             Current database: NULL</code></pre></div>",
+            "<p>This is a conceptual example. Each connection has its own session state, and the default database must be checked for the session in which you are executing a query.</p>",
+            "<h3>11. Common Beginner Mistakes</h3>",
+            "<table><tr><th>Mistake</th><th>Correct Understanding</th></tr><tr><td>Using USE to create a database</td><td>Use <code>CREATE DATABASE</code> to create it.</td></tr><tr><td>Selecting a database that does not exist</td><td>Check with <code>SHOW DATABASES;</code> first.</td></tr><tr><td>Assuming USE creates tables</td><td>USE selects a database; <code>CREATE TABLE</code> creates tables.</td></tr><tr><td>Assuming every Workbench session uses the same database</td><td>Each connection session has its own default database context.</td></tr><tr><td>Confusing a database with a table</td><td>A database organizes objects; a table stores data in rows and columns.</td></tr><tr><td>Forgetting to verify the selected database</td><td>Use <code>SELECT DATABASE();</code> to check the current selection.</td></tr></table>",
+            "<h3>12. USE in Data Engineering</h3>",
+            "<p>Data Engineers may work with several databases for source systems, staging areas, and reporting datasets. Selecting the intended database helps ensure that queries target the correct tables.</p>",
+            "<div class=\"diagram\"><pre><code>MySQL Server\n     |\n     +---- source_db\n     |\n     +---- staging_db\n     |\n     +---- analytics_db\n               |\n               v\n        USE analytics_db\n               |\n               v\n        Query Target Tables</code></pre></div>",
+            "<p>For example, while validating a transformed dataset, an engineer might select <code>analytics_db</code> and query a summary table. In automated pipelines, database names may instead be included explicitly in SQL statements or connection configuration.</p>",
+            "<p>Always verify the active database before running statements that change data or schema, particularly when several databases have tables with similar names.</p>",
+            "<h3>13. Key Takeaways</h3>",
+            "<div class=\"definition-box\"><b>Remember:</b><br><br>1. <code>USE database_name;</code> selects an existing database for the current session.<br>2. USE does not create a database or table.<br>3. Use <code>SELECT DATABASE();</code> to verify the current selection.<br>4. Use <code>SHOW DATABASES;</code> to list databases visible to your account.<br>5. The selected database must exist and be accessible to your account.<br>6. You can use fully qualified table names such as <code>sales_db.orders</code> instead of selecting a default database first.<br>7. Database selection is session-specific.<br>8. Workbench can select schemas through its interface, but SQL can verify the current session.<br>9. Always confirm the intended database before modifying data.<br>10. Selecting the correct database helps Data Engineers work safely across source, staging, and analytics environments.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1:</b> Open MySQL Workbench and connect to your MySQL Server.</p>",
+            "<p class=\"practice-note\"><b>Step 2:</b> Display the databases visible to your account.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW DATABASES;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3:</b> Ensure that your practice database exists. If it does not exist, create it only in your learning environment.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4:</b> Select the practice database.</p>",
+            "<div class=\"code-block\"><pre><code>USE de_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5:</b> Verify the selected database.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DATABASE();</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6:</b> Compare these two queries and explain how they identify the target table.</p>",
+            "<div class=\"code-block\"><pre><code>USE sales_db;\nSELECT * FROM orders;\n\nSELECT * FROM sales_db.orders;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7:</b> If you have a second database available, select it and run <code>SELECT DATABASE();</code> to observe how the current database changes.</p>",
+            "<p class=\"practice-note\"><b>Step 8:</b> Try selecting a database name that does not exist in your practice environment. Read the error, then use <code>SHOW DATABASES;</code> to check the available names.</p>",
+            "<p class=\"practice-note\"><b>Step 9:</b> Explain why a new Workbench connection might not have the same default database as another connection.</p>",
+            "<p class=\"practice-note\"><b>Step 10:</b> Explain why checking the selected database is important before running a query that modifies data.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Select an existing database, verify the active database, understand session-specific selection, and distinguish USE from CREATE DATABASE.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What does USE do in MySQL?",
+              "a": "USE selects an existing database as the default database for the current session."
+            },
+            {
+              "q": "Q2. What is the syntax for selecting a database?",
+              "a": "Use `USE database_name;`, replacing database_name with an existing database name."
+            },
+            {
+              "q": "Q3. Does USE create a database?",
+              "a": "No. CREATE DATABASE creates a database. USE selects an existing database."
+            },
+            {
+              "q": "Q4. How do you check the currently selected database?",
+              "a": "Execute `SELECT DATABASE();`. It returns the current default database name or NULL if no database is selected."
+            },
+            {
+              "q": "Q5. What happens if you use a database that does not exist?",
+              "a": "MySQL reports an error because the database cannot be selected. Check the spelling, server connection, database existence, and account permissions."
+            },
+            {
+              "q": "Q6. Must you use USE before every SELECT query?",
+              "a": "No. You can select a default database once for the current session, or explicitly qualify the table name with its database name, such as `SELECT * FROM sales_db.orders;`."
+            },
+            {
+              "q": "Q7. What is a fully qualified table name?",
+              "a": "It identifies a table using its database name and table name, such as `sales_db.orders`."
+            },
+            {
+              "q": "Q8. Is the selected database shared by every Workbench connection?",
+              "a": "No. The default database is session-specific. Check each connection using `SELECT DATABASE();`."
+            },
+            {
+              "q": "Q9. Can you select a database through MySQL Workbench without writing USE?",
+              "a": "Yes. You can select a schema through the Workbench interface, depending on the version. Use `SELECT DATABASE();` to verify the current session's selection."
+            },
+            {
+              "q": "Q10. What is the difference between a database and a table?",
+              "a": "A database organizes related database objects. A table stores structured data in rows and columns."
+            },
+            {
+              "q": "Q11. Why is USE important in Data Engineering?",
+              "a": "It helps ensure queries target the intended database when working with separate source, staging, and analytics environments."
+            },
+            {
+              "q": "Q12. What should you verify before executing data-changing SQL?",
+              "a": "Verify the active connection, selected database, target table, statement, and permissions to reduce the risk of changing the wrong data."
+            }
+          ]
+        },
+        {
+          "n": 12,
+          "title": "SHOW TABLES",
+          "explanation": [
+            "<h3>1. What is SHOW TABLES?</h3>",
+            "<p><code>SHOW TABLES</code> is a MySQL command used to display the names of tables available in the currently selected database. It helps you inspect the database structure before retrieving, inserting, or modifying data.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> <code>SHOW TABLES</code> displays the tables in the selected database. You must select a database first using <code>USE database_name;</code>, unless you specify the database directly in the command.</div>",
+            "<h3>2. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SHOW TABLES;</code></pre></div>",
+            "<p>Before running this command, select the database you want to inspect.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW DATABASES;\nUSE de_practice;\nSHOW TABLES;</code></pre></div>",
+            "<p><b>Explanation:</b></p><ul><li><code>SHOW DATABASES;</code> lists databases that your account is allowed to see.</li><li><code>USE de_practice;</code> selects the database for the current session.</li><li><code>SHOW TABLES;</code> lists tables in the selected database.</li></ul>",
+            "<h3>3. Practical Example</h3>",
+            "<p>Suppose your <code>de_practice</code> database contains these tables:</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE de_practice;\nUSE de_practice;\n\nCREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100),\n    department VARCHAR(50)\n);\n\nCREATE TABLE orders (\n    order_id INT PRIMARY KEY,\n    customer_id INT,\n    amount DECIMAL(10,2)\n);\n\nCREATE TABLE customers (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100)\n);\n\nSHOW TABLES;</code></pre></div>",
+            "<p><b>Expected output:</b></p>",
+            "<table><thead><tr><th>Tables_in_de_practice</th></tr></thead><tbody><tr><td>customers</td></tr><tr><td>employees</td></tr><tr><td>orders</td></tr></tbody></table>",
+            "<p>The output contains the table names, not the rows stored inside those tables. The exact output column name depends on the selected database.</p>",
+            "<h3>4. SHOW TABLES Does Not Display Table Data</h3>",
+            "<p>Remember the difference between viewing table names and viewing the actual records.</p>",
+            "<table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>SHOW TABLES;</code></td><td>Lists table names.</td></tr><tr><td><code>DESCRIBE employees;</code></td><td>Displays the columns, data types, and related table structure.</td></tr><tr><td><code>SELECT * FROM employees;</code></td><td>Retrieves rows from the table.</td></tr></tbody></table>",
+            "<div class=\"code-block\"><pre><code>USE de_practice;\n\n-- Display table names\nSHOW TABLES;\n\n-- Inspect the table structure\nDESCRIBE employees;\n\n-- Retrieve records\nSELECT * FROM employees;</code></pre></div>",
+            "<h3>5. Display Tables from a Specific Database</h3>",
+            "<p>You can list tables from another database without changing the currently selected database by specifying the database name.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW TABLES FROM de_practice;</code></pre></div>",
+            "<p>This is useful when you need to inspect multiple databases during development or troubleshooting.</p>",
+            "<h3>6. Filter Table Names Using LIKE</h3>",
+            "<p>MySQL supports the <code>LIKE</code> pattern in <code>SHOW TABLES</code>, allowing you to find table names that match a pattern.</p>",
+            "<div class=\"code-block\"><pre><code>-- Find table names beginning with 'emp'\nSHOW TABLES LIKE 'emp%';\n\n-- Find table names ending with 'log'\nSHOW TABLES LIKE '%log';\n\n-- Find table names containing 'order'\nSHOW TABLES LIKE '%order%';</code></pre></div>",
+            "<p><b>Pattern symbols:</b></p><ul><li><code>%</code> matches zero or more characters.</li><li><code>_</code> matches exactly one character.</li></ul>",
+            "<p>For example, <code>SHOW TABLES LIKE 'emp%';</code> may return <code>employees</code>, <code>employee_salary</code>, and <code>emp_details</code> if those tables exist.</p>",
+            "<h3>7. Show Tables in a Data Engineering Workflow</h3>",
+            "<p>Data Engineers often work with databases containing staging tables, raw data tables, dimension tables, fact tables, and audit tables. Listing tables helps identify which objects are available before exploring their schemas.</p>",
+            "<div class=\"diagram\"><pre><code>Connect to MySQL\n       |\n       v\nSelect database\n       |\n       v\nSHOW TABLES\n       |\n       v\nIdentify required table\n       |\n       v\nDESCRIBE table_name\n       |\n       v\nSELECT sample records</code></pre></div>",
+            "<p>For example, a data warehouse database might contain:</p>",
+            "<table><thead><tr><th>Table</th><th>Possible purpose</th></tr></thead><tbody><tr><td><code>raw_orders</code></td><td>Stores orders as ingested from a source system.</td></tr><tr><td><code>stg_customers</code></td><td>Contains customer data prepared for transformation.</td></tr><tr><td><code>dim_customer</code></td><td>Stores customer dimension attributes.</td></tr><tr><td><code>fact_sales</code></td><td>Stores sales measures for analytics.</td></tr><tr><td><code>etl_audit_log</code></td><td>Tracks pipeline execution or processing details.</td></tr></tbody></table>",
+            "<p>These are example table names; the actual names and purposes depend on the database design.</p>",
+            "<h3>8. Important Things to Remember</h3>",
+            "<ul><li><code>SHOW TABLES;</code> is a MySQL-specific command, not standard SQL syntax supported identically by every database.</li><li>It lists tables in the selected database, subject to your permissions.</li><li>If no database is selected, MySQL normally returns an error indicating that no database is selected.</li><li>If the selected database contains no visible tables, the result may be empty.</li><li>Table names may be case-sensitive on some MySQL installations, depending on the operating system and server configuration.</li><li><code>SHOW TABLES;</code> does not create, delete, or modify tables.</li></ul>",
+            "<h3>9. Common Mistakes</h3>",
+            "<table><thead><tr><th>Mistake</th><th>Correct approach</th></tr></thead><tbody><tr><td>Running <code>SHOW TABLES;</code> without selecting a database.</td><td>Run <code>USE de_practice;</code> first, or use <code>SHOW TABLES FROM de_practice;</code>.</td></tr><tr><td>Expecting table rows as output.</td><td>Use <code>SELECT * FROM table_name;</code>.</td></tr><tr><td>Expecting column details.</td><td>Use <code>DESCRIBE table_name;</code>.</td></tr><tr><td>Getting no matching results from a pattern.</td><td>Check the database and table names, then adjust the <code>LIKE</code> pattern.</td></tr><tr><td>Assuming all database systems support the same command.</td><td>Use the appropriate metadata command for your database system.</td></tr></tbody></table>",
+            "<h3>10. Quick Revision</h3>",
+            "<div class=\"definition-box\"><b>Remember:</b><br><code>SHOW TABLES;</code> — lists tables in the selected database.<br><code>SHOW TABLES FROM de_practice;</code> — lists tables in a specified database.<br><code>SHOW TABLES LIKE 'emp%';</code> — filters table names using a pattern.<br><code>DESCRIBE employees;</code> — inspects a table's structure.<br><code>SELECT * FROM employees;</code> — retrieves table records.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create a practice database.</b> Create a database named <code>de_practice</code> and select it. If it already exists, you can reuse it.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Create three tables.</b> Create tables named <code>employees</code>, <code>customers</code>, and <code>orders</code>. Use the example below or create your own columns.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100)\n);\n\nCREATE TABLE customers (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100)\n);\n\nCREATE TABLE orders (\n    order_id INT PRIMARY KEY,\n    amount DECIMAL(10,2)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: List the tables.</b> Run the command and check whether all three table names appear.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW TABLES;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: List tables from a specific database.</b> Run this command even if a different database is currently selected.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW TABLES FROM de_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Filter table names.</b> Find tables whose names begin with the letter 'e'.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW TABLES LIKE 'e%';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Compare the results.</b> List table names, inspect the structure of <code>employees</code>, and retrieve its records. Notice that the last two commands answer different questions.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW TABLES;\nDESCRIBE employees;\nSELECT * FROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Data Engineering challenge.</b> Imagine that your database contains dozens of tables for an ETL pipeline. Use <code>SHOW TABLES LIKE 'raw%';</code> to find tables whose names begin with <code>raw</code>. Explain how identifying these tables could help you locate raw ingestion data.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Learn to list tables, inspect a specified database, filter table names, and distinguish table metadata from table structure and table records.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is the purpose of SHOW TABLES?",
+              "a": "It lists the tables available in the currently selected MySQL database, subject to your permissions."
+            },
+            {
+              "q": "Q2. Do you need to select a database before running SHOW TABLES?",
+              "a": "Normally, yes. Run USE database_name; first, or specify the database directly with SHOW TABLES FROM database_name;."
+            },
+            {
+              "q": "Q3. Does SHOW TABLES display records stored inside a table?",
+              "a": "No. It displays table names. Use SELECT * FROM table_name; to retrieve records."
+            },
+            {
+              "q": "Q4. How can you list tables from a specific database?",
+              "a": "Use SHOW TABLES FROM database_name;. For example, SHOW TABLES FROM de_practice;."
+            },
+            {
+              "q": "Q5. How can you find tables whose names start with 'emp'?",
+              "a": "Use SHOW TABLES LIKE 'emp%';. The percent sign matches zero or more characters."
+            },
+            {
+              "q": "Q6. What is the difference between SHOW TABLES and DESCRIBE?",
+              "a": "SHOW TABLES lists table names, whereas DESCRIBE table_name displays a table's columns, data types, and related structural information."
+            },
+            {
+              "q": "Q7. Why might SHOW TABLES return no results?",
+              "a": "The selected database might contain no tables, the pattern might not match any table names, or your account might lack permission to see the relevant objects."
+            },
+            {
+              "q": "Q8. Is SHOW TABLES a standard SQL command?",
+              "a": "It is a MySQL-specific metadata command. Other database systems may use different commands or system catalog views to list tables."
+            },
+            {
+              "q": "Q9. Can SHOW TABLES modify or delete data?",
+              "a": "No. It is an inspection command and does not create, update, or delete tables or their records."
+            },
+            {
+              "q": "Q10. Why is SHOW TABLES useful for Data Engineers?",
+              "a": "It helps Data Engineers discover available tables in a database before inspecting schemas, validating source data, troubleshooting pipelines, or preparing SQL transformations."
+            }
+          ]
+        },
+        {
+          "n": 13,
+          "title": "CREATE TABLE",
+          "explanation": [
+            "<h3>1. What is CREATE TABLE?</h3>",
+            "<p><code>CREATE TABLE</code> is a SQL DDL (Data Definition Language) command used to create a new table inside a database. A table stores data in rows and columns, and each column has a name and a data type.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> <code>CREATE TABLE</code> defines a table's structure, including column names, data types, and optional constraints such as primary keys and NOT NULL.</div>",
+            "<p>In Data Engineering, tables are used to store raw source data, staging data, transformed records, dimensions, facts, and pipeline audit information.</p>",
+            "<h3>2. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE table_name (\n    column1 data_type,\n    column2 data_type,\n    column3 data_type\n);</code></pre></div>",
+            "<p><b>Understand each part:</b></p><ul><li><code>CREATE TABLE</code> tells the database to create a table.</li><li><code>table_name</code> is the name assigned to the table.</li><li><code>column1</code>, <code>column2</code>, and other names define the columns.</li><li><code>data_type</code> specifies the kind of value a column can store.</li><li>Commas separate column definitions, and the statement ends with a semicolon.</li></ul>",
+            "<h3>3. Create Your First Table</h3>",
+            "<p>First, select your practice database.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;\n\nCREATE TABLE employees (\n    employee_id INT,\n    employee_name VARCHAR(100),\n    department VARCHAR(50),\n    salary DECIMAL(10,2),\n    joining_date DATE\n);</code></pre></div>",
+            "<p>This statement creates an <code>employees</code> table with five columns.</p>",
+            "<table><thead><tr><th>Column</th><th>Data type</th><th>Purpose</th></tr></thead><tbody><tr><td><code>employee_id</code></td><td><code>INT</code></td><td>Stores a whole-number identifier.</td></tr><tr><td><code>employee_name</code></td><td><code>VARCHAR(100)</code></td><td>Stores text up to 100 characters.</td></tr><tr><td><code>department</code></td><td><code>VARCHAR(50)</code></td><td>Stores department names.</td></tr><tr><td><code>salary</code></td><td><code>DECIMAL(10,2)</code></td><td>Stores a numeric value with two decimal places.</td></tr><tr><td><code>joining_date</code></td><td><code>DATE</code></td><td>Stores a calendar date.</td></tr></tbody></table>",
+            "<p>Creating the table defines its structure. It does not automatically insert employee records.</p>",
+            "<h3>4. Understand Rows and Columns</h3>",
+            "<p>Consider the following sample data that could be inserted into the <code>employees</code> table later.</p>",
+            "<table><thead><tr><th>employee_id</th><th>employee_name</th><th>department</th><th>salary</th><th>joining_date</th></tr></thead><tbody><tr><td>101</td><td>Ravi</td><td>IT</td><td>35000.00</td><td>2025-01-15</td></tr><tr><td>102</td><td>Priya</td><td>HR</td><td>32000.00</td><td>2025-03-10</td></tr></tbody></table>",
+            "<ul><li><b>Columns:</b> employee_id, employee_name, department, salary, joining_date.</li><li><b>Rows:</b> Each complete employee record.</li><li><b>Schema:</b> The definition of the table, including its columns and their data types.</li></ul>",
+            "<div class=\"diagram\"><pre><code>employees table\n       |\n       +-- employee_id      INT\n       +-- employee_name    VARCHAR(100)\n       +-- department       VARCHAR(50)\n       +-- salary           DECIMAL(10,2)\n       +-- joining_date     DATE</code></pre></div>",
+            "<h3>5. Common Data Types Used in CREATE TABLE</h3>",
+            "<p>Choose data types based on the values a column must store. Detailed coverage of data types comes in the next topic.</p>",
+            "<table><thead><tr><th>Data type</th><th>Typical use</th><th>Example</th></tr></thead><tbody><tr><td><code>INT</code></td><td>Whole numbers</td><td>101</td></tr><tr><td><code>BIGINT</code></td><td>Larger whole numbers</td><td>9000000000</td></tr><tr><td><code>VARCHAR(n)</code></td><td>Variable-length text</td><td><code>'Data Engineer'</code></td></tr><tr><td><code>CHAR(n)</code></td><td>Fixed-length character fields</td><td>Country code such as <code>'IN'</code></td></tr><tr><td><code>DECIMAL(p,s)</code></td><td>Exact decimal numbers</td><td>1250.75</td></tr><tr><td><code>DATE</code></td><td>Calendar dates</td><td><code>'2026-10-21'</code></td></tr><tr><td><code>DATETIME</code></td><td>Date and time</td><td><code>'2026-10-21 09:30:00'</code></td></tr><tr><td><code>BOOLEAN</code></td><td>True/false-style values in MySQL</td><td><code>TRUE</code> or <code>FALSE</code></td></tr></tbody></table>",
+            "<h3>6. Create a Table with a Primary Key</h3>",
+            "<p>A primary key uniquely identifies each row. It must contain unique, non-NULL values. The following example introduces the primary key syntax; constraints are covered in more detail in a later topic.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100),\n    email VARCHAR(150)\n);</code></pre></div>",
+            "<p>Here, <code>customer_id</code> is the primary key. Two customers cannot have the same <code>customer_id</code>, and it cannot be NULL.</p>",
+            "<h3>7. Create a Table with NOT NULL and DEFAULT</h3>",
+            "<p>You can define basic rules while creating a table. These rules are called constraints or column attributes.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE products (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL,\n    price DECIMAL(10,2) NOT NULL,\n    status VARCHAR(20) DEFAULT 'ACTIVE'\n);</code></pre></div>",
+            "<ul><li><code>PRIMARY KEY</code> uniquely identifies each product.</li><li><code>NOT NULL</code> prevents the column from storing a NULL value.</li><li><code>DEFAULT 'ACTIVE'</code> supplies the default value when an insert omits the column or uses the DEFAULT keyword.</li></ul>",
+            "<p>For example, if a new product is inserted without specifying <code>status</code>, MySQL uses <code>ACTIVE</code> unless another applicable rule changes the behavior.</p>",
+            "<h3>8. Verify the Table After Creating It</h3>",
+            "<p>After creating a table, confirm that it exists and inspect its structure.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW TABLES;\n\nDESCRIBE employees;\n\nSHOW CREATE TABLE employees;</code></pre></div>",
+            "<table><thead><tr><th>Command</th><th>What it verifies</th></tr></thead><tbody><tr><td><code>SHOW TABLES;</code></td><td>Lists tables in the selected database.</td></tr><tr><td><code>DESCRIBE employees;</code></td><td>Displays columns, data types, and key/null information.</td></tr><tr><td><code>SHOW CREATE TABLE employees;</code></td><td>Displays the SQL definition MySQL uses for the table.</td></tr></tbody></table>",
+            "<h3>9. What Happens if the Table Already Exists?</h3>",
+            "<p>Running <code>CREATE TABLE employees (...);</code> again normally produces an error if a table named <code>employees</code> already exists in that database.</p>",
+            "<p>To avoid an error when the table already exists, you can use:</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE IF NOT EXISTS employees (\n    employee_id INT,\n    employee_name VARCHAR(100)\n);</code></pre></div>",
+            "<div class=\"definition-box\"><b>Important:</b> <code>IF NOT EXISTS</code> prevents the existing-table error, but it does not update the structure of a table that already exists. If its columns need changing, use an appropriate <code>ALTER TABLE</code> statement.</div>",
+            "<h3>10. Create a Table Using Another Table's Structure</h3>",
+            "<p>In MySQL, <code>CREATE TABLE ... LIKE</code> creates a new table using the existing table's structure, including its column definitions and indexes. It does not copy the existing rows.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees_backup LIKE employees;</code></pre></div>",
+            "<p>The new table <code>employees_backup</code> has the same table structure and indexes as <code>employees</code>, but it starts without copied data. Check the exact behavior for specialized table features if your schema uses them.</p>",
+            "<h3>11. CREATE TABLE in Data Engineering</h3>",
+            "<p>Data Engineers create tables to organize data at different stages of a pipeline. For example, an incoming orders dataset may first be stored in a raw table, then cleaned into a staging table, and finally loaded into an analytics table.</p>",
+            "<div class=\"diagram\"><pre><code>Source System\n      |\n      v\nraw_orders\n      |\n      v\nstg_orders\n      |\n      v\nfact_orders\n      |\n      v\nReports and Analytics</code></pre></div>",
+            "<p>A simplified raw ingestion table could look like this:</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE raw_orders (\n    order_id BIGINT,\n    customer_id BIGINT,\n    order_amount DECIMAL(12,2),\n    order_timestamp DATETIME,\n    source_system VARCHAR(50)\n);</code></pre></div>",
+            "<p>This structure can store order identifiers, customer identifiers, exact monetary values, event timestamps, and the source system. In a production pipeline, you would also decide how to handle duplicate identifiers, missing values, schema changes, audit columns, and indexing based on the workload.</p>",
+            "<h3>12. Common Mistakes</h3>",
+            "<table><thead><tr><th>Mistake</th><th>How to avoid it</th></tr></thead><tbody><tr><td>Forgetting a comma between column definitions.</td><td>Separate column definitions with commas, but do not place an extra comma before the closing parenthesis.</td></tr><tr><td>Using a reserved word as a column or table name.</td><td>Choose clear names that avoid reserved words, or quote identifiers with backticks when necessary.</td></tr><tr><td>Using an unsuitable data type.</td><td>Choose a type that can represent the required values and precision.</td></tr><tr><td>Expecting CREATE TABLE to insert records.</td><td>Use <code>INSERT INTO</code> to add data.</td></tr><tr><td>Repeating CREATE TABLE without checking whether the table exists.</td><td>Use <code>SHOW TABLES;</code> or <code>CREATE TABLE IF NOT EXISTS</code> where appropriate.</td></tr><tr><td>Assuming IF NOT EXISTS updates an existing table.</td><td>Use <code>ALTER TABLE</code> for schema changes.</td></tr><tr><td>Creating a table without considering how records will be identified.</td><td>Choose suitable keys and constraints based on the data requirements.</td></tr></tbody></table>",
+            "<h3>13. Quick Revision</h3>",
+            "<div class=\"definition-box\"><b>Remember:</b><br><code>CREATE TABLE</code> creates a new table structure.<br><code>INT</code>, <code>VARCHAR</code>, <code>DECIMAL</code>, and <code>DATE</code> define the types of values columns can store.<br><code>PRIMARY KEY</code> uniquely identifies each row.<br><code>NOT NULL</code> disallows NULL values in a column.<br><code>DEFAULT</code> supplies a default value when applicable.<br><code>CREATE TABLE IF NOT EXISTS</code> avoids an error if the table already exists, but does not alter it.<br><code>DESCRIBE</code> and <code>SHOW CREATE TABLE</code> help verify the resulting structure.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Select your practice database.</b> Create it if necessary, then make it the active database.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Create an employees table.</b> Include an ID, name, department, salary, and joining date.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT,\n    employee_name VARCHAR(100),\n    department VARCHAR(50),\n    salary DECIMAL(10,2),\n    joining_date DATE\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Verify the table.</b> Confirm that it appears in the database and inspect its columns.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW TABLES;\nDESCRIBE employees;\nSHOW CREATE TABLE employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Create a customers table with a primary key.</b> Add a customer ID, name, and email.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100) NOT NULL,\n    email VARCHAR(150)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Create a products table with a default status.</b> Make the product name mandatory and use a default status of ACTIVE.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE products (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL,\n    price DECIMAL(10,2) NOT NULL,\n    status VARCHAR(20) DEFAULT 'ACTIVE'\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Test IF NOT EXISTS.</b> Run the command twice. Observe that the second execution does not create a duplicate table or change the existing structure.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE IF NOT EXISTS employees (\n    employee_id INT,\n    employee_name VARCHAR(100)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Create a structure-only copy.</b> Make a second table based on the existing employees table and inspect its definition.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees_backup LIKE employees;\nDESCRIBE employees_backup;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8: Data Engineering challenge.</b> Design a <code>raw_orders</code> table with an order ID, customer ID, amount, order timestamp, and source system. Choose suitable data types and explain why each type fits its column.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE raw_orders (\n    order_id BIGINT,\n    customer_id BIGINT,\n    order_amount DECIMAL(12,2),\n    order_timestamp DATETIME,\n    source_system VARCHAR(50)\n);</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Create tables with appropriate column names and data types, apply basic constraints, verify the resulting schema, and understand how table definitions support data ingestion and transformation pipelines.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is CREATE TABLE in SQL?",
+              "a": "CREATE TABLE is a DDL command that creates a new table by defining its columns, data types, and optional constraints."
+            },
+            {
+              "q": "Q2. What is the basic syntax of CREATE TABLE?",
+              "a": "CREATE TABLE table_name (column1 data_type, column2 data_type);. Each column definition specifies a name and data type, with optional constraints."
+            },
+            {
+              "q": "Q3. Does CREATE TABLE insert data into the table?",
+              "a": "No. It creates the table structure. Use INSERT INTO to add records."
+            },
+            {
+              "q": "Q4. What is the purpose of a data type in CREATE TABLE?",
+              "a": "A data type defines the kind of values a column can store, such as whole numbers, text, decimal values, dates, or timestamps."
+            },
+            {
+              "q": "Q5. What is a primary key?",
+              "a": "A primary key uniquely identifies each row in a table. Its values must be unique and cannot be NULL."
+            },
+            {
+              "q": "Q6. What does NOT NULL mean?",
+              "a": "NOT NULL prevents a column from storing a NULL value. It is useful for required information such as a product name."
+            },
+            {
+              "q": "Q7. What is the purpose of DEFAULT?",
+              "a": "DEFAULT provides a value when an INSERT statement omits the column or explicitly requests the default, provided no other applicable rule prevents it."
+            },
+            {
+              "q": "Q8. What happens if you create a table that already exists?",
+              "a": "MySQL normally returns an error. CREATE TABLE IF NOT EXISTS suppresses the existing-table error, but it does not modify the table's current structure."
+            },
+            {
+              "q": "Q9. How can you check a table's structure after creating it?",
+              "a": "Use DESCRIBE table_name; to inspect columns and data types, or SHOW CREATE TABLE table_name; to see the table definition."
+            },
+            {
+              "q": "Q10. What does CREATE TABLE ... LIKE do in MySQL?",
+              "a": "It creates a new table using an existing table's structure and indexes, without copying its rows."
+            },
+            {
+              "q": "Q11. Why is CREATE TABLE important in Data Engineering?",
+              "a": "It lets Data Engineers define storage structures for raw ingestion, staging, transformation, warehouse, and audit data."
+            },
+            {
+              "q": "Q12. What is the difference between CREATE TABLE and ALTER TABLE?",
+              "a": "CREATE TABLE creates a new table, whereas ALTER TABLE changes the structure of an existing table."
+            }
+          ]
+        },
+        {
+          "n": 14,
+          "title": "Data Types",
+          "explanation": [
+            "<h3>1. What Are Data Types?</h3>",
+            "<p>A data type defines the kind of value a database column can store, such as whole numbers, text, decimal numbers, dates, or timestamps. When creating a table, choosing the correct data type helps maintain data quality, control storage, and perform calculations correctly.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> A data type specifies the permitted form of data stored in a column and influences how the database validates, stores, and processes its values.</div>",
+            "<p>For Data Engineers, data types are especially important when ingesting data from APIs, CSV files, application databases, and event streams into staging tables and data warehouses.</p>",
+            "<h3>2. Why Are Data Types Important?</h3>",
+            "<ul><li><b>Data quality:</b> Helps prevent values from being stored in an unsuitable format.</li><li><b>Correct calculations:</b> Numeric types support arithmetic and aggregation.</li><li><b>Date operations:</b> Date and time types enable filtering by date, calculating durations, and analyzing events over time.</li><li><b>Storage efficiency:</b> Appropriate types avoid unnecessarily large or unsuitable representations.</li><li><b>Data consistency:</b> Helps standardize data across ingestion, transformation, and reporting stages.</li></ul>",
+            "<h3>3. Main Categories of MySQL Data Types</h3>",
+            "<div class=\"diagram\"><pre><code>MySQL Data Types\n       |\n       +-- Numeric\n       |     +-- INT, BIGINT\n       |     +-- DECIMAL, FLOAT, DOUBLE\n       |\n       +-- String and Binary\n       |     +-- CHAR, VARCHAR, TEXT\n       |     +-- BINARY, VARBINARY, BLOB\n       |\n       +-- Date and Time\n       |     +-- DATE, TIME\n       |     +-- DATETIME, TIMESTAMP\n       |\n       +-- Other Types\n             +-- BOOLEAN (TINYINT alias)\n             +-- JSON</code></pre></div>",
+            "<p>This is a practical overview of common MySQL types. MySQL also provides additional types, and their exact behavior can depend on the version and configuration.</p>",
+            "<h3>4. Integer Data Types</h3>",
+            "<p>Integer types store whole numbers without a fractional component. They are commonly used for identifiers, counts, quantities, and status codes.</p>",
+            "<table><thead><tr><th>Type</th><th>Storage</th><th>Signed range</th><th>Typical use</th></tr></thead><tbody><tr><td><code>TINYINT</code></td><td>1 byte</td><td>-128 to 127</td><td>Small numeric flags or counters</td></tr><tr><td><code>SMALLINT</code></td><td>2 bytes</td><td>-32,768 to 32,767</td><td>Small counts</td></tr><tr><td><code>MEDIUMINT</code></td><td>3 bytes</td><td>-8,388,608 to 8,388,607</td><td>Medium-range whole numbers</td></tr><tr><td><code>INT</code></td><td>4 bytes</td><td>-2,147,483,648 to 2,147,483,647</td><td>Common IDs and quantities</td></tr><tr><td><code>BIGINT</code></td><td>8 bytes</td><td>-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807</td><td>Very large counts or identifiers</td></tr></tbody></table>",
+            "<p>These ranges are for signed integer types. An <code>UNSIGNED</code> integer does not store negative values and has a higher nonnegative range. For example, MySQL's unsigned <code>INT</code> ranges from 0 to 4,294,967,295.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE inventory (\n    product_id INT,\n    quantity INT UNSIGNED,\n    reorder_level SMALLINT\n);</code></pre></div>",
+            "<p><b>Important:</b> Choose a type based on the maximum value expected, not just the current value. Also, an identifier containing leading zeros or nonnumeric characters may need a string type instead of an integer.</p>",
+            "<h3>5. DECIMAL, FLOAT, and DOUBLE</h3>",
+            "<p>These types store numbers that can contain a fractional part, but they differ in precision and representation.</p>",
+            "<table><thead><tr><th>Type</th><th>How it works</th><th>Common use</th></tr></thead><tbody><tr><td><code>DECIMAL(p,s)</code></td><td>Exact decimal representation with specified precision and scale.</td><td>Prices, financial amounts, precise decimal quantities.</td></tr><tr><td><code>FLOAT</code></td><td>Approximate floating-point number, usually single precision.</td><td>Measurements where approximate precision is acceptable.</td></tr><tr><td><code>DOUBLE</code></td><td>Approximate floating-point number, usually double precision.</td><td>Scientific calculations and approximate numerical analysis.</td></tr></tbody></table>",
+            "<p>In <code>DECIMAL(p,s)</code>, <code>p</code> is the maximum number of digits and <code>s</code> is the number of digits after the decimal point. For example, <code>DECIMAL(10,2)</code> allows up to ten total digits, with two after the decimal point.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE sales (\n    sale_id BIGINT,\n    sale_amount DECIMAL(10,2),\n    temperature FLOAT,\n    measurement DOUBLE\n);</code></pre></div>",
+            "<p>For a sale amount such as 1250.75, <code>DECIMAL(10,2)</code> is generally more appropriate than <code>FLOAT</code> because financial amounts usually require exact decimal arithmetic.</p>",
+            "<div class=\"definition-box\"><b>Data Engineering rule:</b> Use <code>DECIMAL</code> for money and other values requiring controlled decimal precision. Use floating-point types when approximate numerical representation is appropriate.</div>",
+            "<h3>6. String Data Types</h3>",
+            "<p>String types store text such as names, email addresses, categories, product codes, and source-system identifiers.</p>",
+            "<table><thead><tr><th>Type</th><th>Description</th><th>Example use</th></tr></thead><tbody><tr><td><code>CHAR(n)</code></td><td>Fixed-length character field.</td><td>Fixed-width codes.</td></tr><tr><td><code>VARCHAR(n)</code></td><td>Variable-length character field with a declared maximum length.</td><td>Names, email addresses, department names.</td></tr><tr><td><code>TINYTEXT</code></td><td>Small text value, maximum 255 bytes.</td><td>Short text fields.</td></tr><tr><td><code>TEXT</code></td><td>Text value, maximum 65,535 bytes.</td><td>Descriptions and comments.</td></tr><tr><td><code>MEDIUMTEXT</code></td><td>Larger text value, maximum 16,777,215 bytes.</td><td>Longer textual content.</td></tr><tr><td><code>LONGTEXT</code></td><td>Very large text value, maximum 4,294,967,295 bytes.</td><td>Large documents or text payloads.</td></tr></tbody></table>",
+            "<p>The limits for TEXT types are in bytes, not necessarily characters. Character encoding affects how many characters fit. Actual storage and practical limits also depend on row size, configuration, and the database environment.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers (\n    customer_id INT,\n    customer_name VARCHAR(100),\n    country_code CHAR(2),\n    customer_description TEXT\n);</code></pre></div>",
+            "<p><b>When to choose CHAR versus VARCHAR:</b> Use <code>CHAR</code> when values are consistently fixed-length, such as a two-character country code. Use <code>VARCHAR</code> for values whose lengths vary, such as names. Character padding and comparison behavior can depend on the type and collation.</p>",
+            "<h3>7. Binary Data Types</h3>",
+            "<p>Binary types store byte sequences rather than ordinary text. They can be useful for binary identifiers, hashes, and binary payloads.</p>",
+            "<table><thead><tr><th>Type</th><th>Purpose</th></tr></thead><tbody><tr><td><code>BINARY(n)</code></td><td>Fixed-length binary values.</td></tr><tr><td><code>VARBINARY(n)</code></td><td>Variable-length binary values.</td></tr><tr><td><code>BLOB</code></td><td>Binary large objects.</td></tr></tbody></table>",
+            "<p>For many Data Engineering systems, large files and images are stored in object storage, while their paths, metadata, and checksums are stored in database tables. This can be easier to scale than storing every large binary payload directly in a relational table.</p>",
+            "<h3>8. Date and Time Data Types</h3>",
+            "<p>Date and time types are essential for event data, transaction records, ingestion timestamps, and incremental data pipelines.</p>",
+            "<table><thead><tr><th>Type</th><th>What it stores</th><th>Example</th></tr></thead><tbody><tr><td><code>DATE</code></td><td>Calendar date.</td><td><code>2026-10-21</code></td></tr><tr><td><code>TIME</code></td><td>Time of day or a time interval, depending on use.</td><td><code>14:30:00</code></td></tr><tr><td><code>DATETIME</code></td><td>Date and time value without automatic timezone conversion.</td><td><code>2026-10-21 14:30:00</code></td></tr><tr><td><code>TIMESTAMP</code></td><td>Date and time value stored with timezone-related conversion behavior.</td><td><code>2026-10-21 09:00:00</code></td></tr></tbody></table>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE pipeline_runs (\n    run_id BIGINT,\n    run_date DATE,\n    started_at DATETIME,\n    completed_at DATETIME,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);</code></pre></div>",
+            "<p><b>DATETIME versus TIMESTAMP:</b> MySQL <code>DATETIME</code> stores the date and time fields without timezone conversion. <code>TIMESTAMP</code> is converted between the session time zone and UTC when stored and retrieved. Its supported range is also narrower than that of <code>DATETIME</code> in common MySQL versions. For reliable pipelines, define your timezone conventions explicitly, often by normalizing event timestamps to UTC.</p>",
+            "<h3>9. BOOLEAN and JSON Data Types</h3>",
+            "<p>MySQL supports Boolean-style values and a native JSON type, both useful in application and ingestion data.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE api_events (\n    event_id BIGINT,\n    is_processed BOOLEAN DEFAULT FALSE,\n    event_payload JSON\n);</code></pre></div>",
+            "<p>In MySQL, <code>BOOLEAN</code> is a synonym for <code>TINYINT(1)</code>; <code>TRUE</code> and <code>FALSE</code> correspond to 1 and 0. This does not automatically enforce that only 0 and 1 can be stored.</p>",
+            "<p>The native <code>JSON</code> type validates JSON documents and supports JSON operations. It is useful when source events contain flexible attributes, although frequently queried fields may be better modeled as separate columns or generated/indexed expressions.</p>",
+            "<h3>10. Choosing the Correct Data Type</h3>",
+            "<p>Consider what the data represents, which operations you will perform, its maximum expected size, and whether exact precision is required.</p>",
+            "<table><thead><tr><th>Business value</th><th>Possible MySQL type</th><th>Reason</th></tr></thead><tbody><tr><td>Employee count</td><td><code>INT</code></td><td>Whole number.</td></tr><tr><td>Large event identifier</td><td><code>BIGINT</code></td><td>Supports a larger numeric range.</td></tr><tr><td>Order amount</td><td><code>DECIMAL(12,2)</code></td><td>Exact decimal amount.</td></tr><tr><td>Customer name</td><td><code>VARCHAR(100)</code></td><td>Variable-length text.</td></tr><tr><td>Country code</td><td><code>CHAR(2)</code></td><td>Fixed-length code.</td></tr><tr><td>Order date</td><td><code>DATE</code></td><td>Only the calendar date is needed.</td></tr><tr><td>Event timestamp</td><td><code>DATETIME</code> or <code>TIMESTAMP</code></td><td>Choice depends on timezone and range requirements.</td></tr><tr><td>Flexible API payload</td><td><code>JSON</code></td><td>Stores a structured JSON document.</td></tr><tr><td>Product code such as <code>00125</code></td><td><code>VARCHAR</code></td><td>Preserves leading zeros as part of the identifier.</td></tr></tbody></table>",
+            "<h3>11. Data Types in a Data Engineering Pipeline</h3>",
+            "<p>Suppose a source system sends order records as CSV data. The source may represent every field as text, but the destination table should use types that reflect the meaning of each field.</p>",
+            "<div class=\"diagram\"><pre><code>CSV / API Source\n       |\n       v\nInspect source fields\n       |\n       v\nDefine destination data types\n       |\n       v\nLoad into staging table\n       |\n       v\nValidate and transform\n       |\n       v\nLoad warehouse tables</code></pre></div>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE stg_orders (\n    order_id BIGINT,\n    customer_id BIGINT,\n    order_amount DECIMAL(12,2),\n    order_date DATE,\n    ingested_at DATETIME,\n    source_payload JSON\n);</code></pre></div>",
+            "<p>In this example, identifiers use integer types, the amount uses exact decimal storage, the business date uses DATE, the ingestion time uses DATETIME, and flexible source attributes can be stored in JSON. The best design depends on the actual source schema and downstream queries.</p>",
+            "<h3>12. Common Data Type Mistakes</h3>",
+            "<table><thead><tr><th>Mistake</th><th>Why it matters</th><th>Better choice</th></tr></thead><tbody><tr><td>Storing money in FLOAT.</td><td>Approximate representation can create rounding differences.</td><td>Use DECIMAL for exact decimal amounts.</td></tr><tr><td>Storing dates in VARCHAR unnecessarily.</td><td>Date validation, comparison, and arithmetic become more difficult.</td><td>Use DATE, DATETIME, or TIMESTAMP as appropriate.</td></tr><tr><td>Using INT for a code with leading zeros.</td><td>Leading zeros are lost.</td><td>Use CHAR or VARCHAR for identifiers where zeros are meaningful.</td></tr><tr><td>Choosing a column length without considering source data.</td><td>Valid incoming values may be rejected or truncated depending on configuration and operation.</td><td>Inspect source data and select an appropriate capacity.</td></tr><tr><td>Using TEXT for every text column.</td><td>Can make the schema less intentional and affect indexing or query design.</td><td>Use VARCHAR for bounded text and larger text types when needed.</td></tr><tr><td>Ignoring timestamp timezone behavior.</td><td>Events can appear at unexpected times when processed in different sessions or regions.</td><td>Define a clear timezone convention and test conversions.</td></tr><tr><td>Assuming BOOLEAN strictly accepts only TRUE or FALSE.</td><td>MySQL BOOLEAN is an alias for TINYINT(1).</td><td>Apply appropriate validation or constraints if strict enforcement is required.</td></tr></tbody></table>",
+            "<h3>13. Quick Revision</h3>",
+            "<div class=\"definition-box\"><b>Remember:</b><br><code>INT</code> and <code>BIGINT</code> — whole numbers.<br><code>DECIMAL</code> — exact decimal values, often used for money.<br><code>FLOAT</code> and <code>DOUBLE</code> — approximate floating-point values.<br><code>CHAR</code> and <code>VARCHAR</code> — character strings.<br><code>TEXT</code> — longer text content.<br><code>DATE</code> — calendar date.<br><code>DATETIME</code> and <code>TIMESTAMP</code> — date and time, with different timezone behavior.<br><code>BOOLEAN</code> — Boolean-style value represented by TINYINT in MySQL.<br><code>JSON</code> — structured JSON documents.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create a practice database.</b> Select a database in which you can safely create learning tables.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Create an employees table.</b> Use integer, text, decimal, and date types.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT,\n    employee_name VARCHAR(100),\n    department VARCHAR(50),\n    salary DECIMAL(10,2),\n    joining_date DATE\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Inspect the data types.</b> Run DESCRIBE and identify the type used for each column.</p>",
+            "<div class=\"code-block\"><pre><code>DESCRIBE employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Create a financial transactions table.</b> Use an exact decimal type for the transaction amount and an appropriate date/time type for the transaction timestamp.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE transactions (\n    transaction_id BIGINT,\n    account_code VARCHAR(20),\n    amount DECIMAL(12,2),\n    transaction_time DATETIME\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Create an event table.</b> Include a Boolean-style processing flag and a JSON payload.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE events (\n    event_id BIGINT,\n    is_processed BOOLEAN DEFAULT FALSE,\n    event_payload JSON,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Preserve leading zeros.</b> Create a table for product codes such as 00125 and 00078. Decide why VARCHAR is more appropriate than INT for the code.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE product_codes (\n    product_code VARCHAR(10),\n    product_name VARCHAR(100)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Choose types for a Data Engineering pipeline.</b> Design a staging table with an order ID, customer ID, order amount, order date, ingestion timestamp, and optional JSON source payload. Explain each type choice.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE stg_orders (\n    order_id BIGINT,\n    customer_id BIGINT,\n    order_amount DECIMAL(12,2),\n    order_date DATE,\n    ingested_at DATETIME,\n    source_payload JSON\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8: Think through the trade-offs.</b> Explain why DECIMAL is suitable for money, why an identifier can be text even if it contains digits, and why a pipeline needs a clear timestamp timezone convention.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Select data types based on meaning, precision, expected range, and downstream processing needs. Be able to justify your choices for real-world ingestion and analytics tables.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is a data type in SQL?",
+              "a": "A data type defines the kind of value a column can store, such as an integer, string, decimal number, date, timestamp, or JSON document."
+            },
+            {
+              "q": "Q2. What is the difference between INT and BIGINT?",
+              "a": "Both store whole numbers, but BIGINT uses more storage and supports a much larger numeric range than INT."
+            },
+            {
+              "q": "Q3. What is the difference between DECIMAL and FLOAT?",
+              "a": "DECIMAL stores exact decimal values with specified precision and scale, whereas FLOAT stores approximate floating-point values. DECIMAL is generally preferable for money."
+            },
+            {
+              "q": "Q4. What do DECIMAL(10,2) and its numbers mean?",
+              "a": "The first number is the maximum total number of digits, and the second is the number of digits after the decimal point. DECIMAL(10,2) allows up to ten total digits, including two fractional digits."
+            },
+            {
+              "q": "Q5. What is the difference between CHAR and VARCHAR?",
+              "a": "CHAR is a fixed-length character type, while VARCHAR stores variable-length strings up to a declared maximum length."
+            },
+            {
+              "q": "Q6. Why should a product code such as 00125 often use VARCHAR instead of INT?",
+              "a": "Because the leading zeros may be meaningful. Storing the code as an integer would remove those zeros."
+            },
+            {
+              "q": "Q7. What is the difference between DATE and DATETIME?",
+              "a": "DATE stores a calendar date, while DATETIME stores both a date and a time."
+            },
+            {
+              "q": "Q8. What is the difference between DATETIME and TIMESTAMP in MySQL?",
+              "a": "DATETIME stores date and time fields without automatic timezone conversion. TIMESTAMP converts between the session time zone and UTC when storing and retrieving values."
+            },
+            {
+              "q": "Q9. Is BOOLEAN a separate native storage type in MySQL?",
+              "a": "No. BOOLEAN is a synonym for TINYINT(1), with TRUE and FALSE corresponding to 1 and 0. It does not by itself restrict values to only those two numbers."
+            },
+            {
+              "q": "Q10. When should you use the JSON data type?",
+              "a": "Use JSON when a column needs to hold structured JSON documents, such as flexible API or event payloads. Frequently queried fields may still be better represented as separate columns."
+            },
+            {
+              "q": "Q11. Why are data types important in Data Engineering?",
+              "a": "They help validate incoming data, preserve numerical precision, support date calculations, maintain consistency across pipeline stages, and make downstream transformations more reliable."
+            },
+            {
+              "q": "Q12. What happens if incoming data does not fit a column's data type?",
+              "a": "Depending on the value, SQL mode, and operation, MySQL may reject the value, raise an error, or convert it. Data pipelines should validate source values and test how invalid data is handled."
+            },
+            {
+              "q": "Q13. Should every numeric-looking field use INT?",
+              "a": "No. Identifiers, phone numbers, postal codes, and product codes may need CHAR or VARCHAR when leading zeros, formatting, or nonnumeric characters are meaningful."
+            },
+            {
+              "q": "Q14. Which data type is generally appropriate for a monetary amount?",
+              "a": "DECIMAL with a suitable precision and scale is generally appropriate when exact decimal arithmetic is required."
+            }
+          ]
+        },
+        {
+          "n": 15,
+          "title": "DESCRIBE / DESC Table",
+          "explanation": [
+            "<h3>1. What Is DESCRIBE / DESC?</h3>",
+            "<p><code>DESCRIBE</code> is a MySQL command used to inspect the structure of an existing table. It displays information about the table's columns, including column names, data types, whether NULL values are allowed, key information, default values, and extra attributes.</p>",
+            "<p><code>DESC</code> is a shorter synonym for <code>DESCRIBE</code> in MySQL. Both commands provide the same table description.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> <code>DESCRIBE table_name;</code> displays the structural details of a table without retrieving all its data rows.</div>",
+            "<h3>2. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>DESCRIBE table_name;\n\n-- Short form\nDESC table_name;</code></pre></div>",
+            "<p>Before running the command, select the database containing your table.</p>",
+            "<div class=\"code-block\"><pre><code>USE de_practice;\n\nDESCRIBE employees;\n\nDESC employees;</code></pre></div>",
+            "<p>Both commands inspect the structure of the <code>employees</code> table.</p>",
+            "<h3>3. Example: Create a Table and Describe It</h3>",
+            "<p>Consider the following table definition:</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10,2) DEFAULT 0.00,\n    joining_date DATE\n);\n\nDESCRIBE employees;</code></pre></div>",
+            "<p>The output will contain information similar to the following:</p>",
+            "<table><thead><tr><th>Field</th><th>Type</th><th>Null</th><th>Key</th><th>Default</th><th>Extra</th></tr></thead><tbody><tr><td>employee_id</td><td>int</td><td>NO</td><td>PRI</td><td>NULL</td><td></td></tr><tr><td>employee_name</td><td>varchar(100)</td><td>NO</td><td></td><td>NULL</td><td></td></tr><tr><td>department</td><td>varchar(50)</td><td>YES</td><td></td><td>NULL</td><td></td></tr><tr><td>salary</td><td>decimal(10,2)</td><td>YES</td><td></td><td>0.00</td><td></td></tr><tr><td>joining_date</td><td>date</td><td>YES</td><td></td><td>NULL</td><td></td></tr></tbody></table>",
+            "<p><b>Note:</b> The output is illustrative. Exact formatting and displayed details can vary by MySQL version and table definition. In the primary-key row, the Default column may display NULL to indicate that no explicit default is defined; it does not mean the primary key can actually contain NULL.</p>",
+            "<h3>4. Understand Each Output Column</h3>",
+            "<table><thead><tr><th>Output column</th><th>Meaning</th></tr></thead><tbody><tr><td><code>Field</code></td><td>The name of the table column.</td></tr><tr><td><code>Type</code></td><td>The data type, such as INT, VARCHAR(100), DATE, or DECIMAL(10,2).</td></tr><tr><td><code>Null</code></td><td>YES means NULL is allowed; NO means NULL is not allowed.</td></tr><tr><td><code>Key</code></td><td>Shows key information, such as PRI for a primary key, UNI for a unique key, or MUL for a nonunique indexed key.</td></tr><tr><td><code>Default</code></td><td>The default value used when applicable if an INSERT omits the column or requests its default.</td></tr><tr><td><code>Extra</code></td><td>Additional attributes, such as auto-increment behavior.</td></tr></tbody></table>",
+            "<h3>5. Understanding the Null Column</h3>",
+            "<p>The <code>Null</code> column tells you whether a column can store a NULL value.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers (\n    customer_id INT NOT NULL,\n    customer_name VARCHAR(100) NOT NULL,\n    email VARCHAR(150)\n);\n\nDESCRIBE customers;</code></pre></div>",
+            "<p>In this example:</p><ul><li><code>customer_id</code> cannot be NULL.</li><li><code>customer_name</code> cannot be NULL.</li><li><code>email</code> can be NULL because no NOT NULL constraint was specified.</li></ul>",
+            "<div class=\"definition-box\"><b>Important:</b> NULL represents a missing or unknown value; it is not the same as zero, an empty string, or the text <code>'NULL'</code>.</div>",
+            "<h3>6. Understanding the Key Column</h3>",
+            "<p>The <code>Key</code> column provides information about indexes and key constraints.</p>",
+            "<table><thead><tr><th>Value</th><th>General meaning</th></tr></thead><tbody><tr><td><code>PRI</code></td><td>The column participates in a primary key.</td></tr><tr><td><code>UNI</code></td><td>The column is associated with a unique index.</td></tr><tr><td><code>MUL</code></td><td>The column is associated with a nonunique index that allows repeated values.</td></tr><tr><td>Blank</td><td>No key marker is shown for that column in this output.</td></tr></tbody></table>",
+            "<p>A blank Key value does not necessarily mean that the column is never used in a relationship. For example, a foreign key may not appear as PRI or UNI. To inspect complete constraint definitions, use <code>SHOW CREATE TABLE table_name;</code>.</p>",
+            "<h3>7. Understanding Default and Extra</h3>",
+            "<p>The <code>Default</code> column shows the configured default, if any. The <code>Extra</code> column displays additional column properties.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE orders (\n    order_id INT AUTO_INCREMENT PRIMARY KEY,\n    order_status VARCHAR(20) DEFAULT 'PENDING',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nDESCRIBE orders;</code></pre></div>",
+            "<p>In this example:</p><ul><li><code>order_id</code> is configured to generate an incrementing value when MySQL assigns the identifier.</li><li><code>order_status</code> has a default value of <code>PENDING</code>.</li><li><code>created_at</code> uses the current timestamp as its default.</li></ul>",
+            "<p>Depending on the column definition and MySQL version, the Extra field may display attributes such as <code>auto_increment</code> or generated-column information.</p>",
+            "<h3>8. Describe a Table in Another Database</h3>",
+            "<p>You can inspect a table without first changing the selected database by qualifying the table name with its database name.</p>",
+            "<div class=\"code-block\"><pre><code>DESCRIBE de_practice.employees;\n\nDESC de_practice.customers;</code></pre></div>",
+            "<p>This is useful when you need to compare schemas across databases or inspect a table in a different environment.</p>",
+            "<h3>9. DESCRIBE vs SHOW TABLES vs SELECT</h3>",
+            "<p>These commands answer different questions during database exploration.</p>",
+            "<table><thead><tr><th>Command</th><th>Purpose</th><th>Example question</th></tr></thead><tbody><tr><td><code>SHOW TABLES;</code></td><td>Lists table names.</td><td>Which tables exist in this database?</td></tr><tr><td><code>DESCRIBE employees;</code></td><td>Displays table columns and structural details.</td><td>What columns and data types does the table have?</td></tr><tr><td><code>SELECT * FROM employees;</code></td><td>Retrieves records from the table.</td><td>What data is stored in the table?</td></tr><tr><td><code>SHOW CREATE TABLE employees;</code></td><td>Shows the table's SQL definition.</td><td>Which constraints and definitions were configured?</td></tr></tbody></table>",
+            "<div class=\"diagram\"><pre><code>Explore a Database\n       |\n       v\nSHOW TABLES\n       |\n       v\nChoose a table\n       |\n       v\nDESCRIBE table_name\n       |\n       v\nUnderstand columns and types\n       |\n       v\nSELECT sample records</code></pre></div>",
+            "<h3>10. DESCRIBE in Data Engineering</h3>",
+            "<p>Data Engineers often need to inspect source tables before extracting data or building ETL/ELT pipelines. DESCRIBE helps identify the available columns and their data types.</p>",
+            "<p>For example, before creating a pipeline that extracts orders, inspect the source schema:</p>",
+            "<div class=\"code-block\"><pre><code>DESCRIBE source_db.orders;</code></pre></div>",
+            "<p>Suppose the source contains <code>order_id</code>, <code>customer_id</code>, <code>amount</code>, and <code>created_at</code>. You can use that information to design a staging table with suitable data types and map the source fields to the destination.</p>",
+            "<div class=\"diagram\"><pre><code>Source Database\n       |\n       v\nDESCRIBE source_table\n       |\n       v\nInspect column names and types\n       |\n       v\nDesign staging schema\n       |\n       v\nBuild ingestion pipeline\n       |\n       v\nValidate loaded data</code></pre></div>",
+            "<p>Schema inspection is also useful when troubleshooting pipeline failures caused by changed column names, unexpected data types, or missing fields. DESCRIBE shows the current structure; it does not by itself compare schema versions or identify when a change occurred.</p>",
+            "<h3>11. Common Mistakes</h3>",
+            "<table><thead><tr><th>Mistake</th><th>Correct approach</th></tr></thead><tbody><tr><td>Using DESCRIBE without a table name.</td><td>Provide an existing table name, such as <code>DESCRIBE employees;</code>.</td></tr><tr><td>Confusing table structure with table records.</td><td>Use DESCRIBE for structure and SELECT for records.</td></tr><tr><td>Assuming DESC is a different command.</td><td>In MySQL, DESC is a synonym for DESCRIBE.</td></tr><tr><td>Assuming a blank Key field means the column is unused.</td><td>Inspect indexes and constraints when more detail is needed.</td></tr><tr><td>Assuming Default NULL means NULL is allowed.</td><td>Check the Null column and constraints separately.</td></tr><tr><td>Expecting DESCRIBE to show every constraint definition.</td><td>Use <code>SHOW CREATE TABLE table_name;</code> for the full table definition.</td></tr></tbody></table>",
+            "<h3>12. Quick Revision</h3>",
+            "<div class=\"definition-box\"><b>Remember:</b><br><code>DESCRIBE table_name;</code> — displays table structure.<br><code>DESC table_name;</code> — shorter MySQL synonym.<br><code>Field</code> — column name.<br><code>Type</code> — data type.<br><code>Null</code> — whether NULL is allowed.<br><code>Key</code> — key or index marker.<br><code>Default</code> — configured default value.<br><code>Extra</code> — additional attributes.<br><code>SHOW CREATE TABLE</code> — inspect the complete table definition.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Select your practice database.</b> Create it if needed and make it the active database.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Create an employees table.</b> Include an integer ID, required employee name, department, salary, and joining date.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10,2) DEFAULT 0.00,\n    joining_date DATE\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Inspect the table using DESCRIBE.</b> Identify every output column and explain what it means.</p>",
+            "<div class=\"code-block\"><pre><code>DESCRIBE employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Run the shorter form.</b> Compare its output with the previous command.</p>",
+            "<div class=\"code-block\"><pre><code>DESC employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Inspect another database's table.</b> Use the database-qualified name without switching the active database.</p>",
+            "<div class=\"code-block\"><pre><code>DESC de_practice.employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Compare structure and records.</b> Run all three commands and explain what each result tells you.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW TABLES;\nDESCRIBE employees;\nSELECT * FROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Inspect auto-increment and default values.</b> Create an orders table and identify the relevant details in the output.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE orders (\n    order_id INT AUTO_INCREMENT PRIMARY KEY,\n    order_status VARCHAR(20) DEFAULT 'PENDING',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nDESCRIBE orders;\nSHOW CREATE TABLE orders;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8: Data Engineering challenge.</b> Imagine you need to copy a source table into a staging database. Use DESCRIBE to list the source columns and types. Write down the mapping you would need for the destination table and identify any columns requiring type conversion.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Inspect MySQL table schemas confidently, understand the output of DESCRIBE / DESC, and use schema information to prepare reliable data ingestion and transformation workflows.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is DESCRIBE in MySQL?",
+              "a": "DESCRIBE is a command that displays the structure of an existing table, including column names, data types, NULL allowance, key information, defaults, and extra attributes."
+            },
+            {
+              "q": "Q2. What is the difference between DESCRIBE and DESC?",
+              "a": "In MySQL, DESC is a shorter synonym for DESCRIBE. Both commands provide the same table description."
+            },
+            {
+              "q": "Q3. What does the Field column show?",
+              "a": "It shows the names of the columns defined in the table."
+            },
+            {
+              "q": "Q4. What does the Type column show?",
+              "a": "It displays the data type of each column, such as INT, VARCHAR(100), DATE, or DECIMAL(10,2)."
+            },
+            {
+              "q": "Q5. What does Null mean in DESCRIBE output?",
+              "a": "YES means the column permits NULL values, while NO means NULL values are not permitted."
+            },
+            {
+              "q": "Q6. What does PRI mean in the Key column?",
+              "a": "PRI indicates that the column participates in a primary key."
+            },
+            {
+              "q": "Q7. What does the Default column show?",
+              "a": "It shows the column's configured default value, if one is defined. A displayed NULL does not by itself prove that the column allows NULL values."
+            },
+            {
+              "q": "Q8. Does DESCRIBE show the records stored in a table?",
+              "a": "No. DESCRIBE shows table structure. Use SELECT to retrieve records."
+            },
+            {
+              "q": "Q9. How do you inspect a table in another database?",
+              "a": "Use a database-qualified name, such as DESCRIBE de_practice.employees;."
+            },
+            {
+              "q": "Q10. What is the difference between DESCRIBE and SHOW CREATE TABLE?",
+              "a": "DESCRIBE presents a convenient summary of the columns and their properties. SHOW CREATE TABLE displays the SQL definition of the table, including its configured constraints and other definition details."
+            },
+            {
+              "q": "Q11. Why do Data Engineers use DESCRIBE?",
+              "a": "They use it to inspect source schemas, map columns into staging tables, check data types, and investigate pipeline errors related to schema differences."
+            },
+            {
+              "q": "Q12. Is DESCRIBE supported identically in every database system?",
+              "a": "No. DESCRIBE is commonly used in MySQL, but other database systems may use different commands or catalog views to inspect table schemas."
+            }
+          ]
+        },
+        {
+          "n": 16,
+          "title": "ALTER TABLE",
+          "explanation": [
+            "<h3>1. What Is ALTER TABLE?</h3>",
+            "<p><code>ALTER TABLE</code> is a SQL Data Definition Language (DDL) command used to modify the structure of an existing database table without having to recreate the entire table.</p>",
+            "<p>It allows you to add columns, remove columns, change data types, rename columns, rename tables, and manage constraints.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> <code>ALTER TABLE</code> modifies the schema of an existing table. Depending on the operation, MySQL may also need to validate, reorganize, or convert the data already stored in that table.</div>",
+            "<h3>2. Why Do We Need ALTER TABLE?</h3>",
+            "<p>Database requirements change over time. A table that was suitable when an application was first developed may need additional columns, different data types, or new constraints.</p>",
+            "<p><b>Example:</b> Suppose an employee management application initially stores only employee IDs, names, and departments. Later, the business decides to store employee salaries and email addresses.</p>",
+            "<p>Instead of deleting and recreating the table, you can modify its structure using <code>ALTER TABLE</code>.</p>",
+            "<div class=\"diagram\"><pre><code>Existing Table\n      |\n      v\nBusiness Requirement Changes\n      |\n      v\nALTER TABLE\n      |\n      v\nUpdated Table Structure\n      |\n      v\nApplication / Pipeline Uses New Schema</code></pre></div>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE table_name\n    alteration_action;</code></pre></div>",
+            "<p>The alteration action specifies what you want to change, such as adding a column, modifying a data type, or removing a column.</p>",
+            "<h3>4. Create a Practice Table</h3>",
+            "<p>We will use the following table to understand different ALTER TABLE operations.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;\n\nCREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100),\n    department VARCHAR(50)\n);\n\nDESCRIBE employees;</code></pre></div>",
+            "<p><b>Initial structure:</b></p>",
+            "<table><thead><tr><th>Column</th><th>Data Type</th></tr></thead><tbody><tr><td>employee_id</td><td>INT</td></tr><tr><td>employee_name</td><td>VARCHAR(100)</td></tr><tr><td>department</td><td>VARCHAR(50)</td></tr></tbody></table>",
+            "<p>All examples below assume this table exists. Some operations depend on changes made in earlier examples.</p>",
+            "<h3>5. ADD COLUMN — Add a New Column</h3>",
+            "<p>Use <code>ADD COLUMN</code> to add a new column to an existing table.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nADD COLUMN salary DECIMAL(10,2);</code></pre></div>",
+            "<p>The table now includes a <code>salary</code> column. Existing records are retained, and the new column will normally contain NULL for existing rows when the column is nullable and has no explicit default.</p>",
+            "<p><b>Add another column:</b></p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nADD COLUMN email VARCHAR(150);</code></pre></div>",
+            "<p><b>Add multiple columns in one statement:</b></p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nADD COLUMN joining_date DATE,\nADD COLUMN employee_status VARCHAR(20) DEFAULT 'ACTIVE';</code></pre></div>",
+            "<div class=\"definition-box\"><b>Data Engineering example:</b> If a source system starts providing a new field called <code>source_system</code>, the staging table may need a corresponding column to store it.</div>",
+            "<h3>6. ADD COLUMN with FIRST and AFTER</h3>",
+            "<p>MySQL supports <code>FIRST</code> and <code>AFTER</code> to specify where a new column should appear in the table definition.</p>",
+            "<div class=\"code-block\"><pre><code>-- Add a column at the beginning\nALTER TABLE employees\nADD COLUMN company_code VARCHAR(20) FIRST;\n\n-- Add a column after employee_name\nALTER TABLE employees\nADD COLUMN phone_number VARCHAR(20)\nAFTER employee_name;</code></pre></div>",
+            "<p>These options affect column order. They do not determine how rows are physically ordered or how query results are sorted.</p>",
+            "<p>For production data pipelines, explicitly selecting columns is generally safer than depending on the order returned by <code>SELECT *</code>.</p>",
+            "<h3>7. MODIFY COLUMN — Change a Column's Definition</h3>",
+            "<p>Use <code>MODIFY COLUMN</code> to change a column's data type, length, or other attributes without renaming the column.</p>",
+            "<p><b>Example:</b> Increase the maximum length of employee names from 100 to 200 characters.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nMODIFY COLUMN employee_name VARCHAR(200);</code></pre></div>",
+            "<p><b>Another example:</b> Change salary precision.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nMODIFY COLUMN salary DECIMAL(12,2);</code></pre></div>",
+            "<p><b>Important:</b> When using MODIFY COLUMN, specify the complete desired column definition, including attributes such as NOT NULL or DEFAULT if they must be retained. A modification may remove attributes that are not repeated.</p>",
+            "<p>Changing a data type can fail or cause conversions if existing values are incompatible. Always inspect existing data before modifying populated production tables.</p>",
+            "<h3>8. CHANGE COLUMN — Rename and Redefine a Column</h3>",
+            "<p>In MySQL, <code>CHANGE COLUMN</code> can rename a column and optionally change its definition.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nCHANGE COLUMN employee_name full_name VARCHAR(200);</code></pre></div>",
+            "<p><b>Syntax:</b></p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE table_name\nCHANGE COLUMN old_column_name new_column_name data_type;</code></pre></div>",
+            "<p>After execution, <code>employee_name</code> becomes <code>full_name</code>.</p>",
+            "<p>The new column definition must be supplied, even if the data type is not changing.</p>",
+            "<h3>9. RENAME COLUMN — Rename Without Redefining the Type</h3>",
+            "<p>MySQL 8.0 supports <code>RENAME COLUMN</code>, which changes the column name without requiring you to repeat its data type.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nRENAME COLUMN full_name TO employee_name;</code></pre></div>",
+            "<p>This changes the name back to <code>employee_name</code>.</p>",
+            "<table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>MODIFY COLUMN</code></td><td>Changes a column definition without renaming it.</td></tr><tr><td><code>CHANGE COLUMN</code></td><td>Can rename a column and change its definition.</td></tr><tr><td><code>RENAME COLUMN</code></td><td>Renames a column without repeating its definition.</td></tr></tbody></table>",
+            "<h3>10. DROP COLUMN — Remove a Column</h3>",
+            "<p>Use <code>DROP COLUMN</code> to permanently remove a column from a table.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nDROP COLUMN phone_number;</code></pre></div>",
+            "<p>This removes the <code>phone_number</code> column and its stored values from the table.</p>",
+            "<div class=\"definition-box\"><b>Warning:</b> Dropping a column is a destructive schema change. The values stored in that column are lost from the table. Confirm that applications, reports, views, and data pipelines no longer depend on it before executing the command.</div>",
+            "<h3>11. RENAME TO — Rename an Existing Table</h3>",
+            "<p>You can rename a table using <code>ALTER TABLE ... RENAME TO</code>.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nRENAME TO staff;</code></pre></div>",
+            "<p>The table is now named <code>staff</code>.</p>",
+            "<p>To continue using the original name:</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE staff\nRENAME TO employees;</code></pre></div>",
+            "<p>Renaming a table does not intentionally delete its rows, but dependent application code, queries, and external pipelines may need to be updated.</p>",
+            "<h3>12. Add and Remove Constraints</h3>",
+            "<p>ALTER TABLE can also add or remove constraints. Constraints help enforce rules about stored data.</p>",
+            "<p><b>Example: Add a UNIQUE constraint to email.</b></p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nADD CONSTRAINT uq_employee_email UNIQUE (email);</code></pre></div>",
+            "<p>This creates a unique constraint for the email column. The operation can fail if existing non-NULL email values contain duplicates.</p>",
+            "<p><b>Remove the unique constraint in MySQL:</b></p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nDROP INDEX uq_employee_email;</code></pre></div>",
+            "<p>MySQL implements UNIQUE constraints using unique indexes, so the named index can be dropped to remove the constraint.</p>",
+            "<p>Primary keys, foreign keys, CHECK constraints, and other constraint types will be covered in the dedicated Constraints &amp; Keys section.</p>",
+            "<h3>13. Add an Index Using ALTER TABLE</h3>",
+            "<p>Indexes can improve the performance of certain queries by helping the database locate matching records efficiently.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nADD INDEX idx_department (department);</code></pre></div>",
+            "<p>To remove the index:</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nDROP INDEX idx_department;</code></pre></div>",
+            "<p>Indexes require additional storage and can increase the work needed for inserts, updates, and deletes. They should be selected based on query patterns rather than added to every column.</p>",
+            "<h3>14. Perform Multiple Alterations in One Statement</h3>",
+            "<p>MySQL allows multiple compatible table alterations to be combined in a single ALTER TABLE statement.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nADD COLUMN manager_id INT,\nADD COLUMN location VARCHAR(100),\nMODIFY COLUMN department VARCHAR(100);</code></pre></div>",
+            "<p>This statement adds two columns and increases the allowed length of the department column.</p>",
+            "<p>Combining compatible changes can reduce the number of schema-change operations, although the execution cost depends on the table, MySQL version, storage engine, and type of alteration.</p>",
+            "<h3>15. Verify Changes After ALTER TABLE</h3>",
+            "<p>After changing a table, inspect its updated structure.</p>",
+            "<div class=\"code-block\"><pre><code>DESCRIBE employees;\n\nSHOW CREATE TABLE employees;\n\nSHOW TABLES;</code></pre></div>",
+            "<p><code>DESCRIBE</code> shows column-level details, while <code>SHOW CREATE TABLE</code> displays the full table definition, including indexes and constraints.</p>",
+            "<h3>16. ALTER TABLE in Data Engineering</h3>",
+            "<p>Schema evolution is a common challenge in Data Engineering. Source systems may add fields, change column lengths, rename attributes, or introduce new business requirements.</p>",
+            "<p><b>Example:</b> A data ingestion pipeline initially receives orders with four fields:</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE stg_orders (\n    order_id BIGINT,\n    customer_id BIGINT,\n    order_amount DECIMAL(12,2),\n    order_date DATE\n);</code></pre></div>",
+            "<p>Later, the source system introduces a new field called <code>payment_method</code>.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE stg_orders\nADD COLUMN payment_method VARCHAR(30);</code></pre></div>",
+            "<p>Now the destination table can store the additional field, provided the ingestion and transformation logic is also updated.</p>",
+            "<div class=\"diagram\"><pre><code>Source Schema Changes\n          |\n          v\nIdentify New / Modified Field\n          |\n          v\nAssess Downstream Impact\n          |\n          v\nALTER TABLE Staging Schema\n          |\n          v\nUpdate Pipeline Mapping\n          |\n          v\nTest Data Ingestion\n          |\n          v\nValidate Downstream Results</code></pre></div>",
+            "<p><b>Important:</b> Changing the table alone does not automatically update Python scripts, SQL transformations, ETL tools, dashboards, or other applications that depend on the previous schema.</p>",
+            "<h3>17. Production Considerations</h3>",
+            "<p>ALTER TABLE is straightforward for learning tables, but production schema changes require planning because they can affect data availability, query performance, and dependent systems.</p>",
+            "<ul><li><b>Backups:</b> Ensure an appropriate backup or recovery strategy exists before destructive changes.</li><li><b>Existing data:</b> Verify that current values are compatible with the proposed definition.</li><li><b>Dependencies:</b> Check applications, ETL jobs, reports, views, and scheduled queries.</li><li><b>Locks and execution time:</b> Some ALTER TABLE operations may acquire metadata locks or rebuild data, affecting concurrent workloads.</li><li><b>MySQL version:</b> Online and instant DDL capabilities vary by MySQL version, storage engine, and alteration type.</li><li><b>Transactions:</b> MySQL DDL statements generally cause implicit commits. Do not assume an ALTER TABLE can be undone using ROLLBACK.</li><li><b>Testing:</b> Test the change on a development or staging environment before production deployment.</li></ul>",
+            "<div class=\"definition-box\"><b>Production principle:</b> A successful ALTER TABLE statement does not automatically mean a schema change is safe for every application or data pipeline. Validate both the database structure and downstream behavior.</div>",
+            "<h3>18. Common Mistakes</h3>",
+            "<table><thead><tr><th>Mistake</th><th>Possible consequence</th><th>Better approach</th></tr></thead><tbody><tr><td>Dropping a column without checking dependencies.</td><td>Data loss and broken queries.</td><td>Review dependencies and recovery options first.</td></tr><tr><td>Changing a data type without inspecting existing values.</td><td>Conversion errors, truncation, or unexpected results.</td><td>Validate existing data before modification.</td></tr><tr><td>Forgetting attributes during MODIFY COLUMN.</td><td>Unintended changes to NULL or DEFAULT behavior.</td><td>Specify the complete desired column definition.</td></tr><tr><td>Renaming a column without updating application queries.</td><td>Unknown column errors.</td><td>Update dependent code and test it.</td></tr><tr><td>Adding a UNIQUE constraint when duplicates exist.</td><td>The alteration fails.</td><td>Check for duplicates before applying the constraint.</td></tr><tr><td>Running a large table alteration without planning.</td><td>Locking, long execution time, or service disruption.</td><td>Evaluate the operation and use a controlled migration process.</td></tr><tr><td>Assuming ALTER TABLE can always be rolled back.</td><td>Unexpected permanent schema changes.</td><td>Understand MySQL DDL commit behavior and prepare recovery steps.</td></tr></tbody></table>",
+            "<h3>19. Quick Revision</h3>",
+            "<table><thead><tr><th>Operation</th><th>Syntax example</th></tr></thead><tbody><tr><td>Add column</td><td><code>ADD COLUMN email VARCHAR(100)</code></td></tr><tr><td>Modify column</td><td><code>MODIFY COLUMN salary DECIMAL(12,2)</code></td></tr><tr><td>Rename and redefine column</td><td><code>CHANGE COLUMN old_name new_name VARCHAR(100)</code></td></tr><tr><td>Rename column</td><td><code>RENAME COLUMN old_name TO new_name</code></td></tr><tr><td>Remove column</td><td><code>DROP COLUMN email</code></td></tr><tr><td>Rename table</td><td><code>RENAME TO new_table_name</code></td></tr><tr><td>Add index</td><td><code>ADD INDEX idx_name (column_name)</code></td></tr><tr><td>Remove index</td><td><code>DROP INDEX idx_name</code></td></tr></tbody></table>",
+            "<div class=\"definition-box\"><b>Remember:</b> <code>CREATE TABLE</code> creates a new table, while <code>ALTER TABLE</code> modifies an existing table. ALTER TABLE is essential for schema evolution, but every structural change should be checked for its impact on existing data and dependent systems.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create a practice database and table.</b> Use a dedicated table so you can safely experiment with structural changes.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;\n\nCREATE TABLE alter_employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100),\n    department VARCHAR(50)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Inspect the initial structure.</b> Identify the existing columns and their data types.</p>",
+            "<div class=\"code-block\"><pre><code>DESCRIBE alter_employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Add a salary column.</b> Use DECIMAL(10,2) to support exact monetary values.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE alter_employees\nADD COLUMN salary DECIMAL(10,2);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Add multiple columns.</b> Add email and joining_date in a single statement.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE alter_employees\nADD COLUMN email VARCHAR(150),\nADD COLUMN joining_date DATE;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Modify an existing column.</b> Increase the employee_name length from 100 to 200 characters.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE alter_employees\nMODIFY COLUMN employee_name VARCHAR(200);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Rename a column.</b> Rename employee_name to full_name, then inspect the result.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE alter_employees\nRENAME COLUMN employee_name TO full_name;\n\nDESCRIBE alter_employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Use CHANGE COLUMN.</b> Rename full_name back to employee_name while preserving VARCHAR(200).</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE alter_employees\nCHANGE COLUMN full_name employee_name VARCHAR(200);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8: Add and remove an index.</b> Create an index on department, inspect the table definition, and remove the index.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE alter_employees\nADD INDEX idx_department (department);\n\nSHOW CREATE TABLE alter_employees;\n\nALTER TABLE alter_employees\nDROP INDEX idx_department;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 9: Remove a column.</b> Drop joining_date and verify that it no longer appears in the table structure.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE alter_employees\nDROP COLUMN joining_date;\n\nDESCRIBE alter_employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 10: Rename the table.</b> Change alter_employees to alter_staff and then rename it back.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE alter_employees\nRENAME TO alter_staff;\n\nSHOW TABLES;\n\nALTER TABLE alter_staff\nRENAME TO alter_employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 11: Data Engineering challenge.</b> Create a staging table for orders. Simulate a source schema change by adding payment_method and ingestion_timestamp columns.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE alter_stg_orders (\n    order_id BIGINT,\n    customer_id BIGINT,\n    order_amount DECIMAL(12,2),\n    order_date DATE\n);\n\nALTER TABLE alter_stg_orders\nADD COLUMN payment_method VARCHAR(30),\nADD COLUMN ingestion_timestamp DATETIME;\n\nDESCRIBE alter_stg_orders;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 12: Production-thinking challenge.</b> Imagine a pipeline currently executes <code>SELECT order_id, order_amount FROM alter_stg_orders;</code>. Explain what might happen if order_amount is renamed to total_amount without updating the pipeline SQL.</p>",
+            "<p class=\"practice-note\"><b>Step 13: Review and explain.</b> Without looking at the examples, write the commands needed to add a column, modify its data type, rename it, drop it, and rename a table.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Confidently modify existing MySQL tables using ALTER TABLE, verify schema changes, recognize destructive operations, and understand how schema evolution affects real-world Data Engineering pipelines.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is ALTER TABLE in SQL?",
+              "a": "ALTER TABLE is a DDL command used to modify the structure of an existing table, including adding, modifying, renaming, or removing columns and managing certain constraints."
+            },
+            {
+              "q": "Q2. What is the difference between CREATE TABLE and ALTER TABLE?",
+              "a": "CREATE TABLE creates a new table, whereas ALTER TABLE changes the structure of an existing table."
+            },
+            {
+              "q": "Q3. How do you add a new column to a table?",
+              "a": "Use ALTER TABLE table_name ADD COLUMN column_name data_type;. For example, ALTER TABLE employees ADD COLUMN salary DECIMAL(10,2);."
+            },
+            {
+              "q": "Q4. How do you add multiple columns using ALTER TABLE?",
+              "a": "Use multiple ADD COLUMN clauses in one statement, separated by commas. For example, ALTER TABLE employees ADD COLUMN email VARCHAR(100), ADD COLUMN joining_date DATE;."
+            },
+            {
+              "q": "Q5. What is the purpose of MODIFY COLUMN?",
+              "a": "MODIFY COLUMN changes a column's definition, such as its data type, size, or nullability, without changing its name."
+            },
+            {
+              "q": "Q6. What is the difference between MODIFY COLUMN and CHANGE COLUMN?",
+              "a": "MODIFY COLUMN changes the definition without renaming the column. CHANGE COLUMN can rename the column and change its definition, and requires the new column definition."
+            },
+            {
+              "q": "Q7. How do you rename a column in MySQL 8.0?",
+              "a": "Use ALTER TABLE table_name RENAME COLUMN old_name TO new_name;. Alternatively, CHANGE COLUMN can rename a column while specifying its definition."
+            },
+            {
+              "q": "Q8. How do you remove a column?",
+              "a": "Use ALTER TABLE table_name DROP COLUMN column_name;. This removes the column and its stored values."
+            },
+            {
+              "q": "Q9. How do you rename a table using ALTER TABLE?",
+              "a": "Use ALTER TABLE old_table_name RENAME TO new_table_name;."
+            },
+            {
+              "q": "Q10. Does ALTER TABLE always preserve existing data?",
+              "a": "No. Many alterations retain existing rows, but operations such as DROP COLUMN remove data, and incompatible data type changes can fail or cause conversions. The effects depend on the alteration."
+            },
+            {
+              "q": "Q11. Can ALTER TABLE add a primary key or unique constraint?",
+              "a": "Yes. ALTER TABLE can add and remove supported constraints. Existing data must satisfy the new constraint, or the operation may fail."
+            },
+            {
+              "q": "Q12. How can you verify changes made by ALTER TABLE?",
+              "a": "Use DESCRIBE table_name; for column details and SHOW CREATE TABLE table_name; for the complete table definition."
+            },
+            {
+              "q": "Q13. Can multiple columns be changed in a single ALTER TABLE statement?",
+              "a": "Yes. MySQL supports combining multiple compatible alterations in one statement, such as adding columns and modifying another column."
+            },
+            {
+              "q": "Q14. Why is ALTER TABLE important in Data Engineering?",
+              "a": "It supports schema evolution when source systems introduce new fields, change data types, or require modifications to staging and warehouse tables."
+            },
+            {
+              "q": "Q15. What is schema evolution?",
+              "a": "Schema evolution is the process of changing a dataset or database structure over time as business and technical requirements change."
+            },
+            {
+              "q": "Q16. Can ALTER TABLE affect running applications or ETL pipelines?",
+              "a": "Yes. Renaming or removing columns, changing data types, or locking a table during alteration can affect dependent queries, applications, and pipelines."
+            },
+            {
+              "q": "Q17. Can you always undo ALTER TABLE using ROLLBACK in MySQL?",
+              "a": "No. MySQL DDL statements generally cause implicit commits. You should not rely on transaction ROLLBACK to reverse an ALTER TABLE operation."
+            },
+            {
+              "q": "Q18. What precautions should be taken before altering a production table?",
+              "a": "Review existing data and dependencies, prepare backups or recovery options, evaluate locking and execution time, test the change in a nonproduction environment, and validate downstream systems after deployment."
+            }
+          ]
+        },
+        {
+          "n": 17,
+          "title": "DROP TABLE",
+          "explanation": [
+            "<h3>1. What Is DROP TABLE?</h3>",
+            "<p><code>DROP TABLE</code> is a SQL Data Definition Language (DDL) command used to permanently remove an existing table from a database. It removes the table structure and the data stored inside that table.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> <code>DROP TABLE</code> removes a table, including its columns, records, indexes, and associated table definition. It is different from deleting individual rows because the table itself is removed.</div>",
+            "<p>In Data Engineering, this command can be useful when cleaning up temporary staging tables, removing obsolete development tables, or managing test environments. In production, it must be used with extreme care.</p>",
+            "<h3>2. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>DROP TABLE table_name;</code></pre></div>",
+            "<p>For example, to remove a table named <code>employees</code>:</p>",
+            "<div class=\"code-block\"><pre><code>DROP TABLE employees;</code></pre></div>",
+            "<p>After successful execution, the <code>employees</code> table no longer exists in that database. Its data and table definition are removed.</p>",
+            "<h3>3. Prepare a Practice Table</h3>",
+            "<p>Before practising DROP TABLE, create a separate test database and table. Do not use an important work or production table for this exercise.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;\n\nCREATE TABLE drop_demo (\n    id INT PRIMARY KEY,\n    employee_name VARCHAR(100),\n    department VARCHAR(50)\n);\n\nINSERT INTO drop_demo\n(id, employee_name, department)\nVALUES\n(1, 'Ravi', 'IT'),\n(2, 'Priya', 'HR');</code></pre></div>",
+            "<p>Check the table and its records before removing it.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW TABLES;\nSELECT * FROM drop_demo;</code></pre></div>",
+            "<h3>4. What Happens When You Drop a Table?</h3>",
+            "<p>Suppose the table contains the following records before the operation:</p>",
+            "<table><thead><tr><th>id</th><th>employee_name</th><th>department</th></tr></thead><tbody><tr><td>1</td><td>Ravi</td><td>IT</td></tr><tr><td>2</td><td>Priya</td><td>HR</td></tr></tbody></table>",
+            "<p>Execute the command:</p>",
+            "<div class=\"code-block\"><pre><code>DROP TABLE drop_demo;</code></pre></div>",
+            "<p>Afterward, both the records and the table definition are gone. Running <code>SHOW TABLES;</code> will no longer list <code>drop_demo</code>.</p>",
+            "<div class=\"diagram\"><pre><code>Before DROP TABLE\n       |\n       v\nTable Structure + Stored Records\n       |\n       v\nDROP TABLE drop_demo;\n       |\n       v\nTable Removed\n       |\n       +-- Structure removed\n       +-- Records removed\n       +-- Table indexes removed</code></pre></div>",
+            "<div class=\"definition-box\"><b>Important:</b> DROP TABLE is not a command to clear a table while keeping its structure. It removes the table itself.</div>",
+            "<h3>5. DROP TABLE IF EXISTS</h3>",
+            "<p>Normally, MySQL reports an error if you try to drop a table that does not exist. You can use <code>IF EXISTS</code> to avoid that missing-table error.</p>",
+            "<div class=\"code-block\"><pre><code>DROP TABLE IF EXISTS drop_demo;</code></pre></div>",
+            "<p>This command removes <code>drop_demo</code> if it exists. If the table does not exist, MySQL issues a warning rather than the usual missing-table error.</p>",
+            "<p>This syntax is useful in repeatable development scripts and cleanup procedures where a table may or may not exist.</p>",
+            "<h3>6. Drop Multiple Tables</h3>",
+            "<p>MySQL allows you to remove more than one table in a single statement.</p>",
+            "<div class=\"code-block\"><pre><code>DROP TABLE IF EXISTS temp_orders, temp_customers;</code></pre></div>",
+            "<p>If both tables exist, this statement removes both. If either table is absent, <code>IF EXISTS</code> prevents the missing-table error for that table.</p>",
+            "<div class=\"definition-box\"><b>Warning:</b> Double-check every table name in a multi-table DROP statement. One statement can remove multiple tables, so a naming mistake can have a large impact.</div>",
+            "<h3>7. DROP TABLE vs DELETE vs TRUNCATE</h3>",
+            "<p>These commands have different purposes. Understanding the difference is essential before changing or removing database objects.</p>",
+            "<table><thead><tr><th>Feature</th><th>DROP TABLE</th><th>DELETE</th><th>TRUNCATE TABLE</th></tr></thead><tbody><tr><td>Primary purpose</td><td>Remove the table itself.</td><td>Remove selected rows or all rows.</td><td>Remove all rows while keeping the table structure.</td></tr><tr><td>Table structure remains?</td><td>No.</td><td>Yes.</td><td>Yes.</td></tr><tr><td>Supports WHERE?</td><td>No.</td><td>Yes.</td><td>No.</td></tr><tr><td>Can remove selected rows?</td><td>No; removes the entire table.</td><td>Yes.</td><td>No; removes all rows.</td></tr><tr><td>Typical use</td><td>Remove an obsolete table.</td><td>Remove specific records.</td><td>Empty a table for reuse.</td></tr></tbody></table>",
+            "<p><b>Examples:</b></p>",
+            "<div class=\"code-block\"><pre><code>-- Remove the entire table\nDROP TABLE drop_demo;\n\n-- Remove only records matching a condition\nDELETE FROM employees\nWHERE department = 'HR';\n\n-- Remove all rows but retain the table structure\nTRUNCATE TABLE employees;</code></pre></div>",
+            "<p>Run these examples independently against appropriate practice tables. The first statement removes the table, so the later examples cannot operate on that same table unless it is recreated.</p>",
+            "<h3>8. DROP TABLE vs DROP DATABASE</h3>",
+            "<p>Both commands remove database objects, but they operate at different levels.</p>",
+            "<table><thead><tr><th>Command</th><th>What it removes</th></tr></thead><tbody><tr><td><code>DROP TABLE table_name;</code></td><td>One specified table.</td></tr><tr><td><code>DROP DATABASE database_name;</code></td><td>The specified database and its contained objects.</td></tr></tbody></table>",
+            "<p>For example, <code>DROP TABLE orders;</code> removes the <code>orders</code> table, while <code>DROP DATABASE de_practice;</code> removes the entire practice database and its contained tables.</p>",
+            "<div class=\"definition-box\"><b>Safety rule:</b> Use DROP DATABASE only when you intend to remove the whole database. For this lesson, practise with DROP TABLE on a dedicated test table.</div>",
+            "<h3>9. Foreign Keys and DROP TABLE</h3>",
+            "<p>Tables may be related through foreign key constraints. If another table references the table you want to drop, MySQL may reject the operation because of the dependency.</p>",
+            "<p>For example, an <code>orders</code> table might reference a <code>customers</code> table:</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers_demo (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100)\n);\n\nCREATE TABLE orders_demo (\n    order_id INT PRIMARY KEY,\n    customer_id INT,\n    FOREIGN KEY (customer_id)\n        REFERENCES customers_demo(customer_id)\n);</code></pre></div>",
+            "<p>In this relationship, <code>orders_demo</code> depends on <code>customers_demo</code>. Attempting to drop the referenced table can fail while the foreign key dependency exists.</p>",
+            "<p>Inspect the relationship first:</p>",
+            "<div class=\"code-block\"><pre><code>SHOW CREATE TABLE orders_demo;</code></pre></div>",
+            "<p>For safe cleanup, understand the foreign key relationship and remove or change dependencies in the correct order. Do not disable foreign key checks just to force a destructive operation unless you fully understand the consequences.</p>",
+            "<h3>10. Can You Recover a Dropped Table?</h3>",
+            "<p>In normal MySQL workflows, you should treat <code>DROP TABLE</code> as a destructive operation. You generally cannot undo a completed DROP TABLE with an ordinary transaction ROLLBACK because DDL operations cause implicit commits.</p>",
+            "<p>Recovery may be possible if suitable backups, database snapshots, replicas, or binary logs are available and configured correctly. The exact recovery procedure depends on the database environment and recovery objectives.</p>",
+            "<div class=\"definition-box\"><b>Production rule:</b> Never assume that a dropped table can be restored. Verify the database, table name, dependencies, backup coverage, and recovery procedure before executing DROP TABLE.</div>",
+            "<h3>11. DROP TABLE in Data Engineering</h3>",
+            "<p>Data pipelines often create temporary, staging, and intermediate tables. When those tables are no longer needed, a cleanup process may remove them.</p>",
+            "<p>For example, a development workflow may create a temporary table for validating incoming orders.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE temp_orders_validation (\n    order_id BIGINT,\n    order_amount DECIMAL(12,2),\n    order_date DATE\n);\n\n-- Perform validation and testing here.\n\nDROP TABLE IF EXISTS temp_orders_validation;</code></pre></div>",
+            "<div class=\"diagram\"><pre><code>Extract Source Data\n        |\n        v\nCreate Temporary Table\n        |\n        v\nValidate and Transform\n        |\n        v\nLoad Target Table\n        |\n        v\nConfirm Success\n        |\n        v\nClean Up Temporary Table</code></pre></div>",
+            "<p>Cleanup should happen only when the table is no longer required. In production pipelines, consider whether the temporary data is needed for debugging, audit, or retry purposes before removing it.</p>",
+            "<h3>12. Production Safety Checklist</h3>",
+            "<p>Before dropping any table in a real environment, follow a deliberate verification process.</p>",
+            "<ul><li>Confirm the active database with <code>SELECT DATABASE();</code>.</li><li>Verify the exact table name using <code>SHOW TABLES;</code>.</li><li>Inspect its structure with <code>DESCRIBE table_name;</code>.</li><li>Check whether applications, reports, views, jobs, or pipelines depend on the table.</li><li>Check foreign key relationships and other relevant dependencies.</li><li>Confirm that the table is obsolete or that removal is explicitly approved.</li><li>Verify backups and recovery procedures if the data matters.</li><li>Use a dedicated development or test environment when learning.</li><li>Use <code>IF EXISTS</code> where repeatable cleanup scripts need to handle a missing table gracefully.</li></ul>",
+            "<h3>13. Common Mistakes</h3>",
+            "<table><thead><tr><th>Mistake</th><th>Why it is a problem</th><th>Better approach</th></tr></thead><tbody><tr><td>Using DROP TABLE to remove a few rows.</td><td>The entire table and its data are removed.</td><td>Use DELETE with a carefully checked WHERE condition.</td></tr><tr><td>Using DROP TABLE when you only want an empty table.</td><td>The table structure is removed too.</td><td>Use TRUNCATE TABLE when removing all rows is intended and appropriate.</td></tr><tr><td>Dropping a table in the wrong database.</td><td>Important data may be permanently removed.</td><td>Verify SELECT DATABASE() and the table name before executing.</td></tr><tr><td>Ignoring foreign key dependencies.</td><td>The operation may fail or disrupt related workflows.</td><td>Inspect the schema and dependency relationships.</td></tr><tr><td>Assuming IF EXISTS makes the command safe.</td><td>It only handles a missing-table condition; it does not prevent deletion of the wrong existing table.</td><td>Verify the target object before execution.</td></tr><tr><td>Assuming ROLLBACK can undo DROP TABLE.</td><td>MySQL DDL operations cause implicit commits.</td><td>Prepare a recovery plan and suitable backups.</td></tr></tbody></table>",
+            "<h3>14. Quick Revision</h3>",
+            "<div class=\"definition-box\"><b>Remember:</b><br><code>DROP TABLE table_name;</code> — removes the table and its data.<br><code>DROP TABLE IF EXISTS table_name;</code> — avoids an error when the table does not exist.<br><code>DROP TABLE table1, table2;</code> — removes multiple specified tables.<br><code>DELETE</code> — removes rows while retaining the table structure.<br><code>TRUNCATE TABLE</code> — removes all rows while retaining the table structure.<br><code>DROP DATABASE</code> — removes a database and its contained objects.<br><b>Data Engineering focus:</b> Safe cleanup, dependency awareness, backups, and production recovery planning.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create a dedicated practice table.</b> Do not use a table that contains important data.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;\n\nCREATE TABLE drop_demo (\n    id INT PRIMARY KEY,\n    employee_name VARCHAR(100),\n    department VARCHAR(50)\n);\n\nINSERT INTO drop_demo\n(id, employee_name, department)\nVALUES\n(1, 'Ravi', 'IT'),\n(2, 'Priya', 'HR');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Inspect the table before deleting it.</b> Check the selected database, table list, structure, and records.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DATABASE();\nSHOW TABLES;\nDESCRIBE drop_demo;\nSELECT * FROM drop_demo;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Drop the practice table.</b> Execute the command only after verifying the target.</p>",
+            "<div class=\"code-block\"><pre><code>DROP TABLE drop_demo;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Verify the result.</b> Check that the table no longer exists.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW TABLES;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Practise IF EXISTS.</b> Run this statement when the table is absent, and observe that MySQL handles the missing table with a warning rather than the usual error.</p>",
+            "<div class=\"code-block\"><pre><code>DROP TABLE IF EXISTS drop_demo;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Compare DROP TABLE and TRUNCATE TABLE.</b> Create a new table, insert sample records, and run SELECT to see the records. Then use TRUNCATE TABLE and inspect the table again. Confirm that the table structure remains.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE truncate_demo (\n    id INT PRIMARY KEY,\n    description VARCHAR(100)\n);\n\nINSERT INTO truncate_demo\nVALUES (1, 'Sample record');\n\nSELECT * FROM truncate_demo;\nTRUNCATE TABLE truncate_demo;\nSELECT * FROM truncate_demo;\nDESCRIBE truncate_demo;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Compare DELETE and DROP TABLE.</b> Create a separate test table, insert a few rows, delete one row with a WHERE clause, and then inspect the remaining rows. Do not drop the table until you understand the difference.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE delete_demo (\n    id INT PRIMARY KEY,\n    name VARCHAR(50)\n);\n\nINSERT INTO delete_demo VALUES\n(1, 'Ravi'),\n(2, 'Priya');\n\nDELETE FROM delete_demo WHERE id = 1;\nSELECT * FROM delete_demo;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8: Data Engineering challenge.</b> Imagine that a pipeline creates a temporary table called <code>temp_orders_validation</code>. Write a cleanup statement that can safely run whether the table exists or not. Explain why you should verify that the validation process and any required debugging are complete before cleanup.</p>",
+            "<div class=\"code-block\"><pre><code>DROP TABLE IF EXISTS temp_orders_validation;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 9: Production scenario.</b> Before dropping an obsolete staging table containing millions of rows, list at least five checks you would perform. Include database verification, dependencies, pipeline usage, backups, and recovery planning.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Understand that DROP TABLE removes both structure and data, distinguish it from DELETE and TRUNCATE, use IF EXISTS appropriately, and develop safe habits for cleaning up Data Engineering tables.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is DROP TABLE in SQL?",
+              "a": "DROP TABLE is a DDL command that removes an existing table, its stored records, and its table definition from the database."
+            },
+            {
+              "q": "Q2. What is the syntax of DROP TABLE?",
+              "a": "The basic syntax is DROP TABLE table_name;. For example, DROP TABLE employees;."
+            },
+            {
+              "q": "Q3. What happens to the table's data after DROP TABLE?",
+              "a": "The table and its stored data are removed. You should not assume the data can be recovered unless a suitable recovery mechanism is available."
+            },
+            {
+              "q": "Q4. What is DROP TABLE IF EXISTS?",
+              "a": "It drops the table if it exists and avoids the usual error when the table is missing. MySQL issues a warning for a nonexistent table."
+            },
+            {
+              "q": "Q5. Can you drop multiple tables in one statement?",
+              "a": "Yes. For example, DROP TABLE IF EXISTS temp_orders, temp_customers; removes the specified tables if they exist."
+            },
+            {
+              "q": "Q6. What is the difference between DROP TABLE and DELETE?",
+              "a": "DROP TABLE removes the entire table and its data. DELETE removes selected rows or all rows while retaining the table structure."
+            },
+            {
+              "q": "Q7. What is the difference between DROP TABLE and TRUNCATE TABLE?",
+              "a": "DROP TABLE removes the table itself, while TRUNCATE TABLE removes all rows but retains the table structure."
+            },
+            {
+              "q": "Q8. Does DROP TABLE support a WHERE clause?",
+              "a": "No. DROP TABLE removes the entire specified table. Use DELETE with a WHERE clause when only selected records need to be removed."
+            },
+            {
+              "q": "Q9. Can a foreign key prevent a table from being dropped?",
+              "a": "Yes. MySQL may reject dropping a table that is referenced by a foreign key in another table. Inspect dependencies and handle them deliberately."
+            },
+            {
+              "q": "Q10. Can DROP TABLE be undone using ROLLBACK in MySQL?",
+              "a": "Generally, no. MySQL DDL statements cause implicit commits, so an ordinary transaction ROLLBACK cannot be relied on to restore a dropped table."
+            },
+            {
+              "q": "Q11. How is DROP TABLE different from DROP DATABASE?",
+              "a": "DROP TABLE removes one table. DROP DATABASE removes the database and the objects it contains."
+            },
+            {
+              "q": "Q12. Why is DROP TABLE used in Data Engineering?",
+              "a": "It can remove obsolete staging tables, temporary validation tables, and development artifacts after they are no longer needed."
+            },
+            {
+              "q": "Q13. Is DROP TABLE IF EXISTS always safe?",
+              "a": "No. It only prevents an error when the table is missing. If the named table exists, it will still be dropped. Verify the database and table name before execution."
+            },
+            {
+              "q": "Q14. What should you check before dropping a production table?",
+              "a": "Confirm the database and table name, inspect dependencies, check applications and pipelines, verify the table is approved for removal, and ensure a suitable backup or recovery plan exists."
+            },
+            {
+              "q": "Q15. Why should temporary tables be dropped carefully in a data pipeline?",
+              "a": "They may still be required for retries, debugging, validation, or audit purposes. Cleanup should occur only after their purpose is complete and required information has been preserved."
+            }
+          ]
+        },
+        {
+          "n": 18,
+          "title": "TRUNCATE TABLE",
+          "explanation": [
+            "<h3>1. What Is TRUNCATE TABLE?</h3>",
+            "<p><code>TRUNCATE TABLE</code> is a MySQL DDL command used to remove all rows from an existing table while keeping the table structure available for future use.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> <code>TRUNCATE TABLE</code> removes all records from a table but preserves its columns, data types, indexes, and table definition.</div>",
+            "<p>In Data Engineering, TRUNCATE is commonly useful when clearing a staging table before reloading a complete dataset, resetting practice tables, or preparing temporary data storage for another processing run.</p>",
+            "<h3>2. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>TRUNCATE TABLE table_name;</code></pre></div>",
+            "<p>For example:</p>",
+            "<div class=\"code-block\"><pre><code>TRUNCATE TABLE employees;</code></pre></div>",
+            "<p>This removes every row from the <code>employees</code> table. The table itself remains, so you can insert new records afterward.</p>",
+            "<h3>3. Create a Practice Table</h3>",
+            "<p>Use a dedicated practice database and table so you do not accidentally remove important data.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;\n\nCREATE TABLE truncate_demo (\n    employee_id INT PRIMARY KEY AUTO_INCREMENT,\n    employee_name VARCHAR(100),\n    department VARCHAR(50),\n    salary DECIMAL(10,2)\n);\n\nINSERT INTO truncate_demo\n(employee_name, department, salary)\nVALUES\n('Ravi', 'IT', 35000.00),\n('Priya', 'HR', 32000.00),\n('Arun', 'Finance', 40000.00);</code></pre></div>",
+            "<p>Check the records before truncating the table.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT * FROM truncate_demo;\nSELECT COUNT(*) FROM truncate_demo;</code></pre></div>",
+            "<p>The count should be 3 if all three insertions succeeded.</p>",
+            "<h3>4. Execute TRUNCATE TABLE</h3>",
+            "<p>Run the following command:</p>",
+            "<div class=\"code-block\"><pre><code>TRUNCATE TABLE truncate_demo;</code></pre></div>",
+            "<p>Now check the table again:</p>",
+            "<div class=\"code-block\"><pre><code>SELECT * FROM truncate_demo;\nSELECT COUNT(*) FROM truncate_demo;\nDESCRIBE truncate_demo;</code></pre></div>",
+            "<p>The SELECT query returns no data rows, and the count returns 0. The DESCRIBE command still displays the table's columns because the table structure remains.</p>",
+            "<div class=\"diagram\"><pre><code>Before TRUNCATE\n       |\n       v\nTable Structure + 3 Records\n       |\n       v\nTRUNCATE TABLE truncate_demo;\n       |\n       v\nAfter TRUNCATE\n       |\n       +-- Table structure remains\n       +-- All records removed\n       +-- Table available for reuse</code></pre></div>",
+            "<h3>5. TRUNCATE TABLE vs DELETE vs DROP TABLE</h3>",
+            "<p>This is one of the most important SQL distinctions to understand.</p>",
+            "<table><thead><tr><th>Feature</th><th>TRUNCATE TABLE</th><th>DELETE</th><th>DROP TABLE</th></tr></thead><tbody><tr><td>Removes rows</td><td>All rows</td><td>Selected or all rows</td><td>Table and its rows</td></tr><tr><td>Table structure remains</td><td>Yes</td><td>Yes</td><td>No</td></tr><tr><td>Supports WHERE</td><td>No</td><td>Yes</td><td>No</td></tr><tr><td>Typical purpose</td><td>Empty a table quickly</td><td>Delete particular records</td><td>Remove an obsolete table</td></tr><tr><td>Command category in MySQL</td><td>DDL</td><td>DML</td><td>DDL</td></tr><tr><td>Transaction rollback</td><td>Cannot generally be rolled back as an ordinary MySQL transaction operation</td><td>Can be rolled back before commit when transactional conditions are met</td><td>Cannot generally be rolled back as an ordinary MySQL transaction operation</td></tr></tbody></table>",
+            "<p><b>Example commands:</b></p>",
+            "<div class=\"code-block\"><pre><code>-- Remove all rows but retain the table\nTRUNCATE TABLE employees;\n\n-- Remove only employees in the HR department\nDELETE FROM employees\nWHERE department = 'HR';\n\n-- Remove the entire table\nDROP TABLE employees;</code></pre></div>",
+            "<p>These examples are alternatives, not a sequence to run against the same table. TRUNCATE and DROP are destructive operations, so verify the target before executing them.</p>",
+            "<h3>6. Why TRUNCATE Does Not Support WHERE</h3>",
+            "<p>TRUNCATE is designed to remove all rows from a table. It does not provide row-by-row filtering with a WHERE condition.</p>",
+            "<div class=\"code-block\"><pre><code>-- Invalid syntax in MySQL\nTRUNCATE TABLE employees\nWHERE department = 'HR';</code></pre></div>",
+            "<p>If you need to remove only selected records, use DELETE with a WHERE clause:</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM employees\nWHERE department = 'HR';</code></pre></div>",
+            "<div class=\"definition-box\"><b>Remember:</b> TRUNCATE means remove all rows. DELETE with WHERE means remove only rows matching a condition.</div>",
+            "<h3>7. Does TRUNCATE Reset AUTO_INCREMENT?</h3>",
+            "<p>In MySQL, truncating a table resets its AUTO_INCREMENT counter to its initial value for the table, subject to the table definition and engine behavior.</p>",
+            "<p>For example, suppose an auto-increment column has generated IDs 1, 2, and 3. After truncation, the next automatically generated ID will normally start again at 1.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE truncate_ids (\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    name VARCHAR(50)\n);\n\nINSERT INTO truncate_ids (name)\nVALUES ('A'), ('B'), ('C');\n\nSELECT * FROM truncate_ids;\n\nTRUNCATE TABLE truncate_ids;\n\nINSERT INTO truncate_ids (name)\nVALUES ('D');\n\nSELECT * FROM truncate_ids;</code></pre></div>",
+            "<p>In this example, the newly inserted record will normally receive ID 1 after truncation. Do not rely on generated IDs as permanent business identifiers across table resets.</p>",
+            "<h3>8. TRUNCATE and Foreign Key Constraints</h3>",
+            "<p>MySQL restricts truncating an InnoDB table that is referenced by a foreign key from another table. The operation may fail even if the referencing table contains no rows.</p>",
+            "<p>For example, if <code>orders_demo.customer_id</code> references <code>customers_demo.customer_id</code>, truncating the referenced customers table can be restricted.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW CREATE TABLE orders_demo;\nSHOW CREATE TABLE customers_demo;</code></pre></div>",
+            "<p>Inspect the relationships before truncating. If you need to clear related tables, plan the operation around their foreign key dependencies and integrity requirements. Do not disable foreign key checks simply to force a truncate operation without understanding the risks.</p>",
+            "<h3>9. What Happens to Indexes and Constraints?</h3>",
+            "<p>TRUNCATE removes the rows, but the table remains with its defined columns, indexes, and constraints.</p>",
+            "<table><thead><tr><th>Table property</th><th>After TRUNCATE</th></tr></thead><tbody><tr><td>Columns</td><td>Remain</td></tr><tr><td>Column data types</td><td>Remain</td></tr><tr><td>Primary key definition</td><td>Remains</td></tr><tr><td>Indexes</td><td>Remain</td></tr><tr><td>Constraints</td><td>Remain</td></tr><tr><td>Stored rows</td><td>Removed</td></tr><tr><td>AUTO_INCREMENT counter</td><td>Normally reset in MySQL</td></tr></tbody></table>",
+            "<p>Use DESCRIBE and SHOW CREATE TABLE to confirm that the structure is still available after truncation.</p>",
+            "<h3>10. Is TRUNCATE Faster Than DELETE?</h3>",
+            "<p>TRUNCATE is often faster than deleting every row individually because MySQL can use a more efficient table-level operation. However, the actual performance depends on the storage engine, table design, foreign keys, database version, and operational environment.</p>",
+            "<table><thead><tr><th>Scenario</th><th>Likely choice</th></tr></thead><tbody><tr><td>Remove a small number of matching rows</td><td><code>DELETE ... WHERE</code></td></tr><tr><td>Remove all rows and reuse the table</td><td><code>TRUNCATE TABLE</code>, if appropriate</td></tr><tr><td>Remove the table definition itself</td><td><code>DROP TABLE</code></td></tr></tbody></table>",
+            "<p>Do not choose TRUNCATE solely for speed. First confirm that every row is intended to be removed and that dependencies and recovery requirements have been considered.</p>",
+            "<h3>11. TRUNCATE TABLE in Data Engineering</h3>",
+            "<p>A common Data Engineering pattern is full refresh. A pipeline clears a staging table and loads the latest complete source dataset.</p>",
+            "<div class=\"diagram\"><pre><code>Start ETL Pipeline\n        |\n        v\nValidate Source Availability\n        |\n        v\nTRUNCATE staging table\n        |\n        v\nLoad complete source dataset\n        |\n        v\nValidate row counts and data quality\n        |\n        v\nContinue transformation</code></pre></div>",
+            "<p>A simplified staging table might look like this:</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE stg_daily_sales (\n    order_id BIGINT,\n    product_id BIGINT,\n    sales_amount DECIMAL(12,2),\n    sales_date DATE\n);</code></pre></div>",
+            "<p>If the pipeline intentionally performs a full reload, it might use:</p>",
+            "<div class=\"code-block\"><pre><code>TRUNCATE TABLE stg_daily_sales;\n\n-- Pipeline load step inserts the new complete dataset.</code></pre></div>",
+            "<p><b>Important:</b> This pattern is appropriate only when the staging table is intended to be fully replaced. If the source extract fails after truncation, the staging table may remain empty or incomplete. Production pipelines should use validation, controlled load strategies, recovery plans, and suitable staging or swap-table patterns where necessary.</p>",
+            "<h3>12. Full Load vs Incremental Load</h3>",
+            "<p>TRUNCATE is usually associated with full-refresh workflows rather than incremental loading.</p>",
+            "<table><thead><tr><th>Loading approach</th><th>Typical behavior</th><th>TRUNCATE usage</th></tr></thead><tbody><tr><td>Full load</td><td>Reloads the entire dataset.</td><td>May clear a staging or target table before reloading when the design allows it.</td></tr><tr><td>Incremental load</td><td>Processes only new or changed records.</td><td>Usually avoided for the main target because existing data must be retained.</td></tr><tr><td>Temporary validation load</td><td>Loads a temporary dataset for checking.</td><td>May clear a reusable temporary table between runs.</td></tr></tbody></table>",
+            "<p>For a large production warehouse table, blindly truncating the target before a full reload can make reports unavailable or cause data loss if the reload fails. A safer design may load into a separate table, validate it, and then perform a controlled replacement or merge.</p>",
+            "<h3>13. Transaction and Recovery Considerations</h3>",
+            "<p>In MySQL, TRUNCATE TABLE is a DDL operation that causes an implicit commit. You should not expect an ordinary transaction ROLLBACK to restore the removed rows.</p>",
+            "<p>Recovery depends on your backup strategy, snapshots, binary logs, and database configuration. Before truncating a production table, establish how the data would be restored if the operation were accidental or the subsequent pipeline failed.</p>",
+            "<div class=\"definition-box\"><b>Production safety rule:</b> Treat TRUNCATE TABLE as a destructive operation. Confirm the selected database, exact table name, intended full-table removal, dependencies, and recovery plan before executing it.</div>",
+            "<h3>14. Common Mistakes</h3>",
+            "<table><thead><tr><th>Mistake</th><th>Why it is wrong</th><th>Correct approach</th></tr></thead><tbody><tr><td>Using TRUNCATE to remove selected records.</td><td>It removes every row.</td><td>Use DELETE with a WHERE clause.</td></tr><tr><td>Assuming the table is deleted.</td><td>TRUNCATE preserves the table definition.</td><td>Use DROP TABLE only when the table itself should be removed.</td></tr><tr><td>Expecting WHERE to work with TRUNCATE.</td><td>MySQL does not support a WHERE clause for TRUNCATE.</td><td>Use DELETE for conditional removal.</td></tr><tr><td>Assuming ROLLBACK will recover the rows.</td><td>TRUNCATE causes an implicit commit in MySQL.</td><td>Plan backups and recovery before execution.</td></tr><tr><td>Ignoring foreign key dependencies.</td><td>MySQL may reject truncating a referenced table.</td><td>Inspect relationships and plan the cleanup correctly.</td></tr><tr><td>Truncating a target table before validating the replacement data.</td><td>A failed reload may leave the target empty or incomplete.</td><td>Validate source availability and use a controlled refresh strategy.</td></tr></tbody></table>",
+            "<h3>15. Quick Revision</h3>",
+            "<div class=\"definition-box\"><b>Remember:</b><br><code>TRUNCATE TABLE table_name;</code> — removes all rows while retaining the table structure.<br><code>DELETE FROM table_name WHERE condition;</code> — removes matching rows.<br><code>DROP TABLE table_name;</code> — removes the table and its data.<br><code>TRUNCATE</code> does not support WHERE in MySQL.<br>It normally resets the AUTO_INCREMENT counter.<br>Foreign key dependencies can prevent truncation.<br>MySQL TRUNCATE causes an implicit commit and should be treated as destructive.<br><b>Data Engineering focus:</b> Full refreshes, staging-table cleanup, validation, and safe recovery planning.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create a dedicated practice table.</b> Use a separate table to avoid losing important data.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;\n\nCREATE TABLE truncate_practice (\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    name VARCHAR(100),\n    department VARCHAR(50)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Insert sample records.</b> Add three rows and check the row count.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO truncate_practice (name, department)\nVALUES\n('Ravi', 'IT'),\n('Priya', 'HR'),\n('Arun', 'Finance');\n\nSELECT * FROM truncate_practice;\nSELECT COUNT(*) FROM truncate_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Truncate the table.</b> Execute the command only after verifying that you are using the correct practice table.</p>",
+            "<div class=\"code-block\"><pre><code>TRUNCATE TABLE truncate_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Verify the results.</b> Confirm that there are no rows but the table structure remains.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT COUNT(*) FROM truncate_practice;\nDESCRIBE truncate_practice;\nSHOW CREATE TABLE truncate_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Test AUTO_INCREMENT behavior.</b> Insert a new row after truncation and inspect the generated ID.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO truncate_practice (name, department)\nVALUES ('Kiran', 'Data Engineering');\n\nSELECT * FROM truncate_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Compare with DELETE.</b> Reinsert several rows and delete only one matching record using a WHERE clause. Observe that the remaining rows stay in the table.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO truncate_practice (name, department)\nVALUES\n('Meena', 'IT'),\n('Suresh', 'HR'),\n('Divya', 'Finance');\n\nDELETE FROM truncate_practice\nWHERE department = 'HR';\n\nSELECT * FROM truncate_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Compare with DROP TABLE.</b> Explain what would happen to the columns and indexes if you ran DROP TABLE instead. Do not run it until you can clearly describe the difference.</p>",
+            "<p class=\"practice-note\"><b>Step 8: Data Engineering challenge.</b> Imagine that a daily ETL job fully reloads a staging table. Explain when truncating the staging table is appropriate, what could happen if the source load fails afterward, and how you would validate the replacement data before publishing it.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Understand how TRUNCATE removes all rows while preserving the table structure, distinguish it from DELETE and DROP TABLE, verify AUTO_INCREMENT behavior, and apply full-refresh patterns safely in Data Engineering.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is TRUNCATE TABLE in MySQL?",
+              "a": "TRUNCATE TABLE is a DDL command that removes all rows from a table while preserving its table definition."
+            },
+            {
+              "q": "Q2. What is the syntax of TRUNCATE TABLE?",
+              "a": "The syntax is TRUNCATE TABLE table_name;. For example, TRUNCATE TABLE employees;."
+            },
+            {
+              "q": "Q3. Does TRUNCATE TABLE delete the table structure?",
+              "a": "No. It removes the rows but preserves the table's columns, indexes, and constraints."
+            },
+            {
+              "q": "Q4. Does TRUNCATE TABLE support WHERE?",
+              "a": "No. TRUNCATE removes all rows. Use DELETE with a WHERE clause to remove selected records."
+            },
+            {
+              "q": "Q5. What is the difference between TRUNCATE TABLE and DELETE?",
+              "a": "TRUNCATE removes all rows through a DDL operation. DELETE can remove selected rows or all rows and is a DML operation."
+            },
+            {
+              "q": "Q6. What is the difference between TRUNCATE TABLE and DROP TABLE?",
+              "a": "TRUNCATE removes all rows but retains the table structure. DROP TABLE removes both the table and its data."
+            },
+            {
+              "q": "Q7. Does TRUNCATE reset AUTO_INCREMENT in MySQL?",
+              "a": "Yes, it normally resets the AUTO_INCREMENT counter to its initial value for the table."
+            },
+            {
+              "q": "Q8. Can TRUNCATE TABLE be rolled back in MySQL?",
+              "a": "You should not rely on an ordinary ROLLBACK to undo TRUNCATE TABLE. It is a DDL operation that causes an implicit commit."
+            },
+            {
+              "q": "Q9. Can a foreign key prevent TRUNCATE TABLE?",
+              "a": "Yes. MySQL may prevent truncating an InnoDB table that is referenced by a foreign key from another table."
+            },
+            {
+              "q": "Q10. Is TRUNCATE always faster than DELETE?",
+              "a": "It is often more efficient for removing every row, but performance depends on the storage engine, table design, constraints, database version, and environment."
+            },
+            {
+              "q": "Q11. Why is TRUNCATE useful in Data Engineering?",
+              "a": "It can clear a staging table before a full data reload or reset a reusable validation table between pipeline runs."
+            },
+            {
+              "q": "Q12. Should you truncate a production table before validating incoming data?",
+              "a": "Not without a safe refresh plan. If the source or subsequent load fails, the table may remain empty or incomplete. Validate the source and consider loading into a separate table before controlled replacement."
+            },
+            {
+              "q": "Q13. What happens to indexes and constraints after TRUNCATE?",
+              "a": "They remain defined on the table even though all rows are removed."
+            },
+            {
+              "q": "Q14. What should you verify before running TRUNCATE TABLE?",
+              "a": "Confirm the selected database, exact table name, intention to remove all rows, foreign key dependencies, and an appropriate recovery plan."
+            }
+          ]
+        },
+        {
+          "n": 19,
+          "title": "What Are Constraints",
+          "explanation": [
+            "<h3>1. What Are Constraints?</h3>",
+            "<p>Constraints are rules applied to table columns or combinations of columns to control the data that can be stored in a database. They help maintain data accuracy, consistency, and integrity.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> A constraint is a rule enforced by the database to prevent invalid data from being inserted or existing data from being changed in a way that violates the rule.</div>",
+            "<p>For example, an employee ID should uniquely identify an employee, an employee name may be required, and an order should reference a valid customer. Constraints help enforce these requirements directly in the database.</p>",
+            "<h3>2. Why Do We Need Constraints?</h3>",
+            "<p>Without appropriate constraints, a database might contain duplicate IDs, missing required values, invalid relationships, or values that violate business rules.</p>",
+            "<table><thead><tr><th>Problem</th><th>Constraint that helps</th></tr></thead><tbody><tr><td>Two employees have the same employee ID.</td><td>PRIMARY KEY</td></tr><tr><td>An employee name is missing.</td><td>NOT NULL</td></tr><tr><td>Two accounts use the same unique account number.</td><td>UNIQUE</td></tr><tr><td>An order refers to a nonexistent customer.</td><td>FOREIGN KEY</td></tr><tr><td>A product price is negative when negative prices are not allowed.</td><td>CHECK</td></tr><tr><td>A new order should start with a predefined status.</td><td>DEFAULT</td></tr></tbody></table>",
+            "<h3>3. Main Types of SQL Constraints</h3>",
+            "<div class=\"diagram\"><pre><code>SQL Constraints\n      |\n      +-- PRIMARY KEY\n      |     Uniquely identifies each row\n      |\n      +-- FOREIGN KEY\n      |     Enforces relationships between tables\n      |\n      +-- UNIQUE\n      |     Prevents duplicate key values\n      |\n      +-- NOT NULL\n      |     Requires a value\n      |\n      +-- DEFAULT\n      |     Supplies a default value\n      |\n      +-- CHECK\n            Enforces a condition</code></pre></div>",
+            "<p>These constraints are supported by MySQL, although exact behavior and restrictions can vary by MySQL version and table definition.</p>",
+            "<h3>4. Example: A Table Without Constraints</h3>",
+            "<p>Consider an employee table without constraints.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees_unrestricted (\n    employee_id INT,\n    employee_name VARCHAR(100),\n    email VARCHAR(150),\n    salary DECIMAL(10,2)\n);</code></pre></div>",
+            "<p>This definition does not explicitly prevent duplicate employee IDs, duplicate email addresses, missing names, or negative salaries. Some values may be allowed even when they violate the intended business rules.</p>",
+            "<p>For example, these records could be accepted by the table definition:</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees_unrestricted\n(employee_id, employee_name, email, salary)\nVALUES\n(101, 'Ravi', 'ravi@example.com', 35000.00),\n(101, 'Priya', 'priya@example.com', -5000.00),\n(103, NULL, 'ravi@example.com', 42000.00);</code></pre></div>",
+            "<p>All three rows can satisfy the table's current definition because no relevant constraints were declared. A database may still reject data for other reasons, such as data type or operational errors.</p>",
+            "<h3>5. Example: A Table with Constraints</h3>",
+            "<p>We can define rules when creating the table.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    email VARCHAR(150) UNIQUE,\n    salary DECIMAL(10,2) CHECK (salary >= 0),\n    status VARCHAR(20) DEFAULT 'ACTIVE'\n);</code></pre></div>",
+            "<p>This definition applies several rules:</p>",
+            "<ul><li><code>PRIMARY KEY</code> prevents duplicate employee IDs and disallows NULL in the key.</li><li><code>NOT NULL</code> requires an employee name.</li><li><code>UNIQUE</code> prevents duplicate non-NULL email values; MySQL generally permits multiple NULL values in a unique index.</li><li><code>CHECK</code> requires salary to be at least zero when the condition evaluates to false for an invalid value. NULL handling is different from a simple false result.</li><li><code>DEFAULT</code> supplies <code>ACTIVE</code> when an INSERT omits the status column or explicitly requests its default.</li></ul>",
+            "<div class=\"definition-box\"><b>Important:</b> A constraint is enforced by the database, not just by the application screen. Other applications and data pipelines that write to the same table must also obey the applicable rules.</div>",
+            "<h3>6. PRIMARY KEY</h3>",
+            "<p>A primary key uniquely identifies each row in a table. It cannot contain duplicate values or NULL values.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE departments (\n    department_id INT PRIMARY KEY,\n    department_name VARCHAR(100)\n);</code></pre></div>",
+            "<p>Here, <code>department_id</code> is the primary key.</p>",
+            "<p>Valid example:</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO departments\n(department_id, department_name)\nVALUES\n(10, 'IT'),\n(20, 'HR');</code></pre></div>",
+            "<p>Attempting to insert another row with <code>department_id = 10</code> would violate the primary key constraint.</p>",
+            "<h3>7. NOT NULL</h3>",
+            "<p>The <code>NOT NULL</code> constraint requires a column to have a non-NULL value.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100) NOT NULL\n);</code></pre></div>",
+            "<p>The following insert would fail because the customer name is NULL:</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO customers\n(customer_id, customer_name)\nVALUES (1, NULL);</code></pre></div>",
+            "<p>NOT NULL does not reject an empty string such as <code>''</code>. If empty strings are also invalid, add suitable validation or another appropriate rule.</p>",
+            "<h3>8. UNIQUE</h3>",
+            "<p>The <code>UNIQUE</code> constraint prevents duplicate values in a column or combination of columns.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE user_accounts (\n    user_id INT PRIMARY KEY,\n    username VARCHAR(50) UNIQUE\n);</code></pre></div>",
+            "<p>Two rows cannot have the same non-NULL username. In MySQL, a UNIQUE index generally permits multiple NULL values because NULL is treated differently from an ordinary value for uniqueness checks.</p>",
+            "<h3>9. FOREIGN KEY</h3>",
+            "<p>A foreign key enforces a relationship between tables by requiring a referencing value to match an eligible key in the referenced table, subject to the constraint's NULL and referential-action rules.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers_fk (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100) NOT NULL\n);\n\nCREATE TABLE orders_fk (\n    order_id INT PRIMARY KEY,\n    customer_id INT,\n    FOREIGN KEY (customer_id)\n        REFERENCES customers_fk(customer_id)\n);</code></pre></div>",
+            "<p>The <code>customer_id</code> in <code>orders_fk</code> references a customer in <code>customers_fk</code>. An order cannot reference a nonexistent customer. Because the foreign key column is nullable in this definition, NULL can be allowed; adding NOT NULL would require a customer value for every order.</p>",
+            "<div class=\"diagram\"><pre><code>customers_fk\n-------------\ncustomer_id (PK)\ncustomer_name\n       |\n       | referenced by\n       v\norders_fk\n---------\norder_id (PK)\ncustomer_id (FK)</code></pre></div>",
+            "<p>Foreign keys help preserve referential integrity, especially when multiple applications or pipelines write related data.</p>",
+            "<h3>10. DEFAULT</h3>",
+            "<p>The <code>DEFAULT</code> constraint or column attribute supplies a value when an INSERT statement omits that column or requests its default.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE tasks (\n    task_id INT PRIMARY KEY,\n    task_name VARCHAR(100) NOT NULL,\n    task_status VARCHAR(20) DEFAULT 'PENDING'\n);</code></pre></div>",
+            "<p>Insert a task without specifying its status:</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO tasks (task_id, task_name)\nVALUES (1, 'Load customer data');\n\nSELECT * FROM tasks;</code></pre></div>",
+            "<p>The inserted task receives <code>PENDING</code> as its status. A DEFAULT value does not generally replace an explicitly supplied NULL; if NULL is supplied, the result depends on the column's nullability and the statement's behavior.</p>",
+            "<h3>11. CHECK</h3>",
+            "<p>The <code>CHECK</code> constraint enforces a condition on column values. In modern MySQL versions, CHECK constraints are enforced; older MySQL versions before 8.0.16 parsed CHECK syntax but did not enforce those constraints.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE products (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL,\n    price DECIMAL(10,2) CHECK (price >= 0),\n    stock_quantity INT CHECK (stock_quantity >= 0)\n);</code></pre></div>",
+            "<p>This design prevents negative prices and stock quantities when the CHECK condition evaluates to false. Because SQL uses three-valued logic, a CHECK condition that evaluates to UNKNOWN because of NULL does not by itself reject the row. Use NOT NULL as well if the value is required.</p>",
+            "<h3>12. Column-Level vs Table-Level Constraints</h3>",
+            "<p>Constraints can be written alongside a column definition or at the table level. Table-level constraints are especially useful for composite keys and rules involving multiple columns.</p>",
+            "<p><b>Column-level example:</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees_column_level (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL\n);</code></pre></div>",
+            "<p><b>Table-level example:</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees_table_level (\n    employee_id INT,\n    employee_name VARCHAR(100) NOT NULL,\n    CONSTRAINT pk_employees PRIMARY KEY (employee_id)\n);</code></pre></div>",
+            "<p>Both examples declare a primary key and a required employee name. The named table-level form also gives the primary key constraint an explicit name.</p>",
+            "<h3>13. Composite Constraints</h3>",
+            "<p>A composite key or constraint uses more than one column together. For example, a student can enroll in many courses, but the same student should not have duplicate enrollment records for the same course.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE enrollments (\n    student_id INT,\n    course_id INT,\n    enrollment_date DATE,\n    PRIMARY KEY (student_id, course_id)\n);</code></pre></div>",
+            "<p>The combination of <code>student_id</code> and <code>course_id</code> must be unique. Either value can repeat across different combinations, but the same pair cannot appear twice. Both columns are also NOT NULL because they belong to the primary key.</p>",
+            "<h3>14. Constraints and Data Quality in Data Engineering</h3>",
+            "<p>Data Engineers build pipelines that ingest, transform, and load data from different sources. Constraints can help the database reject invalid records, but they must be designed carefully to match the expected data quality and ingestion strategy.</p>",
+            "<table><thead><tr><th>Data Engineering scenario</th><th>Potential constraint</th></tr></thead><tbody><tr><td>Each source order must have a unique ID.</td><td>PRIMARY KEY or UNIQUE, depending on the data model.</td></tr><tr><td>Every order must reference a valid customer.</td><td>FOREIGN KEY.</td></tr><tr><td>Order amount cannot be negative.</td><td>CHECK, if negative amounts are invalid in the business domain.</td></tr><tr><td>Every processed record must have a status.</td><td>NOT NULL.</td></tr><tr><td>New records start with a known processing status.</td><td>DEFAULT.</td></tr></tbody></table>",
+            "<p>Some raw ingestion tables intentionally allow incomplete or duplicate source records so that the pipeline can preserve the original data and quarantine invalid rows. Strict constraints are often more appropriate for validated staging or curated warehouse tables, depending on the architecture.</p>",
+            "<div class=\"diagram\"><pre><code>Source Data\n     |\n     v\nRaw Ingestion\n(Preserve source records)\n     |\n     v\nValidation and Cleaning\n     |\n     v\nApply Business Rules\n     |\n     v\nCurated Database Tables\n     |\n     +-- PRIMARY KEY\n     +-- FOREIGN KEY\n     +-- NOT NULL\n     +-- UNIQUE / CHECK</code></pre></div>",
+            "<h3>15. What Happens When a Constraint Is Violated?</h3>",
+            "<p>If an INSERT or UPDATE violates an enforced constraint, MySQL normally rejects the statement with an error. The exact effect on a multi-row statement depends on the statement, storage engine, and transaction context.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE constraint_test (\n    id INT PRIMARY KEY,\n    age INT CHECK (age >= 18)\n);\n\nINSERT INTO constraint_test VALUES (1, 25);\n\n-- This violates the CHECK constraint\nINSERT INTO constraint_test VALUES (2, 15);</code></pre></div>",
+            "<p>The first insert should succeed. The second should fail on a MySQL version that enforces CHECK constraints because the age is below 18.</p>",
+            "<p>Constraints provide an important last line of defense, but they do not replace source validation, meaningful error logging, or pipeline monitoring.</p>",
+            "<h3>16. Inspecting Constraints</h3>",
+            "<p>You can inspect a table definition to see its constraints and indexes.</p>",
+            "<div class=\"code-block\"><pre><code>DESCRIBE employees;\nSHOW CREATE TABLE employees;</code></pre></div>",
+            "<p><code>DESCRIBE</code> gives a convenient overview of columns and key markers. <code>SHOW CREATE TABLE</code> shows the SQL definition and is more useful when you need to inspect the declared constraints.</p>",
+            "<h3>17. Common Mistakes</h3>",
+            "<table><thead><tr><th>Mistake</th><th>Why it is incorrect</th><th>Better approach</th></tr></thead><tbody><tr><td>Assuming PRIMARY KEY allows NULL.</td><td>Primary key values must be unique and non-NULL.</td><td>Use a valid identifier for every row.</td></tr><tr><td>Assuming UNIQUE always means only one NULL is allowed.</td><td>MySQL generally allows multiple NULL values in a unique index.</td><td>Use NOT NULL as well if the field is required.</td></tr><tr><td>Using NOT NULL to reject empty strings.</td><td>An empty string is not NULL.</td><td>Validate empty values separately.</td></tr><tr><td>Assuming DEFAULT overwrites every missing or NULL value.</td><td>DEFAULT applies when the column is omitted or its default is requested; explicit NULL is different.</td><td>Understand INSERT behavior and nullability.</td></tr><tr><td>Assuming CHECK rejects NULL automatically.</td><td>A CHECK condition evaluating to UNKNOWN may pass.</td><td>Combine CHECK with NOT NULL where required.</td></tr><tr><td>Assuming FOREIGN KEY columns must always be NOT NULL.</td><td>A nullable foreign key may permit NULL references.</td><td>Add NOT NULL if a reference is mandatory.</td></tr><tr><td>Adding constraints without checking existing data.</td><td>Existing duplicates or invalid values may prevent constraint creation.</td><td>Profile and clean data before applying constraints.</td></tr></tbody></table>",
+            "<h3>18. Quick Revision</h3>",
+            "<div class=\"definition-box\"><b>Remember:</b><br><code>PRIMARY KEY</code> — unique row identifier; no duplicates or NULLs.<br><code>FOREIGN KEY</code> — enforces relationships between tables.<br><code>UNIQUE</code> — prevents duplicate key values; MySQL generally permits multiple NULLs.<br><code>NOT NULL</code> — requires a non-NULL value.<br><code>DEFAULT</code> — supplies a default when applicable.<br><code>CHECK</code> — enforces a Boolean condition when that constraint is supported and enforced.<br><b>Data Engineering focus:</b> Use constraints to support data integrity while designing ingestion, validation, and warehouse schemas.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create a dedicated practice database.</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE IF NOT EXISTS de_practice;\nUSE de_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Create a table with PRIMARY KEY and NOT NULL.</b> Try inserting a NULL employee name and observe the result.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE constraint_employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL\n);\n\nINSERT INTO constraint_employees\nVALUES (1, 'Ravi');\n\n-- Expected to fail because employee_id is duplicated\nINSERT INTO constraint_employees\nVALUES (1, 'Priya');\n\n-- Expected to fail because employee_name is NULL\nINSERT INTO constraint_employees\nVALUES (2, NULL);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Practise UNIQUE.</b> Create a user table and test inserting the same non-NULL username twice.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE constraint_users (\n    user_id INT PRIMARY KEY,\n    username VARCHAR(50) UNIQUE\n);\n\nINSERT INTO constraint_users VALUES (1, 'nethaji');\n\n-- Expected to fail because the username is duplicated\nINSERT INTO constraint_users VALUES (2, 'nethaji');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Practise DEFAULT.</b> Insert a task without specifying its status and inspect the resulting value.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE constraint_tasks (\n    task_id INT PRIMARY KEY,\n    task_name VARCHAR(100) NOT NULL,\n    status VARCHAR(20) DEFAULT 'PENDING'\n);\n\nINSERT INTO constraint_tasks (task_id, task_name)\nVALUES (1, 'Load orders');\n\nSELECT * FROM constraint_tasks;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Practise CHECK.</b> Create a products table where the price cannot be negative. Use a MySQL version that enforces CHECK constraints.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE constraint_products (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL,\n    price DECIMAL(10,2) NOT NULL CHECK (price >= 0)\n);\n\nINSERT INTO constraint_products\nVALUES (1, 'Keyboard', 1200.00);\n\n-- Expected to fail because the price is negative\nINSERT INTO constraint_products\nVALUES (2, 'Mouse', -100.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Practise FOREIGN KEY.</b> Create a parent customer table and a child orders table. Insert a valid customer and order, then attempt an order with a customer ID that does not exist.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE constraint_customers (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100) NOT NULL\n);\n\nCREATE TABLE constraint_orders (\n    order_id INT PRIMARY KEY,\n    customer_id INT NOT NULL,\n    FOREIGN KEY (customer_id)\n        REFERENCES constraint_customers(customer_id)\n);\n\nINSERT INTO constraint_customers\nVALUES (101, 'Ravi');\n\nINSERT INTO constraint_orders\nVALUES (1001, 101);\n\n-- Expected to fail because customer 999 does not exist\nINSERT INTO constraint_orders\nVALUES (1002, 999);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Practise a composite primary key.</b> Create an enrollment table where a student cannot enroll in the same course twice.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE constraint_enrollments (\n    student_id INT,\n    course_id INT,\n    enrollment_date DATE,\n    PRIMARY KEY (student_id, course_id)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8: Inspect the constraints.</b> Use SHOW CREATE TABLE on each practice table and identify its declared rules.</p>",
+            "<div class=\"code-block\"><pre><code>SHOW CREATE TABLE constraint_employees;\nSHOW CREATE TABLE constraint_users;\nSHOW CREATE TABLE constraint_products;\nSHOW CREATE TABLE constraint_orders;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 9: Data Engineering challenge.</b> Design a curated orders table with a primary key, a mandatory customer reference, a nonnegative order amount, and a default processing status. Explain which constraints should be applied in the curated layer and which validation may need to occur earlier in the pipeline.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Understand how PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, DEFAULT, and CHECK enforce data integrity. Learn to test both valid and invalid inserts and inspect constraints before using them in production schemas.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What are constraints in SQL?",
+              "a": "Constraints are rules defined on columns or tables to enforce data integrity and prevent invalid values or relationships."
+            },
+            {
+              "q": "Q2. Why are constraints important?",
+              "a": "They help prevent duplicate identifiers, missing required values, invalid references, and values that violate business rules."
+            },
+            {
+              "q": "Q3. What are the main types of MySQL constraints?",
+              "a": "Common constraints and column attributes include PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, DEFAULT, and CHECK."
+            },
+            {
+              "q": "Q4. What is the difference between PRIMARY KEY and UNIQUE?",
+              "a": "A table can have only one primary key, although it may contain multiple columns. Primary key values must be unique and non-NULL. A table can have multiple UNIQUE constraints, and MySQL generally allows multiple NULL values in a unique index."
+            },
+            {
+              "q": "Q5. What does NOT NULL do?",
+              "a": "It prevents a column from storing NULL. It does not automatically reject an empty string or a value such as zero."
+            },
+            {
+              "q": "Q6. What is a FOREIGN KEY?",
+              "a": "A foreign key enforces a relationship by requiring non-NULL referencing values to match an eligible key in the referenced table, subject to referential actions."
+            },
+            {
+              "q": "Q7. What does DEFAULT do?",
+              "a": "It supplies a value when an INSERT omits the column or explicitly requests its default. It does not generally replace an explicitly supplied NULL."
+            },
+            {
+              "q": "Q8. What is a CHECK constraint?",
+              "a": "A CHECK constraint enforces a condition on inserted or updated data. For example, CHECK (salary >= 0) rejects negative salaries when the constraint is enforced."
+            },
+            {
+              "q": "Q9. Does a CHECK constraint automatically reject NULL?",
+              "a": "No. A CHECK condition that evaluates to UNKNOWN because of NULL may pass. Use NOT NULL as well when the column must contain a value."
+            },
+            {
+              "q": "Q10. What happens when an INSERT violates a constraint?",
+              "a": "MySQL normally rejects the statement with an error if an enforced constraint is violated. The effect on a multi-row statement depends on the statement and transaction context."
+            },
+            {
+              "q": "Q11. What is a composite primary key?",
+              "a": "A composite primary key consists of two or more columns whose combination uniquely identifies each row."
+            },
+            {
+              "q": "Q12. How can you inspect constraints in MySQL?",
+              "a": "Use SHOW CREATE TABLE table_name; to inspect the table definition and declared constraints. DESCRIBE table_name; provides a shorter overview of columns and key information."
+            },
+            {
+              "q": "Q13. Should raw ingestion tables always have strict constraints?",
+              "a": "Not necessarily. Some pipelines preserve imperfect source records for auditing or later validation. Strict constraints may be more suitable for validated staging or curated tables, depending on the design."
+            },
+            {
+              "q": "Q14. Why should you check existing data before adding a constraint?",
+              "a": "Existing duplicates, NULL values, invalid references, or values that violate a CHECK condition may prevent the constraint from being added."
+            },
+            {
+              "q": "Q15. How do constraints help Data Engineers?",
+              "a": "They enforce database-level data integrity, support consistent warehouse schemas, prevent invalid relationships, and provide a safeguard for data written by applications and pipelines."
+            }
+          ]
+        },
+        {
+          "n": 20,
+          "title": "PRIMARY KEY",
+          "explanation": [
+            "<h3>1. What Is a Primary Key?</h3>",
+            "<p>A <b>PRIMARY KEY</b> is a constraint that uniquely identifies each row in a database table. It ensures that every record has a unique identifier and that the identifier cannot be <code>NULL</code>.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> A primary key is a column, or a combination of columns, that uniquely identifies every row in a table. It must contain unique, non-NULL values.</div>",
+            "<h3>2. Why Do We Need a Primary Key?</h3>",
+            "<p>Imagine an employee table containing two employees named Ravi. If you identify employees only by name, you cannot reliably distinguish between them. An employee ID solves this problem.</p>",
+            "<table><tr><th>employee_id</th><th>employee_name</th><th>department</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td></tr><tr><td>102</td><td>Ravi</td><td>HR</td></tr><tr><td>103</td><td>Priya</td><td>IT</td></tr></table>",
+            "<p>Here, <code>employee_id</code> uniquely identifies each employee, even when names are repeated.</p>",
+            "<h3>3. Rules of a Primary Key</h3>",
+            "<ul><li><b>Unique:</b> Duplicate primary key values are not allowed.</li><li><b>Not NULL:</b> A primary key cannot contain NULL values.</li><li><b>One primary key constraint per table:</b> A table can have only one primary key constraint.</li><li><b>Single or multiple columns:</b> The primary key can consist of one column or multiple columns.</li><li><b>Stable identifier:</b> Choose values that are unlikely to change over time.</li></ul>",
+            "<div class=\"diagram\"><pre>EMPLOYEE TABLE\n\nemployee_id  employee_name\n-----------  -------------\n101          Ravi\n102          Ravi\n103          Priya\n\nPRIMARY KEY: employee_id\n\n101  → One specific employee\n102  → Another specific employee\n103  → Another specific employee</pre></div>",
+            "<h3>4. Creating a Table with a Primary Key</h3>",
+            "<p>You can define a primary key while creating a table using the <code>PRIMARY KEY</code> constraint.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE company_db;\n\nUSE company_db;\n\nCREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100),\n    department VARCHAR(50),\n    salary DECIMAL(10,2)\n);</code></pre></div>",
+            "<p><b>Explanation:</b></p><ul><li><code>employee_id INT</code> creates an integer column.</li><li><code>PRIMARY KEY</code> makes it the unique identifier for every employee.</li><li><code>VARCHAR(100)</code> stores employee names up to 100 characters.</li><li><code>DECIMAL(10,2)</code> stores salary values with two decimal places.</li></ul>",
+            "<h3>5. Inserting Records</h3>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department, salary)\nVALUES\n    (101, 'Ravi', 'IT', 35000.00),\n    (102, 'Ravi', 'HR', 32000.00),\n    (103, 'Priya', 'IT', 40000.00);\n\nSELECT * FROM employees;</code></pre></div>",
+            "<p>These records are valid because every <code>employee_id</code> is unique and non-NULL.</p>",
+            "<h3>6. What Happens When You Insert a Duplicate Primary Key?</h3>",
+            "<p>Try inserting an employee with an ID that already exists.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department, salary)\nVALUES\n    (101, 'Arun', 'Finance', 30000.00);</code></pre></div>",
+            "<p><b>Result:</b> MySQL rejects the insertion because employee ID <code>101</code> already exists. This prevents two rows from having the same primary key.</p>",
+            "<div class=\"definition-box\"><b>Important:</b> The database enforces the primary key rule. You do not need to write a separate query to check for duplicate primary key values before every insert.</div>",
+            "<h3>7. What Happens When You Insert NULL?</h3>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department, salary)\nVALUES\n    (NULL, 'Kiran', 'IT', 28000.00);</code></pre></div>",
+            "<p><b>Result:</b> MySQL rejects the insertion because a primary key cannot be NULL. Every row must have a valid primary key value.</p>",
+            "<h3>8. Primary Key with AUTO_INCREMENT</h3>",
+            "<p>When you want MySQL to generate numeric identifiers automatically, use <code>AUTO_INCREMENT</code>.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers (\n    customer_id INT AUTO_INCREMENT PRIMARY KEY,\n    customer_name VARCHAR(100) NOT NULL,\n    city VARCHAR(50)\n);\n\nINSERT INTO customers (customer_name, city)\nVALUES\n    ('Ravi', 'Bengaluru'),\n    ('Priya', 'Hyderabad'),\n    ('Arun', 'Chennai');\n\nSELECT * FROM customers;</code></pre></div>",
+            "<p>MySQL generates an identifier for each inserted row. The generated values commonly begin at 1 and increase, unless the table's sequence settings or prior inserts change that behavior.</p>",
+            "<table><tr><th>customer_id</th><th>customer_name</th><th>city</th></tr><tr><td>1</td><td>Ravi</td><td>Bengaluru</td></tr><tr><td>2</td><td>Priya</td><td>Hyderabad</td></tr><tr><td>3</td><td>Arun</td><td>Chennai</td></tr></table>",
+            "<p>Because the ID is generated automatically, you normally omit <code>customer_id</code> from the INSERT statement. Do not assume generated IDs will always be gap-free; deleted rows and failed inserts can leave gaps.</p>",
+            "<h3>9. Defining a Primary Key After Creating a Table</h3>",
+            "<p>If a table already exists and does not have a primary key, you can add one using <code>ALTER TABLE</code>, provided the existing data satisfies the primary key requirements.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE departments (\n    department_id INT NOT NULL,\n    department_name VARCHAR(100)\n);\n\nALTER TABLE departments\nADD PRIMARY KEY (department_id);</code></pre></div>",
+            "<p>The existing <code>department_id</code> values must be unique and non-NULL. If duplicate or NULL values exist, resolve them before adding the constraint.</p>",
+            "<h3>10. Removing a Primary Key</h3>",
+            "<p>In MySQL, you can remove a primary key constraint with <code>ALTER TABLE ... DROP PRIMARY KEY</code>.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE departments\nDROP PRIMARY KEY;</code></pre></div>",
+            "<p>Use this carefully. Other tables may rely on the key through foreign key relationships, and MySQL may prevent the change until those dependencies are handled. Dropping a primary key also removes the uniqueness guarantee provided by that constraint.</p>",
+            "<h3>11. Primary Key vs UNIQUE</h3>",
+            "<table><tr><th>Feature</th><th>PRIMARY KEY</th><th>UNIQUE</th></tr><tr><td>Purpose</td><td>Identifies each row</td><td>Prevents duplicate non-NULL values</td></tr><tr><td>NULL values</td><td>Not allowed</td><td>MySQL generally permits multiple NULL values</td></tr><tr><td>Constraints per table</td><td>One primary key constraint</td><td>Multiple UNIQUE constraints</td></tr><tr><td>Columns</td><td>One or multiple columns</td><td>One or multiple columns</td></tr></table>",
+            "<p>Example: <code>employee_id</code> can be the primary key, while <code>email</code> can have a UNIQUE constraint if duplicate non-NULL email addresses are not allowed.</p>",
+            "<h3>12. Composite Primary Key — Introduction</h3>",
+            "<p>A composite primary key uses two or more columns together to identify a row. Neither column necessarily needs to be unique by itself; the combination must be unique.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE course_enrollments (\n    student_id INT,\n    course_id INT,\n    enrollment_date DATE,\n    PRIMARY KEY (student_id, course_id)\n);</code></pre></div>",
+            "<p>Here, a student can enroll in multiple courses, and a course can have multiple students. But the same student-course combination cannot be inserted twice. Composite primary keys are explored in more detail in the upcoming topic.</p>",
+            "<h3>13. Why Primary Keys Matter in Data Engineering</h3>",
+            "<p>Primary keys are important when ingesting, transforming, validating, and joining data across systems.</p>",
+            "<ul><li><b>Data quality:</b> Helps prevent duplicate identifiers in operational tables.</li><li><b>Joins:</b> Provides a reliable identifier for connecting related tables.</li><li><b>Incremental pipelines:</b> A stable key can help identify records to insert or update.</li><li><b>Deduplication:</b> Helps define which records represent the same entity.</li><li><b>Warehouse modeling:</b> Dimension and fact tables often use keys to connect records.</li></ul>",
+            "<div class=\"code-block\"><pre><code>-- Example: find orders for each customer\nSELECT\n    c.customer_id,\n    c.customer_name,\n    o.order_id,\n    o.order_date\nFROM customers AS c\nJOIN orders AS o\n    ON c.customer_id = o.customer_id;</code></pre></div>",
+            "<p>In this example, <code>customers.customer_id</code> is the primary key, and <code>orders.customer_id</code> would commonly reference it through a foreign key. The <code>orders</code> table is illustrative; create it with the appropriate columns and relationship before running this query.</p>",
+            "<h3>14. Common Mistakes</h3>",
+            "<ul><li><b>Using a person's name as the primary key:</b> Names can repeat and change.</li><li><b>Assuming a primary key can be NULL:</b> It cannot.</li><li><b>Assuming every table must use AUTO_INCREMENT:</b> Natural or externally generated identifiers can also be used when appropriate.</li><li><b>Using a column that is not actually unique:</b> This causes duplicate-key errors or makes it unsuitable as a primary key.</li><li><b>Choosing an unstable identifier:</b> Frequent changes can complicate relationships with other tables.</li><li><b>Assuming IDs have no gaps:</b> AUTO_INCREMENT values are not guaranteed to be consecutive.</li></ul>",
+            "<div class=\"definition-box\"><b>Key Takeaway:</b> A primary key uniquely and reliably identifies every row. It must be unique and non-NULL, and it can consist of one column or a combination of columns.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1:</b> Create a database and select it.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE primary_key_practice;\nUSE primary_key_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2:</b> Create an employees table with employee_id as the primary key.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100),\n    department VARCHAR(50),\n    salary DECIMAL(10,2)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3:</b> Insert three employees. Include two employees with the same name but different IDs.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department, salary)\nVALUES\n    (101, 'Ravi', 'IT', 35000.00),\n    (102, 'Ravi', 'HR', 32000.00),\n    (103, 'Priya', 'IT', 40000.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4:</b> Retrieve all records and verify that each employee has a unique ID.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT * FROM employees;\n\nSELECT employee_id, COUNT(*) AS id_count\nFROM employees\nGROUP BY employee_id;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5:</b> Try inserting a duplicate employee ID. Observe the error and explain why the database rejects it.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department, salary)\nVALUES\n    (101, 'Arun', 'Finance', 30000.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6:</b> Try inserting NULL into employee_id. Observe the error.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department, salary)\nVALUES\n    (NULL, 'Kiran', 'IT', 28000.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7:</b> Create a customers table using AUTO_INCREMENT and insert three records without providing customer_id.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers (\n    customer_id INT AUTO_INCREMENT PRIMARY KEY,\n    customer_name VARCHAR(100) NOT NULL,\n    city VARCHAR(50)\n);\n\nINSERT INTO customers (customer_name, city)\nVALUES\n    ('Ravi', 'Bengaluru'),\n    ('Priya', 'Hyderabad'),\n    ('Arun', 'Chennai');\n\nSELECT * FROM customers;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8:</b> Data Engineering exercise: explain how a unique customer identifier could help prevent duplicate customer records when loading data into a target table. Do not assume a primary key alone automatically deduplicates an incoming file.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Be able to create a primary key, insert valid records, recognize duplicate and NULL key errors, use AUTO_INCREMENT, and explain how stable identifiers help data pipelines.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is a primary key?",
+              "a": "A primary key is a column or combination of columns that uniquely identifies each row in a table. It cannot contain duplicate or NULL values."
+            },
+            {
+              "q": "Q2. Why do we need a primary key?",
+              "a": "It identifies records reliably, prevents duplicate key values, and provides a dependable column for relationships between tables."
+            },
+            {
+              "q": "Q3. Can a primary key contain duplicate values?",
+              "a": "No. Every primary key value, or every combination of values in a composite primary key, must be unique."
+            },
+            {
+              "q": "Q4. Can a primary key contain NULL?",
+              "a": "No. A primary key must identify a row, so its value cannot be NULL."
+            },
+            {
+              "q": "Q5. How many primary keys can a table have?",
+              "a": "A table can have only one primary key constraint, but that constraint can contain multiple columns."
+            },
+            {
+              "q": "Q6. What is AUTO_INCREMENT in MySQL?",
+              "a": "AUTO_INCREMENT automatically generates numeric values for a column when new rows are inserted without an explicit value. It is commonly used for integer primary keys."
+            },
+            {
+              "q": "Q7. What happens when we insert a duplicate primary key?",
+              "a": "MySQL rejects the insert or update with a duplicate-key error, preserving the uniqueness rule."
+            },
+            {
+              "q": "Q8. What is the difference between PRIMARY KEY and UNIQUE?",
+              "a": "A primary key identifies each row and cannot be NULL. A table can have multiple UNIQUE constraints, and MySQL generally allows multiple NULL values in a UNIQUE column."
+            },
+            {
+              "q": "Q9. What is a composite primary key?",
+              "a": "A composite primary key combines two or more columns to identify a row. The combination must be unique even if the individual columns contain repeated values."
+            },
+            {
+              "q": "Q10. Can we add a primary key to an existing table?",
+              "a": "Yes. Use ALTER TABLE ... ADD PRIMARY KEY, provided the existing key values are unique and non-NULL and any dependent relationships allow the change."
+            },
+            {
+              "q": "Q11. Does AUTO_INCREMENT guarantee consecutive numbers without gaps?",
+              "a": "No. Deleted records, failed inserts, and other database operations can leave gaps in generated values."
+            },
+            {
+              "q": "Q12. How does a primary key help Data Engineering?",
+              "a": "It provides a stable record identifier useful for validating data, joining tables, modeling warehouses, and designing incremental loading or deduplication logic. A pipeline still needs explicit logic to handle duplicate incoming records."
+            }
+          ]
         }
   ]
 }
