@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OLTP vs OLAP — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#A371F7; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(163,113,247,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#A371F7; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#A371F7; border-color:#A371F7;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#A371F7;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#A371F7;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Database & Data Concepts</b> &middot; Topic 19 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>OLTP vs OLAP</h1>
+      <p class="sub">Why operational and analytical systems store and process data differently, and how data moves between them. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/107</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note note-info" style="margin-top:22px;">
+    <span class="note-icon">&#9432;</span>
+    <span><strong>Goal:</strong> Understand why different systems store and process data differently, how operational databases differ from analytical systems, and how data engineers move data from operational workloads into analytical environments. The aim is practical understanding, not deep database administration.</span>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. CDC, columnar storage, HTAP..." style="margin-top:20px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 19;               // matches topic.n = 19 (OLTP vs OLAP) in index.html
+const CONTENT_SLUG = 'oltp-olap';  // matches /content/oltp-olap.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'19.1 OLTP Fundamentals', items:[
+      {t:'What is OLTP (Online Transaction Processing)?'}, {t:'Purpose of OLTP systems'},
+      {t:'Real-world examples', tags:['banking','shopping','ticket booking','inventory management']},
+      {t:'What is a transaction in a business application?'},
+      {t:'Typical OLTP operations', tags:['INSERT','UPDATE','DELETE','SELECT']},
+      {t:'Characteristics of OLTP workloads'}, {t:'Many short, frequent transactions'},
+      {t:'Concurrent users and transactions'}, {t:'Data consistency and transaction reliability'},
+      {t:'Example: processing an online order'},
+  ]},
+  { title:'19.2 OLAP Fundamentals', items:[
+      {t:'What is OLAP (Online Analytical Processing)?'}, {t:'Purpose of OLAP systems'},
+      {t:'Real-world examples', tags:['sales analytics','financial reporting','business intelligence']},
+      {t:'Analytical queries and aggregations'}, {t:'Characteristics of OLAP workloads'},
+      {t:'Complex queries across large datasets'}, {t:'Historical data analysis'},
+      {t:'Trend analysis and business performance measurement'},
+      {t:'Example: calculating monthly sales by region and product'},
+      {t:'How OLAP supports business decisions'},
+  ]},
+  { title:'19.3 OLTP vs OLAP — Core Differences', items:[
+      {t:'Primary purpose: operations vs analysis'}, {t:'Transaction processing vs analytical processing'},
+      {t:'Current operational data vs historical analytical data'}, {t:'Read-heavy vs mixed read/write workloads'},
+      {t:'Simple queries vs complex analytical queries'}, {t:'Small transactions vs large scans and aggregations'},
+      {t:'Data granularity and aggregation'}, {t:'Normalized schemas vs analytics-oriented schemas'},
+      {t:'Concurrency and workload characteristics'}, {t:'Latency and throughput requirements'},
+      {t:'Consistency and freshness requirements'}, {t:'Scaling and performance considerations'},
+      {t:'Cost and resource utilization'}, {t:'When to choose OLTP, OLAP or both'},
+  ]},
+  { title:'19.4 OLTP Database Design', items:[
+      {t:'Why operational systems commonly use normalized tables'},
+      {t:'How normalization helps reduce data duplication'},
+      {t:'Maintaining relationships and referential integrity'},
+      {t:'Primary keys and foreign keys in operational workflows'},
+      {t:'Handling frequent inserts and updates'}, {t:'Indexing for operational queries — introductory level'},
+      {t:'Transaction boundaries in business operations'},
+      {t:'Example: customers, orders, order items and products'},
+      {t:'Why large analytical queries can affect operational performance'},
+    ], note:{type:'info', text:'Scope note: you already have Database Design and Normalization topics. Review those concepts only as needed to understand OLTP; do not repeat their full curriculum here.'}
+  },
+  { title:'19.5 OLAP and Analytical Data Design', items:[
+      {t:'Why analytical queries scan large amounts of data'}, {t:'Analytical aggregations and reporting workloads'},
+      {t:'Why historical data matters for analysis'}, {t:'Analytical schemas and denormalized structures'},
+      {t:'Introduction to facts and dimensions'}, {t:'Introduction to star schemas for reporting'},
+      {t:'Column-oriented storage — conceptual understanding'}, {t:'Why columnar storage helps analytical workloads'},
+      {t:'Partitioning and data pruning — introductory concepts'}, {t:'Example: analyzing millions of sales records'},
+    ], note:{type:'info', text:'Scope note: your Data Modeling topic already covers facts, dimensions, star schemas and snowflake schemas. Keep this section focused on why these designs are useful for analytical workloads, rather than reteaching their full design.'}
+  },
+  { title:'19.6 OLTP and OLAP Technologies', items:[
+      {t:'Relational databases used for OLTP'},
+      {t:'Examples of OLTP databases', tags:['PostgreSQL','MySQL','SQL Server','Oracle Database']},
+      {t:'Analytical databases and data warehouse platforms'},
+      {t:'Examples of analytical platforms', tags:['Snowflake','Google BigQuery','Amazon Redshift','ClickHouse']},
+      {t:'Row-oriented vs column-oriented storage'}, {t:'Database engines vs analytical platforms'},
+      {t:'Why one database can support both transactional and analytical queries'},
+      {t:'HTAP (Hybrid Transactional/Analytical Processing) — overview'},
+      {t:'Choosing a platform based on workload requirements'},
+    ], note:{type:'info', text:'These are examples, not strict categories: some technologies support multiple workloads, and architecture matters as much as the product name.'}
+  },
+  { title:'19.7 How Data Moves from OLTP to OLAP', important:true, items:[
+      {t:'Why organizations separate operational and analytical workloads'},
+      {t:'What is ETL and ELT? — overview'}, {t:'Batch data ingestion'}, {t:'CDC fundamentals'},
+      {t:'Full loads vs incremental loads'}, {t:'Why analytical data may lag behind operational data'},
+      {t:'Data freshness and latency requirements'},
+      {t:'Source-system load and production performance risks'},
+      {t:'Data validation between source and target'},
+      {t:'Example: transferring daily order data into an analytics platform'},
+    ], example:'OLTP source system\n(orders, customers, payments and inventory)\n        \u2193\nExtract or capture changes\n        \u2193\nData ingestion and transformation\n(batch ETL/ELT or CDC \u2014 Change Data Capture)\n        \u2193\nLoad and organize data\n        \u2193\nOLAP / analytical platform\n(historical analysis, reports and dashboards)',
+    note:{type:'info', text:'Scope note: this is an introduction to the architecture. Detailed pipelines, CDC implementation, orchestration and streaming belong in their dedicated roadmap topics.'}
+  },
+  { title:'19.8 Practical SQL Comparison', items:[
+      {t:"Write an OLTP-style query to retrieve one customer's order"},
+      {t:'Write an OLTP-style query to update inventory after a sale'},
+      {t:'Write an OLAP-style query to calculate monthly revenue'}, {t:'Aggregate sales by product and region'},
+      {t:'Compare filtering a single order with aggregating millions of orders'},
+      {t:'Understand how indexes can help selective queries'},
+      {t:'Understand why scanning and aggregating large datasets is different'},
+      {t:'Explain why the same SQL query can perform differently on different systems'},
+  ]},
+  { title:'19.9 Real-World Case Studies', items:[
+      {t:'E-commerce: order placement vs sales analytics'}, {t:'Banking: money transfer vs financial reporting'},
+      {t:'Retail: inventory updates vs demand analysis'}, {t:'Food delivery: order tracking vs delivery-performance analysis'},
+      {t:'Manufacturing: production transactions vs plant-performance dashboards'},
+      {t:'Identify the OLTP and OLAP workloads in each case'},
+      {t:'Choose an appropriate system for each workload and justify the decision'},
+  ]},
+  { title:'19.10 Practical Project', items:[
+      {t:'Create sample customers, products, orders and order-items tables'},
+      {t:'Insert sample transactional records'}, {t:'Perform an order-placement transaction'},
+      {t:'Update product inventory when an order is placed'},
+      {t:'Create analytical queries for revenue, products and regions'},
+      {t:'Compare the operational schema with a simple analytics-oriented model'},
+      {t:'Identify which queries belong to OLTP and which belong to OLAP'},
+      {t:'Document the advantages of separating the two workloads'},
+    ],
+    intro:{type:'info', text:'Project: E-commerce OLTP-to-OLAP comparison. Build a small demonstration using sample e-commerce data.'},
+    note:{type:'info', text:'You do not need to deploy two production databases or benchmark millions of records. A local database and sample dataset are enough to demonstrate the concepts.'}
+  },
+  { title:'19.11 Interview Preparation', items:[
+      {t:'What is OLTP?'}, {t:'What is OLAP?'}, {t:'Explain five differences between OLTP and OLAP'},
+      {t:'Why should analytical queries not overload a production database?'},
+      {t:'Why are historical records important in OLAP?'},
+      {t:'Why is columnar storage often preferred for analytical workloads?'},
+      {t:'Can one database support both OLTP and OLAP?'}, {t:'What is HTAP?'},
+      {t:'How does data move from an OLTP database to an analytical platform?'},
+      {t:'What is the difference between batch ingestion and CDC at a high level?'},
+      {t:'How would you design a system for operational transactions and business reporting?'},
+      {t:'Explain OLTP vs OLAP using an e-commerce example'},
+  ]},
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    const diagrams = sec.examples || (sec.example ? [sec.example] : []);
+    diagrams.forEach(txt=>{
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = txt;
+      secEl.appendChild(ex);
+    });
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>
