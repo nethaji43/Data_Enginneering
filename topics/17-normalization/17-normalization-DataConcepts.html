@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Normalization &amp; Denormalization — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#A371F7; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(163,113,247,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#A371F7; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram, .section .format-table{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+  .format-table{border-collapse:collapse; margin-top:14px; margin-bottom:18px; font-size:13.5px; width:calc(100% - 40px);}
+  .format-table th, .format-table td{border:1px solid var(--border); padding:8px 12px; text-align:left; vertical-align:top;}
+  .format-table th{background:var(--surface-2); font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-dim); font-weight:500;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#A371F7; border-color:#A371F7;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#A371F7;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#A371F7;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Database & Data Concepts</b> &middot; Topic 17 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Normalization &amp; Denormalization</h1>
+      <p class="sub">Beyond memorizing 1NF/2NF/3NF: identify redundancy and dependencies in a messy schema, normalize it, then decide when deliberate denormalization is justified. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/200</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. 2NF, BCNF, denormalization techniques..." style="margin-top:28px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 17;                  // matches topic.n = 17 (Normalization & Denormalization) in index.html
+const CONTENT_SLUG = 'normalization'; // matches /content/normalization.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'17.1 Normalization Fundamentals', items:[
+      {t:'What is normalization?'}, {t:'Why normalization is needed'}, {t:'Data redundancy'},
+      {t:'Data consistency'}, {t:'Data integrity'}, {t:'Repeating groups'}, {t:'Duplicate facts'},
+      {t:'Normalization vs database design'}, {t:'Normalization vs cleaning'}, {t:'Normalization vs denormalization'},
+      {t:'Normal forms'}, {t:'Normalization as a step-by-step process'}, {t:'When normalization is useful'},
+      {t:'Benefits of normalization'}, {t:'Limitations of normalization'},
+    ], example:'Messy Table\n    \u2193\nIdentify Dependencies\n    \u2193\nRemove Repeating Groups\n    \u2193\nRemove Partial Dependencies\n    \u2193\nRemove Transitive Dependencies\n    \u2193\nNormalized Tables'
+  },
+  { title:'17.2 Data Anomalies', items:[
+      {t:'What is an anomaly?'}, {t:'Insert anomaly'}, {t:'Update anomaly'}, {t:'Delete anomaly'},
+      {t:'Identify anomalies in a table'}, {t:'Why redundancy causes anomalies'},
+      {t:'How normalization prevents anomalies'}, {t:'Practical examples of each anomaly'},
+    ], example:'order_id | customer_name | customer_city | product\n---------|---------------|---------------|--------\n101      | Ravi          | Bengaluru     | Laptop\n102      | Ravi          | Bengaluru     | Mouse\n103      | Ravi          | Bengaluru     | Keyboard\n\nIf Ravi moves cities, multiple rows need to be updated \u2014 an update anomaly.\nNormalization would separate customer information from order information.'
+  },
+  { title:'17.3 Functional Dependencies', items:[
+      {t:'What is a functional dependency?'}, {t:'Determinant'}, {t:'Dependent attribute'}, {t:'`A \u2192 B`'},
+      {t:'Full functional dependency'}, {t:'Partial dependency'}, {t:'Transitive dependency'},
+      {t:'Identify dependencies from business rules'}, {t:'Functional dependency and primary keys'},
+      {t:'Functional dependency and candidate keys'}, {t:'Determine dependencies before normalization'},
+    ], example:'customer_id \u2192 customer_name\ncustomer_id \u2192 customer_email\n\nMeaning:\ncustomer_id\n     \u2193\ncustomer information',
+    note:{type:'info', text:'Functional dependencies are the conceptual foundation behind the normal forms.'}
+  },
+  { title:'17.4 Unnormalized Form', items:[
+      {t:'What is unnormalized data?'}, {t:'Repeating groups'}, {t:'Multiple values in one column'},
+      {t:'Repeated columns'}, {t:'Duplicate information'}, {t:'Identify unnormalized structures'},
+      {t:'Problems with unnormalized data'}, {t:'Convert an unnormalized table into `1NF`'},
+    ], example:'order_id | customer | products\n---------|----------|--------------------\n101      | Ravi     | Laptop, Mouse, Bag\n\nProblem: "products" contains multiple values.'
+  },
+  { title:'17.5 First Normal Form — 1NF', items:[
+      {t:'What is `1NF`?'}, {t:'Atomic values'}, {t:'No repeating groups'}, {t:'One value per cell'},
+      {t:'Unique rows'}, {t:'Primary key'}, {t:'Identify 1NF violations'}, {t:'Convert unnormalized table \u2192 1NF'},
+      {t:'Validate 1NF'},
+    ], example:'Before\norder_id | customer | products\n---------|----------|----------------\n101      | Ravi     | Laptop, Mouse\n\n1NF\norder_id | customer | product\n---------|----------|--------\n101      | Ravi     | Laptop\n101      | Ravi     | Mouse',
+    note:{type:'info', text:'1NF requires single/atomic values and removes repeating groups.'}
+  },
+  { title:'17.6 Second Normal Form — 2NF', items:[
+      {t:'What is `2NF`?'}, {t:'2NF requires 1NF'}, {t:'Composite primary keys'}, {t:'Partial dependency'},
+      {t:'Full dependency'}, {t:'Identify partial dependencies'},
+      {t:'Why single-column PK tables are automatically free of partial dependency'},
+      {t:'Split tables to remove partial dependency'}, {t:'Validate 2NF'},
+    ], example:'order_id + product_id \u2192 quantity\norder_id \u2192 order_date\nproduct_id \u2192 product_name\n\norder_id \u2192 order_date depends on only part of the composite key\n\u2014 a partial dependency. So split:\n\nOrders              OrderItems\norder_id             order_id\norder_date           product_id\n                     quantity',
+    note:{type:'info', text:'2NF builds on 1NF by eliminating partial dependencies of non-key attributes on a composite key.'}
+  },
+  { title:'17.7 Third Normal Form — 3NF', items:[
+      {t:'What is `3NF`?'}, {t:'3NF requires 2NF'}, {t:'Transitive dependency'},
+      {t:'Identify transitive dependencies'}, {t:'Non-key \u2192 non-key dependency'}, {t:'Remove transitive dependency'},
+      {t:'Create separate tables'}, {t:'Add foreign keys'}, {t:'Validate 3NF'},
+    ], example:'employee_id \u2192 department_id\ndepartment_id \u2192 department_name\ntherefore employee_id \u2192 department_name indirectly.\n\nInstead of one Employee table with department_name duplicated,\nsplit into:\n\nEmployee                 Department\nemployee_id              department_id\nemployee_name            department_name\ndepartment_id',
+    note:{type:'info', text:'3NF removes transitive dependencies so non-key attributes depend on the key rather than another non-key attribute.'}
+  },
+  { title:'17.8 BCNF', items:[
+      {t:'What is `BCNF`?'}, {t:'BCNF vs 3NF'}, {t:'Candidate keys'}, {t:'Determinants'}, {t:'BCNF rule'},
+      {t:'Identify BCNF violations'}, {t:'Convert a schema to BCNF'}, {t:'When BCNF is useful'},
+      {t:'Why BCNF is less commonly needed in everyday application design'},
+    ], note:{type:'info', text:"BCNF is stricter than 3NF: every determinant must be a candidate key. For your Data Engineering preparation, understand BCNF, but don't spend as much time on it as 1NF\u20133NF."}
+  },
+  { title:'17.9 Beyond BCNF — Awareness Only', items:[
+      {t:'`4NF` concept'}, {t:'Multivalued dependency concept'}, {t:'`5NF` concept'}, {t:'Join dependency concept'},
+      {t:'Why higher normal forms exist'}, {t:'Why they are rarely needed in your normal Data Engineering workflow'},
+    ], note:{type:'warning', text:"The formal normalization hierarchy extends beyond 3NF/BCNF, but 1NF\u20133NF are the practical core you should master. Do not spend significant study time on 4NF/5NF for your current goal."}
+  },
+  { title:'17.10 Normalization Process', items:[
+      {t:'Start with business requirements'}, {t:'Identify entities'}, {t:'Identify attributes'},
+      {t:'Identify candidate keys'}, {t:'Identify functional dependencies'}, {t:'Identify repeating groups'},
+      {t:'Apply 1NF'}, {t:'Identify partial dependencies'}, {t:'Apply 2NF'}, {t:'Identify transitive dependencies'},
+      {t:'Apply 3NF'}, {t:'Evaluate BCNF if necessary'}, {t:'Add foreign keys'}, {t:'Add constraints'},
+      {t:'Validate relationships'}, {t:'Test the final schema'},
+    ], example:'Raw / Unnormalized\n        \u2193\n       1NF\n        \u2193\n       2NF\n        \u2193\n       3NF\n        \u2193\n      BCNF?\n        \u2193\nFinal Relational Design'
+  },
+  { title:'17.11 Lossless Decomposition',
+    intro:{type:'info', text:'This is an important advanced concept.'},
+    items:[
+      {t:'What is decomposition?'}, {t:'Why tables are decomposed'}, {t:'Lossless decomposition'},
+      {t:'Lossy decomposition'}, {t:'Why data should not be lost'}, {t:'Reconstructing original information'},
+      {t:'Join after decomposition'}, {t:'Validate decomposition'},
+    ], example:'Original Table\n      \u2193\n Split\n \u250c\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2510\nTable A   Table B\n \u2514\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2518\n      \u2193\n     JOIN\n      \u2193\nRequired Information',
+    note:{type:'info', text:"You don't need to study the mathematical proofs deeply."}
+  },
+  { title:'17.12 Dependency Preservation', items:[
+      {t:'What is dependency preservation?'}, {t:'Why dependencies matter'}, {t:'Preserve important business rules'},
+      {t:'Functional dependencies after decomposition'}, {t:'Check whether dependencies remain enforceable'},
+      {t:'Lossless vs dependency-preserving decomposition'},
+  ]},
+  { title:'17.13 Normalization in Real Systems', items:[
+      {t:'OLTP and normalization'}, {t:'Transactional databases'}, {t:'Frequently updated data'},
+      {t:'Data consistency'}, {t:'Avoiding duplicate facts'}, {t:'Normalized operational schema'},
+      {t:'When high normalization is beneficial'}, {t:'When too much normalization becomes inconvenient'},
+      {t:'Join complexity'}, {t:'Read performance considerations'},
+  ]},
+  { title:'17.14 Denormalization Fundamentals', items:[
+      {t:'What is denormalization?'}, {t:'Why denormalization is used'}, {t:'Deliberately introducing redundancy'},
+      {t:'Denormalization after normalization'}, {t:'Denormalization vs poor database design'},
+      {t:'Performance motivation'}, {t:'Read-heavy workloads'}, {t:'Reporting workloads'},
+      {t:'Analytical workloads'}, {t:'Reduce joins'}, {t:'Precompute values'}, {t:'Duplicate selected attributes'},
+    ], note:{type:'info', text:'Denormalization deliberately introduces redundancy to reduce joins or improve read performance; it is a design trade-off, not simply "bad normalization."'}
+  },
+  { title:'17.15 Techniques of Denormalization', items:[
+      {t:'Duplicate frequently accessed columns'}, {t:'Merge related tables'}, {t:'Precomputed aggregates'},
+      {t:'Summary tables'}, {t:'Materialized views'}, {t:'Stored calculated values'}, {t:'Redundant lookup values'},
+      {t:'Flatten hierarchical structures'}, {t:'Duplicate dimension attributes'}, {t:'Pre-join frequently used data'},
+    ], example:'Normalized:\nOrders \u2192 Customer \u2192 Address\n\nQuery may require:\nOrders JOIN Customer JOIN Address\n\nDenormalized:\nOrders\n------\norder_id\ncustomer_name\ncustomer_city\n\nNow some queries require fewer joins.'
+  },
+  { title:'17.16 Denormalization Trade-offs', items:[
+      {t:'Faster reads'}, {t:'Fewer joins'}, {t:'More storage'}, {t:'Duplicate data'}, {t:'Update complexity'},
+      {t:'Data inconsistency risk'}, {t:'More complicated writes'}, {t:'Synchronization problems'},
+      {t:'ETL complexity'}, {t:'Maintenance cost'}, {t:'Testing requirements'},
+    ], example:'Normalization \u2192 less redundancy \u2192 more joins\nDenormalization \u2192 more redundancy \u2192 fewer joins',
+    note:{type:'info', text:'The decision is a trade-off between consistency, storage, write complexity, and query performance.'}
+  },
+  { title:'17.17 When to Normalize', items:[
+      {t:'Transaction-heavy systems'}, {t:'Frequent updates'}, {t:'Strong consistency requirements'},
+      {t:'Avoiding duplicate facts'}, {t:'Maintaining master data'}, {t:'OLTP systems'},
+      {t:'Operational applications'}, {t:'When data relationships are complex'},
+    ], example:'Banking\nERP\nOrder Management\nInventory\n\nThese generally benefit from carefully normalized relational structures.'
+  },
+  { title:'17.18 When to Denormalize', items:[
+      {t:'Read-heavy workloads'}, {t:'Reporting systems'}, {t:'Analytical workloads'},
+      {t:'Frequently repeated joins'}, {t:'Precomputed aggregations'}, {t:'Query performance requirements'},
+      {t:'Data marts'}, {t:'Some warehouse designs'}, {t:'When controlled redundancy is acceptable'},
+    ], note:{type:'warning', text:"Don't denormalize just because there are many joins. First identify the actual performance problem."}
+  },
+  { title:'17.19 Normalization vs Denormalization', items:[
+      {t:'Compare redundancy'}, {t:'Compare storage'}, {t:'Compare reads'}, {t:'Compare writes'},
+      {t:'Compare joins'}, {t:'Compare consistency'}, {t:'Compare maintenance'}, {t:'Compare performance'},
+      {t:'Compare OLTP suitability'}, {t:'Compare analytical suitability'},
+    ], table:{
+      head:['Area','Normalization','Denormalization'],
+      rows:[
+        ['Redundancy','Low','Higher'],
+        ['Data consistency','Easier','Harder'],
+        ['Storage','Lower','Higher'],
+        ['Joins','More','Fewer'],
+        ['Writes','Usually simpler','Can be more complex'],
+        ['Reads','May require more joins','Often simpler/faster'],
+        ['OLTP','Strong fit','Sometimes'],
+        ['Analytics','Depends on model','Often useful'],
+      ]
+    }
+  },
+  { title:'17.20 Normalization vs Data Warehousing', items:[
+      {t:'OLTP schema'}, {t:'Analytical schema'}, {t:'Normalized operational database'}, {t:'Dimensional model'},
+      {t:'Fact tables'}, {t:'Dimension tables'}, {t:'Star schema'}, {t:'Snowflake schema'},
+      {t:'Why analytical systems may accept redundancy'}, {t:'Query performance vs update consistency'},
+    ], note:{type:'info', text:'This is only an introduction here. Your dedicated Data Warehousing topic should later cover dimensional modeling, fact/dimension design, star schema, snowflake schema, SCD, warehouse architecture, and analytical grain.'}
+  },
+  { title:'17.21 Practical Normalization Exercises', items:[
+      {t:'Exercise 1 — Customer Orders', tags:['OrderID','CustomerName','CustomerEmail','CustomerCity','ProductName','ProductPrice','Quantity']},
+      {t:'Exercise 2 — Employee Database', tags:['repeated department data','repeated manager data','dependencies','tables required','primary keys','foreign keys']},
+      {t:'Exercise 3 — University Database', tags:['Student','Course','Instructor','Department','Enrollment']},
+    ], examples:[
+      'Exercise 1 \u2014 transform:\n\nUnnormalized\n     \u2193\n1NF\n     \u2193\n2NF\n     \u2193\n3NF\n\nExpected direction: Customers, Products, Orders, OrderItems',
+      'Exercise 3 \u2014 design relationships:\n\nStudent\n   \u2193\nEnrollment\n   \u2193\nCourse\n   \u2193\nInstructor\n   \u2193\nDepartment\n\nNormalize the model to 3NF.'
+    ]
+  },
+  { title:'17.22 Practical Denormalization Exercise', items:[
+      {t:'Denormalization Exercise — Orders / Customers / Products reporting layer'},
+    ], example:'Start with: Orders, Customers, Products\n\nReporting requirement:\n"Show order ID, customer name, city, product name, category and total amount."\n\nFirst, the normalized solution:\nOrders JOIN Customers JOIN Products\n\nThen identify whether a reporting layer could benefit from a denormalized structure.'
+  },
+  { title:'17.23 Final Project', items:[
+      {t:'Part A — Normalized OLTP (~3NF)'},
+      {t:'Part B — Analytical/Reporting Structure'},
+    ], examples:[
+      'Part A design (~3NF):\n\nCustomer\n   \u2193\nOrder\n   \u2193\nOrderItem\n   \u2193\nProduct',
+      'Part B reporting structure:\n\nSales_Report\n-------------\norder_id\ncustomer_name\ncustomer_city\nproduct_name\ncategory\nquantity\namount\norder_date'
+    ], note:{type:'info', text:'Compare the two: number of tables, number of joins, duplicate data, storage, query complexity, update complexity.'}
+  },
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    const diagrams = sec.examples || (sec.example ? [sec.example] : []);
+    diagrams.forEach(txt=>{
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = txt;
+      secEl.appendChild(ex);
+    });
+
+    if(sec.table){
+      const tbl = document.createElement('table');
+      tbl.className = 'format-table';
+      tbl.innerHTML = `<thead><tr>${sec.table.head.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${sec.table.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
+      secEl.appendChild(tbl);
+    }
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>
