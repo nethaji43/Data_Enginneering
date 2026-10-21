@@ -2946,6 +2946,1304 @@
               "a": "It provides a stable record identifier useful for validating data, joining tables, modeling warehouses, and designing incremental loading or deduplication logic. A pipeline still needs explicit logic to handle duplicate incoming records."
             }
           ]
+        },
+        {
+          "n": 21,
+          "title": "FOREIGN KEY",
+          "explanation": [
+            "<h3>1. What Is a Foreign Key?</h3>",
+            "<p>A <b>FOREIGN KEY</b> is a constraint that creates a relationship between two tables. It ensures that a value in one table matches an existing referenced value in another table, subject to the foreign key rules.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> A foreign key is a column or combination of columns that references a primary key or an eligible UNIQUE key in another table. It helps maintain referential integrity between related tables.</div>",
+            "<h3>2. Why Do We Need a Foreign Key?</h3>",
+            "<p>Imagine a company database with two tables: <code>departments</code> and <code>employees</code>. Each department has a unique department ID, and each employee belongs to a department.</p>",
+            "<p>Instead of storing the department name repeatedly for every employee, we can store a department ID and connect the two tables.</p>",
+            "<div class=\"diagram\"><pre>DEPARTMENTS TABLE                  EMPLOYEES TABLE\n+---------------+                 +-------------+\n| department_id |  &lt;-------------  | department_id |\n| department_name|                 | employee_id   |\n+---------------+                 | employee_name |\n                                  +-------------+\n\nParent table                      Child table\nReferenced key                    Foreign key</pre></div>",
+            "<p>The <code>departments</code> table is the parent table, and the <code>employees</code> table is the child table. The employee's department ID must refer to a department that exists, unless the foreign key column permits NULL.</p>",
+            "<h3>3. Creating the Parent Table</h3>",
+            "<p>First, create the departments table with a primary key.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE company_fk_db;\nUSE company_fk_db;\n\nCREATE TABLE departments (\n    department_id INT PRIMARY KEY,\n    department_name VARCHAR(100) NOT NULL\n);</code></pre></div>",
+            "<p>Insert a few departments:</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO departments\n    (department_id, department_name)\nVALUES\n    (10, 'IT'),\n    (20, 'HR'),\n    (30, 'Finance');</code></pre></div>",
+            "<table><tr><th>department_id</th><th>department_name</th></tr><tr><td>10</td><td>IT</td></tr><tr><td>20</td><td>HR</td></tr><tr><td>30</td><td>Finance</td></tr></table>",
+            "<h3>4. Creating a Child Table with a Foreign Key</h3>",
+            "<p>Now create the employees table and reference the department ID.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    department_id INT,\n    CONSTRAINT fk_employees_department\n        FOREIGN KEY (department_id)\n        REFERENCES departments(department_id)\n);</code></pre></div>",
+            "<p><b>Explanation:</b></p><ul><li><code>employee_id</code> uniquely identifies an employee.</li><li><code>department_id</code> stores the employee's department reference.</li><li><code>CONSTRAINT fk_employees_department</code> gives the constraint a descriptive name.</li><li><code>FOREIGN KEY (department_id)</code> identifies the child-table column.</li><li><code>REFERENCES departments(department_id)</code> identifies the referenced table and key.</li></ul>",
+            "<div class=\"definition-box\"><b>Remember:</b> Create the parent table before the child table when defining a foreign key relationship. In MySQL, both tables should use a foreign-key-supporting storage engine such as InnoDB.</div>",
+            "<h3>5. Inserting Valid Records</h3>",
+            "<p>Insert employees using department IDs that already exist in the parent table.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department_id)\nVALUES\n    (101, 'Ravi', 10),\n    (102, 'Priya', 20),\n    (103, 'Arun', 10);</code></pre></div>",
+            "<p>These inserts succeed because department IDs 10 and 20 exist in the departments table.</p>",
+            "<h3>6. What Happens When a Foreign Key Value Does Not Exist?</h3>",
+            "<p>Try inserting an employee with a department ID that does not exist.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department_id)\nVALUES\n    (104, 'Kiran', 99);</code></pre></div>",
+            "<p><b>Result:</b> MySQL rejects the insert because department ID 99 is not present in the parent table. This prevents an employee from referencing a nonexistent department.</p>",
+            "<div class=\"diagram\"><pre>Parent table department IDs:\n10, 20, 30\n\nChild row attempts department_id = 99\n\n99 is not present in parent table\n             |\n             v\n     FOREIGN KEY ERROR</pre></div>",
+            "<h3>7. Can a Foreign Key Contain NULL?</h3>",
+            "<p>Yes. A foreign key column can contain NULL when it is not declared NOT NULL. NULL means the row does not currently specify a referenced department.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department_id)\nVALUES\n    (105, 'Sita', NULL);</code></pre></div>",
+            "<p>This insert is allowed by the foreign key constraint because NULL does not reference a nonexistent department. If the business rule requires every employee to belong to a department, declare <code>department_id INT NOT NULL</code> as well.</p>",
+            "<h3>8. What Happens When We Delete a Parent Record?</h3>",
+            "<p>Suppose department 10 has employees. Attempt to delete that department.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM departments\nWHERE department_id = 10;</code></pre></div>",
+            "<p>With the default restrictive behavior, MySQL prevents the deletion while child rows reference that department. You must first handle the dependent employee records or define a suitable referential action.</p>",
+            "<h3>9. ON DELETE and ON UPDATE</h3>",
+            "<p>Foreign keys can specify what happens when the referenced parent row is deleted or its key is updated.</p>",
+            "<table><tr><th>Action</th><th>Meaning</th></tr><tr><td>RESTRICT</td><td>Reject the parent change when dependent rows exist.</td></tr><tr><td>CASCADE</td><td>Propagate the delete or key update to related child rows.</td></tr><tr><td>SET NULL</td><td>Set the child foreign key to NULL when the parent is deleted or updated, where supported and permitted by the column definition.</td></tr><tr><td>NO ACTION</td><td>In MySQL InnoDB, behaves like RESTRICT for foreign key checks.</td></tr></table>",
+            "<p>Example using <code>ON DELETE CASCADE</code>:</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE departments_cascade (\n    department_id INT PRIMARY KEY,\n    department_name VARCHAR(100) NOT NULL\n);\n\nCREATE TABLE employees_cascade (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    department_id INT,\n    CONSTRAINT fk_emp_dept_cascade\n        FOREIGN KEY (department_id)\n        REFERENCES departments_cascade(department_id)\n        ON DELETE CASCADE\n        ON UPDATE CASCADE\n);</code></pre></div>",
+            "<p>With this configuration, deleting a department automatically deletes employees that reference it. Updating a referenced department ID propagates the new ID to child rows. Use cascading deletes carefully because they can remove many related records.</p>",
+            "<h3>10. Adding a Foreign Key to an Existing Table</h3>",
+            "<p>You can add a foreign key after creating both tables, provided the existing child values satisfy the relationship.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nADD CONSTRAINT fk_employees_department\nFOREIGN KEY (department_id)\nREFERENCES departments(department_id);</code></pre></div>",
+            "<p>If existing employee rows contain department IDs that are missing from the parent table, MySQL rejects the constraint addition until those records are corrected.</p>",
+            "<h3>11. Removing a Foreign Key</h3>",
+            "<p>In MySQL, use the constraint name with <code>DROP FOREIGN KEY</code>.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nDROP FOREIGN KEY fk_employees_department;</code></pre></div>",
+            "<p>This removes the foreign key constraint, not the <code>department_id</code> column itself. The column remains, but MySQL no longer enforces that relationship through this constraint.</p>",
+            "<h3>12. Primary Key vs Foreign Key</h3>",
+            "<table><tr><th>Feature</th><th>Primary Key</th><th>Foreign Key</th></tr><tr><td>Main purpose</td><td>Uniquely identifies a row</td><td>Connects related tables</td></tr><tr><td>Duplicate values</td><td>Not allowed</td><td>Allowed when the relationship permits multiple child rows to reference one parent</td></tr><tr><td>NULL values</td><td>Not allowed</td><td>Allowed unless the column is NOT NULL</td></tr><tr><td>How many per table?</td><td>One primary key constraint</td><td>Multiple foreign key constraints are allowed</td></tr><tr><td>Example</td><td>employees.employee_id</td><td>employees.department_id</td></tr></table>",
+            "<h3>13. Foreign Keys in Data Engineering</h3>",
+            "<p>Foreign keys represent relationships that matter when integrating data from multiple sources and building reliable datasets.</p>",
+            "<ul><li><b>Relational integrity:</b> Prevents child records from referencing missing parent records.</li><li><b>Data validation:</b> Helps detect invalid references during ingestion or transformation.</li><li><b>Joins:</b> Identifies the columns commonly used to connect tables.</li><li><b>Warehouse modeling:</b> Fact tables often reference dimension identifiers.</li><li><b>Pipeline quality checks:</b> Helps reveal orphan records when loading data from external files or systems.</li></ul>",
+            "<p>For example, an incoming orders file may contain a customer ID that is missing from the customer dataset. A pipeline can identify these records before loading them into a relational target.</p>",
+            "<div class=\"code-block\"><pre><code>-- Find orders whose customer does not exist\nSELECT\n    o.order_id,\n    o.customer_id\nFROM orders AS o\nLEFT JOIN customers AS c\n    ON o.customer_id = c.customer_id\nWHERE c.customer_id IS NULL;</code></pre></div>",
+            "<p>This query finds orders without a matching customer, assuming <code>customers.customer_id</code> is a non-NULL identifier. It is a data-quality check; it does not itself create a foreign key or enforce integrity.</p>",
+            "<div class=\"definition-box\"><b>Key Takeaway:</b> A foreign key connects a child table to a referenced key in a parent table. It protects referential integrity, while primary keys identify individual rows.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1:</b> Create and select a practice database.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE foreign_key_practice;\nUSE foreign_key_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2:</b> Create a parent table named departments.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE departments (\n    department_id INT PRIMARY KEY,\n    department_name VARCHAR(100) NOT NULL\n);\n\nINSERT INTO departments\n    (department_id, department_name)\nVALUES\n    (10, 'IT'),\n    (20, 'HR'),\n    (30, 'Finance');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3:</b> Create a child table named employees with a foreign key.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    department_id INT,\n    CONSTRAINT fk_employee_department\n        FOREIGN KEY (department_id)\n        REFERENCES departments(department_id)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4:</b> Insert valid employees referencing existing departments.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department_id)\nVALUES\n    (101, 'Ravi', 10),\n    (102, 'Priya', 20),\n    (103, 'Arun', 10);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5:</b> Attempt to insert an employee referencing department 99. Observe the foreign key error.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department_id)\nVALUES\n    (104, 'Kiran', 99);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6:</b> Insert an employee whose department ID is NULL. Explain why this is permitted by the current table definition.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, department_id)\nVALUES\n    (105, 'Sita', NULL);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7:</b> Try deleting department 10 while employees still reference it. Observe what happens.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM departments\nWHERE department_id = 10;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8:</b> Retrieve employees with their department names using a JOIN.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    e.employee_id,\n    e.employee_name,\n    d.department_name\nFROM employees AS e\nLEFT JOIN departments AS d\n    ON e.department_id = d.department_id;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 9:</b> Data Engineering exercise: write a LEFT JOIN query to find employee rows whose non-NULL department IDs do not match a department. Explain how this check can help validate a dataset before loading it into a database with foreign key constraints.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Create parent-child tables, define foreign keys, identify invalid references, understand NULL behavior, test parent deletion rules, and use joins to validate relationships.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is a foreign key?",
+              "a": "A foreign key is a column or group of columns that references an eligible key in another table and helps maintain referential integrity."
+            },
+            {
+              "q": "Q2. What are parent and child tables?",
+              "a": "The parent table contains the referenced key. The child table contains the foreign key that points to that key."
+            },
+            {
+              "q": "Q3. Can a foreign key contain duplicate values?",
+              "a": "Yes. Multiple child rows can reference the same parent row. For example, many employees can belong to department 10."
+            },
+            {
+              "q": "Q4. Can a foreign key contain NULL?",
+              "a": "Yes, if the foreign key column permits NULL. Declare it NOT NULL if every child row must have a reference."
+            },
+            {
+              "q": "Q5. What happens if we insert a foreign key value that does not exist in the parent table?",
+              "a": "MySQL rejects the insert or update when foreign key enforcement is active because the referenced parent key does not exist."
+            },
+            {
+              "q": "Q6. Can a table have multiple foreign keys?",
+              "a": "Yes. A table can have multiple foreign key constraints referencing the same or different parent tables."
+            },
+            {
+              "q": "Q7. What is referential integrity?",
+              "a": "Referential integrity ensures that non-NULL foreign key values correspond to valid referenced key values, preventing invalid relationships."
+            },
+            {
+              "q": "Q8. What is ON DELETE CASCADE?",
+              "a": "It automatically deletes related child rows when the referenced parent row is deleted. It should be used carefully because many records may be removed."
+            },
+            {
+              "q": "Q9. What is the difference between RESTRICT and CASCADE?",
+              "a": "RESTRICT prevents a parent deletion or update when dependent rows would be affected. CASCADE propagates the change to related child rows."
+            },
+            {
+              "q": "Q10. How do you add a foreign key to an existing table?",
+              "a": "Use ALTER TABLE child_table ADD CONSTRAINT constraint_name FOREIGN KEY (child_column) REFERENCES parent_table(parent_column). Existing data must satisfy the relationship."
+            },
+            {
+              "q": "Q11. How do you remove a foreign key in MySQL?",
+              "a": "Use ALTER TABLE child_table DROP FOREIGN KEY constraint_name. This removes the constraint, not the column."
+            },
+            {
+              "q": "Q12. What is the difference between a primary key and a foreign key?",
+              "a": "A primary key uniquely identifies rows in its own table. A foreign key references a key in another table to connect records and enforce referential integrity."
+            },
+            {
+              "q": "Q13. How are foreign keys useful in Data Engineering?",
+              "a": "They help maintain relationships between datasets, prevent invalid references in relational targets, support data modeling, and provide a basis for data-quality checks."
+            },
+            {
+              "q": "Q14. Does a foreign key automatically clean duplicate data in an incoming file?",
+              "a": "No. A foreign key validates references, not general duplicate records. A data pipeline needs separate deduplication and validation logic."
+            }
+          ]
+        },
+        {
+          "n": 22,
+          "title": "UNIQUE",
+          "explanation": [
+            "<h3>1. What Is a UNIQUE Constraint?</h3>",
+            "<p>A <b>UNIQUE</b> constraint ensures that values in a column, or a combination of columns, do not duplicate other existing non-NULL values in the same constrained key.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> UNIQUE is a database constraint that prevents duplicate values in a column or combination of columns. In MySQL, a UNIQUE constraint generally permits multiple NULL values because NULL is treated as an unknown value.</div>",
+            "<h3>2. Why Do We Need UNIQUE?</h3>",
+            "<p>Imagine an employee table where each employee has an ID and an email address. The employee ID identifies the employee, while the email address should not be shared by two employees if the business rule requires each email to be unique.</p>",
+            "<table><tr><th>employee_id</th><th>employee_name</th><th>email</th></tr><tr><td>101</td><td>Ravi</td><td>ravi@example.com</td></tr><tr><td>102</td><td>Priya</td><td>priya@example.com</td></tr><tr><td>103</td><td>Arun</td><td>arun@example.com</td></tr></table>",
+            "<p>Here, <code>employee_id</code> can be the PRIMARY KEY, while <code>email</code> can have a UNIQUE constraint to prevent duplicate email addresses.</p>",
+            "<h3>3. Creating a Table with UNIQUE</h3>",
+            "<p>You can define a UNIQUE constraint while creating a table.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE unique_practice;\nUSE unique_practice;\n\nCREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    email VARCHAR(150) UNIQUE,\n    phone VARCHAR(15) UNIQUE\n);</code></pre></div>",
+            "<p><b>Explanation:</b></p><ul><li><code>employee_id INT PRIMARY KEY</code> uniquely identifies each employee.</li><li><code>email VARCHAR(150) UNIQUE</code> prevents duplicate non-NULL email values.</li><li><code>phone VARCHAR(15) UNIQUE</code> prevents duplicate non-NULL phone values.</li></ul>",
+            "<div class=\"definition-box\"><b>Important:</b> A table can have multiple UNIQUE constraints. In this example, email and phone are independently unique, but neither is the primary key.</div>",
+            "<h3>4. Inserting Valid Records</h3>",
+            "<p>Insert employees with different email addresses and phone numbers.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email, phone)\nVALUES\n    (101, 'Ravi', 'ravi@example.com', '9000000001'),\n    (102, 'Priya', 'priya@example.com', '9000000002'),\n    (103, 'Arun', 'arun@example.com', '9000000003');\n\nSELECT * FROM employees;</code></pre></div>",
+            "<p>These records are valid because no non-NULL email or phone number is repeated.</p>",
+            "<h3>5. What Happens When You Insert a Duplicate Value?</h3>",
+            "<p>Try inserting another employee using an email address that already exists.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email, phone)\nVALUES\n    (104, 'Kiran', 'ravi@example.com', '9000000004');</code></pre></div>",
+            "<p><b>Result:</b> MySQL rejects the insertion because <code>ravi@example.com</code> already exists in the email column.</p>",
+            "<p>You can also test the phone constraint independently:</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email, phone)\nVALUES\n    (104, 'Kiran', 'kiran@example.com', '9000000001');</code></pre></div>",
+            "<p>This insert also fails because phone number <code>9000000001</code> already belongs to another row.</p>",
+            "<h3>6. Can UNIQUE Columns Contain NULL?</h3>",
+            "<p>In MySQL, a UNIQUE constraint generally allows multiple NULL values. This is different from a PRIMARY KEY, which cannot contain NULL.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email, phone)\nVALUES\n    (104, 'Kiran', NULL, '9000000004'),\n    (105, 'Sita', NULL, '9000000005');</code></pre></div>",
+            "<p>Both rows can be inserted because NULL does not represent a known duplicate email value. However, duplicate non-NULL email values are rejected.</p>",
+            "<p>If every employee must have an email address, combine UNIQUE with NOT NULL:</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employee_accounts (\n    employee_id INT PRIMARY KEY,\n    email VARCHAR(150) NOT NULL UNIQUE\n);</code></pre></div>",
+            "<p>Now every row must provide an email, and each email must be unique.</p>",
+            "<h3>7. UNIQUE on Multiple Columns</h3>",
+            "<p>A UNIQUE constraint can apply to a combination of columns. In this case, the combination must be unique, but each individual column may contain repeated values.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE course_enrollments (\n    enrollment_id INT PRIMARY KEY,\n    student_id INT NOT NULL,\n    course_id INT NOT NULL,\n    enrollment_date DATE,\n    CONSTRAINT uq_student_course\n        UNIQUE (student_id, course_id)\n);</code></pre></div>",
+            "<p>This design prevents the same student from being enrolled in the same course more than once. A student can enroll in multiple courses, and a course can have multiple students.</p>",
+            "<table><tr><th>student_id</th><th>course_id</th><th>Allowed?</th></tr><tr><td>1</td><td>101</td><td>Yes</td></tr><tr><td>1</td><td>102</td><td>Yes</td></tr><tr><td>2</td><td>101</td><td>Yes</td></tr><tr><td>1</td><td>101</td><td>No — duplicate combination</td></tr></table>",
+            "<h3>8. Adding UNIQUE to an Existing Table</h3>",
+            "<p>You can add a UNIQUE constraint using <code>ALTER TABLE</code>.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100),\n    email VARCHAR(150)\n);\n\nALTER TABLE customers\nADD CONSTRAINT uq_customers_email UNIQUE (email);</code></pre></div>",
+            "<p>If the existing data contains duplicate non-NULL email values, MySQL rejects the addition until the duplicates are resolved.</p>",
+            "<h3>9. Removing a UNIQUE Constraint</h3>",
+            "<p>In MySQL, a UNIQUE constraint is implemented using a unique index. To remove it, drop the corresponding index.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE customers\nDROP INDEX uq_customers_email;</code></pre></div>",
+            "<p>The index name is the name assigned to the constraint in this example. Dropping the unique index removes that uniqueness enforcement. If another database object depends on it, handle that dependency first.</p>",
+            "<h3>10. PRIMARY KEY vs UNIQUE</h3>",
+            "<table><tr><th>Feature</th><th>PRIMARY KEY</th><th>UNIQUE</th></tr><tr><td>Purpose</td><td>Identifies each row</td><td>Prevents duplicate key values</td></tr><tr><td>Duplicate non-NULL values</td><td>Not allowed</td><td>Not allowed</td></tr><tr><td>NULL values in MySQL</td><td>Not allowed</td><td>Generally multiple NULL values are allowed</td></tr><tr><td>Number per table</td><td>One primary key constraint</td><td>Multiple UNIQUE constraints</td></tr><tr><td>Typical example</td><td>employee_id</td><td>email, phone</td></tr></table>",
+            "<h3>11. UNIQUE vs DISTINCT</h3>",
+            "<p>These two SQL features are related to duplicate values, but they work differently.</p>",
+            "<ul><li><b>UNIQUE:</b> A constraint that prevents duplicate key values from being stored.</li><li><b>DISTINCT:</b> A SELECT keyword that removes duplicate result rows from the query output.</li></ul>",
+            "<div class=\"code-block\"><pre><code>-- UNIQUE is defined when creating or altering a table\nCREATE TABLE users (\n    user_id INT PRIMARY KEY,\n    username VARCHAR(100) UNIQUE\n);\n\n-- DISTINCT filters duplicates from query results\nSELECT DISTINCT department\nFROM employee_records;</code></pre></div>",
+            "<p><code>SELECT DISTINCT</code> does not prevent duplicate values from being inserted into a table. Only an appropriate constraint or index can enforce that rule.</p>",
+            "<h3>12. UNIQUE in Data Engineering</h3>",
+            "<p>UNIQUE constraints can help protect data quality when records are loaded into relational databases.</p>",
+            "<ul><li><b>Business identifiers:</b> Enforce uniqueness for email addresses, usernames, or external reference codes when required by the business rules.</li><li><b>Duplicate prevention:</b> Reject repeated non-NULL values in a constrained key.</li><li><b>Composite uniqueness:</b> Prevent duplicate combinations, such as the same student-course pair or source-system-record pair.</li><li><b>Pipeline validation:</b> Identify duplicates in incoming datasets before inserting them into a target table.</li></ul>",
+            "<p>Example: check for duplicate source record identifiers before loading a dataset.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    source_record_id,\n    COUNT(*) AS record_count\nFROM staging_records\nGROUP BY source_record_id\nHAVING COUNT(*) &gt; 1;</code></pre></div>",
+            "<p>This query finds repeated non-NULL identifiers in the staging data. It is a validation query, not a UNIQUE constraint. If the source identifier is supposed to be unique, investigate the duplicates before loading the records.</p>",
+            "<div class=\"definition-box\"><b>Key Takeaway:</b> UNIQUE prevents duplicate values in a column or combination of columns. MySQL generally permits multiple NULL values in a UNIQUE key, and multiple UNIQUE constraints can exist in the same table.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1:</b> Create a practice database and select it.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE unique_constraint_practice;\nUSE unique_constraint_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2:</b> Create an employees table with unique email and phone columns.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    email VARCHAR(150) UNIQUE,\n    phone VARCHAR(15) UNIQUE\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3:</b> Insert three records with different email addresses and phone numbers.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email, phone)\nVALUES\n    (101, 'Ravi', 'ravi@example.com', '9000000001'),\n    (102, 'Priya', 'priya@example.com', '9000000002'),\n    (103, 'Arun', 'arun@example.com', '9000000003');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4:</b> Attempt to insert a duplicate email address. Observe the error.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email, phone)\nVALUES\n    (104, 'Kiran', 'ravi@example.com', '9000000004');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5:</b> Insert two employees with NULL email values but different employee IDs and phone numbers. Observe whether MySQL permits them.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email, phone)\nVALUES\n    (105, 'Sita', NULL, '9000000005'),\n    (106, 'Mohan', NULL, '9000000006');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6:</b> Create a course enrollment table with a composite UNIQUE constraint.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE course_enrollments (\n    enrollment_id INT PRIMARY KEY,\n    student_id INT NOT NULL,\n    course_id INT NOT NULL,\n    CONSTRAINT uq_student_course\n        UNIQUE (student_id, course_id)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7:</b> Insert valid student-course combinations, then try inserting the same combination twice.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO course_enrollments\n    (enrollment_id, student_id, course_id)\nVALUES\n    (1, 101, 501),\n    (2, 101, 502),\n    (3, 102, 501);\n\n-- This should fail because the combination already exists\nINSERT INTO course_enrollments\n    (enrollment_id, student_id, course_id)\nVALUES\n    (4, 101, 501);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8:</b> Data Engineering exercise: create a staging table containing source_record_id values, insert a few duplicate IDs, and use GROUP BY with HAVING COUNT(*) &gt; 1 to identify them before loading the target table.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Understand single-column and composite UNIQUE constraints, test duplicate and NULL behavior, alter an existing table, and identify duplicates in staging data.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is a UNIQUE constraint?",
+              "a": "A UNIQUE constraint prevents duplicate key values in a column or combination of columns."
+            },
+            {
+              "q": "Q2. Can a table have multiple UNIQUE constraints?",
+              "a": "Yes. A table can have multiple UNIQUE constraints on different columns or combinations of columns."
+            },
+            {
+              "q": "Q3. Can a UNIQUE column contain NULL in MySQL?",
+              "a": "Yes. MySQL generally allows multiple NULL values in a UNIQUE key because NULL is treated as an unknown value. A NOT NULL constraint can be added if NULL is not allowed."
+            },
+            {
+              "q": "Q4. What happens when a duplicate value is inserted into a UNIQUE column?",
+              "a": "MySQL rejects the insert or update with a duplicate-key error if the value duplicates an existing non-NULL value in the unique key."
+            },
+            {
+              "q": "Q5. What is the difference between PRIMARY KEY and UNIQUE?",
+              "a": "A primary key identifies each row and cannot contain NULL. A table has one primary key constraint but can have multiple UNIQUE constraints; MySQL generally permits multiple NULL values in a UNIQUE key."
+            },
+            {
+              "q": "Q6. What is a composite UNIQUE constraint?",
+              "a": "It enforces uniqueness across a combination of columns. Individual columns may repeat, but the constrained combination cannot duplicate another non-NULL combination."
+            },
+            {
+              "q": "Q7. How do you add UNIQUE to an existing table?",
+              "a": "Use ALTER TABLE table_name ADD CONSTRAINT constraint_name UNIQUE (column_name). Existing duplicate values must be resolved before the constraint can be added."
+            },
+            {
+              "q": "Q8. How do you remove a UNIQUE constraint in MySQL?",
+              "a": "Use ALTER TABLE table_name DROP INDEX index_name, using the name of the unique index associated with the constraint."
+            },
+            {
+              "q": "Q9. What is the difference between UNIQUE and DISTINCT?",
+              "a": "UNIQUE enforces a rule on stored data. DISTINCT removes duplicate result rows from a SELECT query without preventing duplicates from being stored."
+            },
+            {
+              "q": "Q10. Does UNIQUE automatically remove existing duplicate records?",
+              "a": "No. Existing duplicate non-NULL key values must be resolved before a UNIQUE constraint can be created."
+            },
+            {
+              "q": "Q11. Can a UNIQUE constraint contain multiple columns?",
+              "a": "Yes. For example, UNIQUE (student_id, course_id) prevents the same student-course combination from being stored twice."
+            },
+            {
+              "q": "Q12. Why is UNIQUE useful in Data Engineering?",
+              "a": "It helps enforce business-key rules in target tables and prevents duplicate identifiers or duplicate combinations. Data pipelines should still validate and resolve duplicate staging records before loading."
+            }
+          ]
+        },
+        {
+          "n": 23,
+          "title": "NOT NULL",
+          "explanation": [
+            "<h3>1. What Is the NOT NULL Constraint?</h3>",
+            "<p>The <b>NOT NULL</b> constraint ensures that a column must contain a value and cannot store SQL NULL. It is used when a particular piece of information is mandatory for every record.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> NOT NULL is a constraint that prevents a column from storing NULL values. Every inserted or updated row must have a non-NULL value in that column.</div>",
+            "<h3>2. Why Do We Need NOT NULL?</h3>",
+            "<p>Imagine an employee table. Every employee must have an employee name, but the department may be optional. We can use NOT NULL for the name and allow NULL in the department column.</p>",
+            "<table><tr><th>employee_id</th><th>employee_name</th><th>department</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td></tr><tr><td>102</td><td>Priya</td><td>HR</td></tr><tr><td>103</td><td>Arun</td><td>NULL</td></tr></table>",
+            "<p>If the table defines <code>employee_name</code> as NOT NULL, the third record is valid because the name exists. The department can be NULL because that column permits it.</p>",
+            "<h3>3. Creating a Table with NOT NULL</h3>",
+            "<p>You can define NOT NULL when creating a table.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE not_null_practice;\nUSE not_null_practice;\n\nCREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    email VARCHAR(150),\n    salary DECIMAL(10,2) NOT NULL\n);</code></pre></div>",
+            "<p><b>Explanation:</b></p><ul><li><code>employee_id INT PRIMARY KEY</code> uniquely identifies each employee and cannot be NULL.</li><li><code>employee_name VARCHAR(100) NOT NULL</code> requires a non-NULL employee name.</li><li><code>email VARCHAR(150)</code> permits NULL because NOT NULL is not specified.</li><li><code>salary DECIMAL(10,2) NOT NULL</code> requires a non-NULL salary value.</li></ul>",
+            "<div class=\"definition-box\"><b>Remember:</b> NOT NULL only prevents NULL. It does not automatically prevent empty strings, zero, negative numbers, or strings containing only spaces. Other rules may be needed to validate those values.</div>",
+            "<h3>4. Inserting Valid Records</h3>",
+            "<p>Insert records that provide values for all NOT NULL columns.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email, salary)\nVALUES\n    (101, 'Ravi', 'ravi@example.com', 35000.00),\n    (102, 'Priya', 'priya@example.com', 40000.00),\n    (103, 'Arun', NULL, 30000.00);\n\nSELECT * FROM employees;</code></pre></div>",
+            "<p>All three rows are valid. The email column allows NULL, while the employee name and salary columns contain values.</p>",
+            "<h3>5. What Happens When We Insert NULL?</h3>",
+            "<p>Try inserting a record without an employee name.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email, salary)\nVALUES\n    (104, NULL, 'kiran@example.com', 28000.00);</code></pre></div>",
+            "<p><b>Result:</b> MySQL rejects the insert because <code>employee_name</code> is defined as NOT NULL.</p>",
+            "<p>You can also omit a required column from an INSERT statement:</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email)\nVALUES\n    (105, 'Kiran', 'kiran@example.com');</code></pre></div>",
+            "<p>This insert fails because <code>salary</code> is NOT NULL and has no default value. If a required column has a suitable default, omitting it can be valid because the database supplies that default.</p>",
+            "<h3>6. Difference Between NULL, Zero, and Empty String</h3>",
+            "<p>These values are not the same.</p>",
+            "<table><tr><th>Value</th><th>Meaning</th><th>Example</th></tr><tr><td>NULL</td><td>Missing, unknown, or unavailable value</td><td>No salary information provided</td></tr><tr><td>0</td><td>A numeric value equal to zero</td><td>Bonus is zero</td></tr><tr><td>''</td><td>An empty string</td><td>Name field contains no characters</td></tr><tr><td>' '</td><td>A string containing a space</td><td>Name field contains whitespace</td></tr></table>",
+            "<p>A NOT NULL constraint rejects SQL NULL, but an empty string or a zero is not NULL. To prevent those values, you need additional validation rules.</p>",
+            "<h3>7. NOT NULL with DEFAULT</h3>",
+            "<p>A DEFAULT value can provide a value when a column is omitted from an INSERT statement. If a column is both NOT NULL and has a suitable default, the database can use that default when the column is omitted.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE tasks (\n    task_id INT PRIMARY KEY,\n    task_name VARCHAR(100) NOT NULL,\n    status VARCHAR(20) NOT NULL DEFAULT 'Pending'\n);\n\nINSERT INTO tasks (task_id, task_name)\nVALUES (1, 'Load customer data');\n\nSELECT * FROM tasks;</code></pre></div>",
+            "<p>The inserted task receives <code>Pending</code> as its status because the status column was omitted and has a default value.</p>",
+            "<p>However, explicitly inserting NULL into a NOT NULL column is not the same as omitting the column. A default generally does not replace an explicitly supplied NULL; the NOT NULL constraint rejects it.</p>",
+            "<h3>8. Adding NOT NULL to an Existing Column</h3>",
+            "<p>You can modify an existing column using <code>ALTER TABLE</code>. Before doing this, check the existing data for NULL values.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE email IS NULL;</code></pre></div>",
+            "<p>Suppose you decide that every employee must have an email address. First, resolve the missing email values using verified data or an appropriate business rule. Then change the column:</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nMODIFY email VARCHAR(150) NOT NULL;</code></pre></div>",
+            "<p>MySQL rejects this change if existing rows contain NULL emails. Do not fill missing values with invented information just to satisfy the constraint.</p>",
+            "<h3>9. Removing NOT NULL</h3>",
+            "<p>If a column should become optional, modify its definition to allow NULL.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nMODIFY email VARCHAR(150) NULL;</code></pre></div>",
+            "<p>This example makes email nullable again. When modifying a MySQL column, include its data type and preserve any other column attributes you need, such as DEFAULT values or comments.</p>",
+            "<h3>10. NOT NULL vs PRIMARY KEY vs UNIQUE</h3>",
+            "<table><tr><th>Feature</th><th>NOT NULL</th><th>PRIMARY KEY</th><th>UNIQUE</th></tr><tr><td>Main purpose</td><td>Prevents NULL</td><td>Uniquely identifies a row</td><td>Prevents duplicate key values</td></tr><tr><td>NULL allowed?</td><td>No</td><td>No</td><td>Generally multiple NULL values allowed in MySQL</td></tr><tr><td>Duplicate non-NULL values?</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Multiple constraints per table?</td><td>Yes</td><td>One primary key constraint</td><td>Yes</td></tr></table>",
+            "<p>These constraints can be combined. For example, <code>email VARCHAR(150) NOT NULL UNIQUE</code> requires every row to have an email and prevents duplicate email values.</p>",
+            "<h3>11. NOT NULL in Data Engineering</h3>",
+            "<p>Data pipelines often depend on required fields to process records reliably. NOT NULL can enforce mandatory data in a relational target table.</p>",
+            "<ul><li><b>Required identifiers:</b> Ensure a record ID is always supplied.</li><li><b>Business-critical fields:</b> Require mandatory attributes such as order date or transaction amount when the schema and business rules demand them.</li><li><b>Target-table validation:</b> Reject incomplete records that violate the table definition.</li><li><b>Pipeline quality checks:</b> Find missing values in staging data before loading.</li></ul>",
+            "<p>Example: find orders that are missing a required order identifier or order date in a staging table.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM staging_orders\nWHERE order_id IS NULL\n   OR order_date IS NULL;</code></pre></div>",
+            "<p>This query identifies incomplete records before loading them into a target table. The staging columns must allow NULL for such records to exist there; otherwise, the database may reject them at insertion time.</p>",
+            "<div class=\"definition-box\"><b>Key Takeaway:</b> NOT NULL ensures that a column cannot store SQL NULL. Use it for mandatory fields, and remember that NULL, zero, and an empty string are different values.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1:</b> Create a practice database and select it.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE not_null_constraint_practice;\nUSE not_null_constraint_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2:</b> Create an employees table with required and optional columns.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    email VARCHAR(150),\n    salary DECIMAL(10,2) NOT NULL\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3:</b> Insert two valid employees, including one with a NULL email.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email, salary)\nVALUES\n    (101, 'Ravi', 'ravi@example.com', 35000.00),\n    (102, 'Priya', NULL, 40000.00);\n\nSELECT * FROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4:</b> Attempt to insert an employee with a NULL name. Observe the error.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email, salary)\nVALUES\n    (103, NULL, 'arun@example.com', 30000.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5:</b> Attempt to insert a record without specifying salary. Explain why it fails.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, email)\nVALUES\n    (104, 'Kiran', 'kiran@example.com');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6:</b> Create a tasks table with a NOT NULL column and a default value.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE tasks (\n    task_id INT PRIMARY KEY,\n    task_name VARCHAR(100) NOT NULL,\n    status VARCHAR(20) NOT NULL DEFAULT 'Pending'\n);\n\nINSERT INTO tasks (task_id, task_name)\nVALUES (1, 'Load customer data');\n\nSELECT * FROM tasks;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7:</b> Compare NULL, zero, and empty strings by inserting appropriate test values into nullable columns. Explain why NOT NULL alone does not reject all empty-looking values.</p>",
+            "<p class=\"practice-note\"><b>Step 8:</b> Data Engineering exercise: create a staging_orders table with nullable order_id and order_date columns. Insert a mixture of complete and incomplete records, then use WHERE with IS NULL to identify rows that should be reviewed before loading.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Apply NOT NULL, understand insert failures, combine NOT NULL with DEFAULT, modify column nullability, and validate mandatory fields in staging data.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is the NOT NULL constraint?",
+              "a": "NOT NULL prevents a column from storing SQL NULL values. Every row must contain a non-NULL value in that column."
+            },
+            {
+              "q": "Q2. Why do we use NOT NULL?",
+              "a": "We use it when a field is mandatory and missing values are not permitted by the data model or business rules."
+            },
+            {
+              "q": "Q3. What happens if we insert NULL into a NOT NULL column?",
+              "a": "MySQL rejects the insert or update because it violates the column constraint."
+            },
+            {
+              "q": "Q4. Can a NOT NULL column contain zero?",
+              "a": "Yes. Zero is a valid numeric value, not SQL NULL. Other constraints or validation logic may be needed if zero is not allowed."
+            },
+            {
+              "q": "Q5. Can a NOT NULL string column contain an empty string?",
+              "a": "Yes. An empty string is different from NULL. NOT NULL alone does not reject empty strings or whitespace-only strings."
+            },
+            {
+              "q": "Q6. What is the difference between NULL and an empty string?",
+              "a": "NULL represents a missing, unknown, or unavailable value. An empty string is a string containing zero characters."
+            },
+            {
+              "q": "Q7. Can we combine NOT NULL and UNIQUE?",
+              "a": "Yes. For example, email VARCHAR(150) NOT NULL UNIQUE requires an email value and prevents duplicate non-NULL email values."
+            },
+            {
+              "q": "Q8. Can we add NOT NULL to an existing column?",
+              "a": "Yes, using ALTER TABLE ... MODIFY in MySQL. Existing NULL values must be resolved before the change can succeed."
+            },
+            {
+              "q": "Q9. What is the relationship between NOT NULL and DEFAULT?",
+              "a": "DEFAULT supplies a value when an insert omits the column. NOT NULL rejects NULL values; a default generally does not replace an explicitly supplied NULL."
+            },
+            {
+              "q": "Q10. How can we find NULL values in SQL?",
+              "a": "Use WHERE column_name IS NULL. Do not use column_name = NULL because SQL NULL must be checked using IS NULL or IS NOT NULL."
+            },
+            {
+              "q": "Q11. What is the difference between PRIMARY KEY and NOT NULL?",
+              "a": "NOT NULL only prevents NULL values. PRIMARY KEY also enforces uniqueness and identifies each row."
+            },
+            {
+              "q": "Q12. Why is NOT NULL important in Data Engineering?",
+              "a": "It helps enforce mandatory fields in target tables and supports data-quality rules. Pipelines can also identify missing required fields in staging data before loading."
+            }
+          ]
+        },
+        {
+          "n": 24,
+          "title": "DEFAULT",
+          "explanation": [
+            "<h3>1. What Is the DEFAULT Constraint?</h3>",
+            "<p>The <b>DEFAULT</b> constraint specifies a value that the database uses when an INSERT statement does not provide a value for a column.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> DEFAULT provides a predefined value for a column when the INSERT statement omits that column or explicitly requests the DEFAULT value.</div>",
+            "<h3>2. Why Do We Need DEFAULT?</h3>",
+            "<p>Imagine an application that creates tasks. Every new task should initially have the status <code>Pending</code>. Instead of requiring every INSERT statement to specify the status, we can define a default value.</p>",
+            "<table><tr><th>task_id</th><th>task_name</th><th>status</th></tr><tr><td>1</td><td>Load customer data</td><td>Pending</td></tr><tr><td>2</td><td>Validate records</td><td>Pending</td></tr><tr><td>3</td><td>Generate report</td><td>Completed</td></tr></table>",
+            "<p>The first two tasks can receive the default status automatically. The third task can specify a different status explicitly.</p>",
+            "<h3>3. Creating a Table with DEFAULT</h3>",
+            "<p>You can define a default value while creating a table.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE default_practice;\nUSE default_practice;\n\nCREATE TABLE tasks (\n    task_id INT PRIMARY KEY,\n    task_name VARCHAR(100) NOT NULL,\n    status VARCHAR(20) NOT NULL DEFAULT 'Pending',\n    priority INT DEFAULT 1\n);</code></pre></div>",
+            "<p><b>Explanation:</b></p><ul><li><code>task_id INT PRIMARY KEY</code> uniquely identifies each task.</li><li><code>task_name VARCHAR(100) NOT NULL</code> requires a task name.</li><li><code>status VARCHAR(20) NOT NULL DEFAULT 'Pending'</code> uses Pending when the status is omitted.</li><li><code>priority INT DEFAULT 1</code> uses 1 when priority is omitted.</li></ul>",
+            "<h3>4. Inserting Records Without Specifying Default Columns</h3>",
+            "<p>Insert a task without providing status or priority.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO tasks (task_id, task_name)\nVALUES (1, 'Load customer data');\n\nSELECT * FROM tasks;</code></pre></div>",
+            "<p>The resulting row receives <code>Pending</code> for status and <code>1</code> for priority.</p>",
+            "<table><tr><th>task_id</th><th>task_name</th><th>status</th><th>priority</th></tr><tr><td>1</td><td>Load customer data</td><td>Pending</td><td>1</td></tr></table>",
+            "<h3>5. Providing a Value Instead of Using DEFAULT</h3>",
+            "<p>You can override a default by explicitly providing a value in the INSERT statement.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO tasks\n    (task_id, task_name, status, priority)\nVALUES\n    (2, 'Validate records', 'In Progress', 2),\n    (3, 'Generate report', 'Completed', 3);\n\nSELECT * FROM tasks;</code></pre></div>",
+            "<p>The explicitly supplied values are used instead of the defaults. DEFAULT is only a fallback; it does not force every row to use the same value.</p>",
+            "<h3>6. Using the DEFAULT Keyword Explicitly</h3>",
+            "<p>You can request the column's default value directly by using the <code>DEFAULT</code> keyword.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO tasks\n    (task_id, task_name, status, priority)\nVALUES\n    (4, 'Check data quality', DEFAULT, DEFAULT);</code></pre></div>",
+            "<p>The status becomes <code>Pending</code>, and the priority becomes <code>1</code>.</p>",
+            "<h3>7. DEFAULT vs NULL</h3>",
+            "<p>DEFAULT and NULL have different meanings. DEFAULT requests a predefined value. NULL represents a missing, unknown, or unavailable value.</p>",
+            "<table><tr><th>Situation</th><th>Result</th></tr><tr><td>Column omitted with a DEFAULT defined</td><td>The default value is used.</td></tr><tr><td>Column explicitly set to DEFAULT</td><td>The default value is used.</td></tr><tr><td>Nullable column omitted without a DEFAULT</td><td>NULL is generally used.</td></tr><tr><td>Column explicitly set to NULL</td><td>NULL is stored if allowed; otherwise the operation is rejected.</td></tr></table>",
+            "<p>For example, in MySQL, explicitly inserting NULL into a NOT NULL column generally causes an error even if the column has a default. The default does not ordinarily replace an explicitly supplied NULL.</p>",
+            "<div class=\"code-block\"><pre><code>-- Uses the default status\nINSERT INTO tasks (task_id, task_name, status)\nVALUES (5, 'Prepare report', DEFAULT);\n\n-- Explicit NULL is not valid for this NOT NULL column\nINSERT INTO tasks (task_id, task_name, status)\nVALUES (6, 'Run pipeline', NULL);</code></pre></div>",
+            "<h3>8. DEFAULT with Numeric and String Values</h3>",
+            "<p>Default values can be numbers, strings, and other supported values appropriate for the column's data type.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE users (\n    user_id INT PRIMARY KEY,\n    username VARCHAR(100) NOT NULL,\n    account_status VARCHAR(20) NOT NULL DEFAULT 'Active',\n    login_count INT NOT NULL DEFAULT 0\n);\n\nINSERT INTO users (user_id, username)\nVALUES (101, 'ravi');</code></pre></div>",
+            "<p>The new user receives account status <code>Active</code> and login count <code>0</code>.</p>",
+            "<h3>9. DEFAULT with Date and Time Values</h3>",
+            "<p>MySQL supports expressions for default values in appropriate date and time columns. For example, a timestamp column can use the current timestamp when a row is created.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE pipeline_runs (\n    run_id INT PRIMARY KEY,\n    pipeline_name VARCHAR(100) NOT NULL,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nINSERT INTO pipeline_runs (run_id, pipeline_name)\nVALUES (1, 'customer_ingestion');</code></pre></div>",
+            "<p>When <code>created_at</code> is omitted, MySQL sets it to the current timestamp. This is useful for recording when a pipeline run or database record was created. Supported default expressions depend on the column type and MySQL version.</p>",
+            "<h3>10. Changing a DEFAULT Value</h3>",
+            "<p>Use <code>ALTER TABLE</code> to change the default value for a column. In MySQL, <code>ALTER COLUMN ... SET DEFAULT</code> changes the default for future inserts; it does not update existing rows.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE tasks\nALTER COLUMN priority SET DEFAULT 2;</code></pre></div>",
+            "<p>New rows that omit priority will now receive <code>2</code>, unless the INSERT statement provides another value.</p>",
+            "<h3>11. Removing a DEFAULT Value</h3>",
+            "<p>Use <code>ALTER COLUMN ... DROP DEFAULT</code> to remove a column's explicit default.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE tasks\nALTER COLUMN priority DROP DEFAULT;</code></pre></div>",
+            "<p>After removing the default, future inserts that omit priority will follow the column's remaining rules. If the column allows NULL, NULL can be used; if it is NOT NULL and has no default, the insert must supply a valid value.</p>",
+            "<h3>12. DEFAULT vs AUTO_INCREMENT</h3>",
+            "<table><tr><th>Feature</th><th>DEFAULT</th><th>AUTO_INCREMENT</th></tr><tr><td>Purpose</td><td>Provides a predefined value</td><td>Generates numeric identifiers</td></tr><tr><td>Typical use</td><td>Status, priority, timestamp</td><td>Primary key ID</td></tr><tr><td>Example</td><td>DEFAULT 'Pending'</td><td>id INT AUTO_INCREMENT</td></tr></table>",
+            "<p>DEFAULT supplies a configured value, while AUTO_INCREMENT generates sequence values for a suitable column. They solve different problems.</p>",
+            "<h3>13. DEFAULT in Data Engineering</h3>",
+            "<p>Default values are useful when designing data ingestion systems, operational metadata tables, and pipeline tracking tables.</p>",
+            "<ul><li><b>Pipeline status:</b> New pipeline runs can start with a status such as Pending.</li><li><b>Retry count:</b> A counter can start at zero.</li><li><b>Audit timestamps:</b> A record creation timestamp can be populated automatically.</li><li><b>Optional attributes:</b> A reasonable default can be supplied when the business rules define one.</li><li><b>Consistent inserts:</b> Applications do not need to repeat the same default value in every INSERT statement.</li></ul>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE etl_pipeline_runs (\n    run_id INT AUTO_INCREMENT PRIMARY KEY,\n    pipeline_name VARCHAR(100) NOT NULL,\n    run_status VARCHAR(20) NOT NULL DEFAULT 'Pending',\n    retry_count INT NOT NULL DEFAULT 0,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nINSERT INTO etl_pipeline_runs (pipeline_name)\nVALUES ('daily_customer_load');\n\nSELECT * FROM etl_pipeline_runs;</code></pre></div>",
+            "<p>When the pipeline run is registered, the database supplies the initial status, retry count, and creation timestamp. The pipeline application can update the status and retry count as execution progresses.</p>",
+            "<h3>14. Common Mistakes</h3>",
+            "<ul><li><b>Confusing DEFAULT with NOT NULL:</b> DEFAULT supplies a fallback value; NOT NULL prohibits NULL.</li><li><b>Assuming DEFAULT replaces explicit NULL:</b> An explicitly supplied NULL is not ordinarily replaced by the default.</li><li><b>Assuming changing a default updates old rows:</b> Altering a default normally affects future inserts, not existing records.</li><li><b>Using misleading defaults:</b> A default should reflect a valid business rule. For example, using 0 for an unknown salary may incorrectly imply the salary is actually zero.</li><li><b>Assuming defaults validate data:</b> DEFAULT does not validate every supplied value. Use appropriate constraints and application or pipeline checks.</li></ul>",
+            "<div class=\"definition-box\"><b>Key Takeaway:</b> DEFAULT provides a predefined value when a column is omitted or DEFAULT is explicitly requested. Choose defaults carefully because they influence how new records are represented.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1:</b> Create a database and select it.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE default_constraint_practice;\nUSE default_constraint_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2:</b> Create a tasks table with default status and priority values.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE tasks (\n    task_id INT PRIMARY KEY,\n    task_name VARCHAR(100) NOT NULL,\n    status VARCHAR(20) NOT NULL DEFAULT 'Pending',\n    priority INT DEFAULT 1\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3:</b> Insert a task without specifying status or priority. Verify the defaults.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO tasks (task_id, task_name)\nVALUES (1, 'Load customer data');\n\nSELECT * FROM tasks;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4:</b> Insert a task with an explicitly supplied status and priority.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO tasks\n    (task_id, task_name, status, priority)\nVALUES\n    (2, 'Validate records', 'In Progress', 2);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5:</b> Use the DEFAULT keyword explicitly in an INSERT statement.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO tasks\n    (task_id, task_name, status, priority)\nVALUES\n    (3, 'Generate report', DEFAULT, DEFAULT);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6:</b> Try inserting NULL into status. Explain why the NOT NULL constraint rejects it even though a default exists.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO tasks\n    (task_id, task_name, status)\nVALUES\n    (4, 'Run validation', NULL);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7:</b> Change the default priority to 2 and insert a new task without specifying priority. Confirm that the new default is applied.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE tasks\nALTER COLUMN priority SET DEFAULT 2;\n\nINSERT INTO tasks (task_id, task_name)\nVALUES (5, 'Check quality');\n\nSELECT * FROM tasks;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8:</b> Create a pipeline tracking table with a default status, retry count, and creation timestamp. Insert a pipeline run by specifying only the pipeline name.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE pipeline_runs (\n    run_id INT AUTO_INCREMENT PRIMARY KEY,\n    pipeline_name VARCHAR(100) NOT NULL,\n    run_status VARCHAR(20) NOT NULL DEFAULT 'Pending',\n    retry_count INT NOT NULL DEFAULT 0,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nINSERT INTO pipeline_runs (pipeline_name)\nVALUES ('daily_customer_load');\n\nSELECT * FROM pipeline_runs;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Define default values, distinguish omitted columns from explicit NULL, change a default, and apply defaults to practical Data Engineering metadata.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is the DEFAULT constraint?",
+              "a": "DEFAULT specifies a value that the database uses when an INSERT statement omits a column or explicitly requests DEFAULT."
+            },
+            {
+              "q": "Q2. Why do we use DEFAULT?",
+              "a": "It supplies consistent initial values for fields such as status, priority, retry count, or record creation timestamp without requiring every INSERT statement to specify them."
+            },
+            {
+              "q": "Q3. What happens when a column with a DEFAULT value is omitted from an INSERT statement?",
+              "a": "The database uses the column's default value."
+            },
+            {
+              "q": "Q4. Can we override a default value?",
+              "a": "Yes. Supply a different value explicitly in the INSERT statement."
+            },
+            {
+              "q": "Q5. What is the difference between DEFAULT and NULL?",
+              "a": "DEFAULT supplies a predefined value, while NULL represents a missing, unknown, or unavailable value. An explicitly supplied NULL is not ordinarily replaced by a default."
+            },
+            {
+              "q": "Q6. Can DEFAULT be used with NOT NULL?",
+              "a": "Yes. For example, status VARCHAR(20) NOT NULL DEFAULT 'Pending' requires a non-NULL status and supplies Pending when the column is omitted."
+            },
+            {
+              "q": "Q7. Does changing a default update existing rows?",
+              "a": "No. Changing a column's default normally affects future inserts and does not update values already stored."
+            },
+            {
+              "q": "Q8. How do you change a default value in MySQL?",
+              "a": "Use ALTER TABLE table_name ALTER COLUMN column_name SET DEFAULT value."
+            },
+            {
+              "q": "Q9. How do you remove a default value in MySQL?",
+              "a": "Use ALTER TABLE table_name ALTER COLUMN column_name DROP DEFAULT."
+            },
+            {
+              "q": "Q10. What is the difference between DEFAULT and AUTO_INCREMENT?",
+              "a": "DEFAULT supplies a predefined value, while AUTO_INCREMENT generates numeric sequence values, commonly for an integer primary key."
+            },
+            {
+              "q": "Q11. Can a DEFAULT value be a timestamp?",
+              "a": "Yes. In MySQL, a TIMESTAMP column can use DEFAULT CURRENT_TIMESTAMP to populate the current timestamp when the column is omitted."
+            },
+            {
+              "q": "Q12. Why is DEFAULT useful in Data Engineering?",
+              "a": "It can initialize pipeline statuses, retry counters, and creation timestamps consistently, reducing repetitive values in INSERT statements."
+            },
+            {
+              "q": "Q13. Does DEFAULT validate the value supplied by a user?",
+              "a": "No. DEFAULT supplies a fallback when appropriate; it does not validate explicitly supplied values. Use constraints and other validation logic for that purpose."
+            }
+          ]
+        },
+        {
+          "n": 25,
+          "title": "CHECK",
+          "explanation": [
+            "<h3>1. What Is the CHECK Constraint?</h3>",
+            "<p>The <b>CHECK</b> constraint ensures that values inserted into or used to update a table satisfy a specified condition. If a value violates the condition, MySQL rejects the operation.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> CHECK is a constraint that validates data against a Boolean condition defined for a column or a combination of columns.</div>",
+            "<h3>2. Why Do We Need CHECK?</h3>",
+            "<p>Imagine an employee table where salary must not be negative and age must be at least 18. Without appropriate validation, invalid values could enter the database. CHECK allows the database to enforce these rules.</p>",
+            "<table><tr><th>employee_id</th><th>employee_name</th><th>age</th><th>salary</th><th>Result</th></tr><tr><td>101</td><td>Ravi</td><td>25</td><td>35000</td><td>Valid</td></tr><tr><td>102</td><td>Priya</td><td>30</td><td>42000</td><td>Valid</td></tr><tr><td>103</td><td>Arun</td><td>16</td><td>28000</td><td>Invalid age</td></tr><tr><td>104</td><td>Kiran</td><td>24</td><td>-5000</td><td>Invalid salary</td></tr></table>",
+            "<p>The CHECK conditions can prevent the last two records from being inserted.</p>",
+            "<h3>3. Creating a Table with CHECK</h3>",
+            "<p>You can define CHECK constraints while creating a table.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE check_practice;\nUSE check_practice;\n\nCREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    age INT CHECK (age >= 18),\n    salary DECIMAL(10,2) CHECK (salary >= 0)\n);</code></pre></div>",
+            "<p><b>Explanation:</b></p><ul><li><code>CHECK (age >= 18)</code> requires a non-NULL age value to be at least 18.</li><li><code>CHECK (salary >= 0)</code> prevents negative salary values.</li><li><code>PRIMARY KEY</code> identifies each employee uniquely.</li><li><code>NOT NULL</code> requires a value for the employee name.</li></ul>",
+            "<div class=\"definition-box\"><b>Important MySQL version note:</b> MySQL enforces CHECK constraints starting with MySQL 8.0.16. Earlier versions accepted CHECK syntax but parsed and ignored the constraint. Confirm your MySQL version before relying on CHECK for data validation.</div>",
+            "<h3>4. Inserting Valid Records</h3>",
+            "<p>Insert records that satisfy both CHECK conditions.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, age, salary)\nVALUES\n    (101, 'Ravi', 25, 35000.00),\n    (102, 'Priya', 30, 42000.00),\n    (103, 'Sita', 22, 28000.00);\n\nSELECT * FROM employees;</code></pre></div>",
+            "<p>These records satisfy the age and salary conditions, so the insert succeeds.</p>",
+            "<h3>5. What Happens When a CHECK Condition Fails?</h3>",
+            "<p>Try inserting an employee whose age is below 18.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, age, salary)\nVALUES\n    (104, 'Arun', 16, 28000.00);</code></pre></div>",
+            "<p><b>Result:</b> On MySQL 8.0.16 or later, the insert is rejected because <code>age >= 18</code> evaluates to false.</p>",
+            "<p>Now try a negative salary.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, age, salary)\nVALUES\n    (105, 'Kiran', 24, -5000.00);</code></pre></div>",
+            "<p>This insert is rejected because the salary condition evaluates to false.</p>",
+            "<div class=\"diagram\"><pre>INSERT OR UPDATE\n       |\n       v\nEvaluate CHECK condition\n       |\n   +---+---+\n   |       |\n TRUE     FALSE\n   |       |\nAllowed  Rejected</pre></div>",
+            "<h3>6. CHECK with UPDATE</h3>",
+            "<p>CHECK constraints also apply when updating existing records. A valid row cannot be changed to a value that violates the constraint.</p>",
+            "<div class=\"code-block\"><pre><code>-- Valid update\nUPDATE employees\nSET salary = 45000.00\nWHERE employee_id = 101;\n\n-- Invalid update\nUPDATE employees\nSET salary = -1000.00\nWHERE employee_id = 101;</code></pre></div>",
+            "<p>The first update succeeds. The second is rejected because the new salary violates the CHECK condition.</p>",
+            "<h3>7. Column-Level and Table-Level CHECK</h3>",
+            "<p>A CHECK constraint can be written next to a column or defined at the table level.</p>",
+            "<p><b>Column-level example:</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE products (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL,\n    price DECIMAL(10,2) CHECK (price >= 0)\n);</code></pre></div>",
+            "<p><b>Table-level example:</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE order_items (\n    order_id INT,\n    quantity INT NOT NULL,\n    unit_price DECIMAL(10,2) NOT NULL,\n    CHECK (quantity > 0),\n    CHECK (unit_price >= 0)\n);</code></pre></div>",
+            "<p>Table-level constraints are especially useful when a condition involves multiple columns.</p>",
+            "<h3>8. CHECK with Multiple Conditions</h3>",
+            "<p>You can combine conditions using logical operators such as AND and OR.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE products (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL,\n    price DECIMAL(10,2) NOT NULL,\n    discount DECIMAL(5,2) NOT NULL,\n    CHECK (price >= 0),\n    CHECK (discount >= 0 AND discount <= 100)\n);</code></pre></div>",
+            "<p>Here, price cannot be negative, and discount must be between 0 and 100 inclusive.</p>",
+            "<h3>9. CHECK Across Multiple Columns</h3>",
+            "<p>A CHECK condition can compare two columns in the same row.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE project_tasks (\n    task_id INT PRIMARY KEY,\n    task_name VARCHAR(100) NOT NULL,\n    start_date DATE NOT NULL,\n    end_date DATE NOT NULL,\n    CONSTRAINT chk_task_dates\n        CHECK (end_date >= start_date)\n);</code></pre></div>",
+            "<p>This constraint prevents an end date from being earlier than its start date. Both columns are also NOT NULL, so the date comparison cannot be bypassed by storing NULL in either column.</p>",
+            "<h3>10. CHECK and NULL Values</h3>",
+            "<p>CHECK does not automatically mean that a column must contain a value. In SQL, a CHECK condition generally rejects a row when the condition is FALSE. If the condition evaluates to UNKNOWN because of NULL, the row may pass the CHECK constraint.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE test_scores (\n    student_id INT PRIMARY KEY,\n    score INT CHECK (score >= 0 AND score <= 100)\n);</code></pre></div>",
+            "<p>Because <code>score</code> is nullable, a NULL score can satisfy this CHECK constraint. If every student must have a score, use both CHECK and NOT NULL.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE test_scores_required (\n    student_id INT PRIMARY KEY,\n    score INT NOT NULL CHECK (score >= 0 AND score <= 100)\n);</code></pre></div>",
+            "<div class=\"definition-box\"><b>Remember:</b> CHECK validates a condition; NOT NULL prevents missing values. Use both when a field must be present and must satisfy a range or rule.</div>",
+            "<h3>11. Naming a CHECK Constraint</h3>",
+            "<p>You can provide a descriptive name to make constraints easier to identify and maintain.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE bank_accounts (\n    account_id INT PRIMARY KEY,\n    balance DECIMAL(12,2) NOT NULL,\n    CONSTRAINT chk_nonnegative_balance\n        CHECK (balance >= 0)\n);</code></pre></div>",
+            "<p>The name <code>chk_nonnegative_balance</code> clearly communicates the purpose of the rule. Naming conventions are helpful when a database contains many constraints.</p>",
+            "<h3>12. Adding CHECK to an Existing Table</h3>",
+            "<p>In supported MySQL versions, you can add a CHECK constraint using ALTER TABLE.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nADD CONSTRAINT chk_employee_age\nCHECK (age >= 18);</code></pre></div>",
+            "<p>MySQL validates existing rows when adding an enforced CHECK constraint. If existing data violates the condition, the change can fail until the data is corrected.</p>",
+            "<h3>13. Removing CHECK</h3>",
+            "<p>Use ALTER TABLE with DROP CHECK and the constraint name to remove a CHECK constraint in MySQL.</p>",
+            "<div class=\"code-block\"><pre><code>ALTER TABLE employees\nDROP CHECK chk_employee_age;</code></pre></div>",
+            "<p>Dropping the constraint removes that validation rule. It does not automatically clean or correct any existing data.</p>",
+            "<h3>14. CHECK vs NOT NULL vs DEFAULT</h3>",
+            "<table><tr><th>Constraint</th><th>Purpose</th><th>Example</th></tr><tr><td>CHECK</td><td>Validates a condition</td><td>CHECK (age >= 18)</td></tr><tr><td>NOT NULL</td><td>Prevents NULL</td><td>age INT NOT NULL</td></tr><tr><td>DEFAULT</td><td>Supplies a value when omitted</td><td>status DEFAULT 'Pending'</td></tr></table>",
+            "<p>These constraints can work together. For example, a quantity column can be NOT NULL and CHECK (quantity > 0), ensuring the value is present and positive.</p>",
+            "<h3>15. CHECK in Data Engineering</h3>",
+            "<p>CHECK constraints can enforce row-level data quality rules in relational databases used by data pipelines and applications.</p>",
+            "<ul><li><b>Range validation:</b> Ensure quantity is positive and discounts fall within an allowed range.</li><li><b>Financial data:</b> Prevent negative values when the business rules do not permit them.</li><li><b>Date validation:</b> Ensure an end date is not earlier than a start date.</li><li><b>Target-table protection:</b> Reject invalid rows during insertion or update.</li><li><b>Data quality design:</b> Translate simple business rules into database-enforced constraints.</li></ul>",
+            "<p>Example: an order line should have a positive quantity and a nonnegative unit price.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE order_lines (\n    order_line_id INT PRIMARY KEY,\n    product_id INT NOT NULL,\n    quantity INT NOT NULL,\n    unit_price DECIMAL(10,2) NOT NULL,\n    CONSTRAINT chk_positive_quantity\n        CHECK (quantity > 0),\n    CONSTRAINT chk_nonnegative_unit_price\n        CHECK (unit_price >= 0)\n);</code></pre></div>",
+            "<p>When a data pipeline inserts records into this table, MySQL can reject rows that violate these rules. A robust pipeline should capture and report rejected records rather than silently losing track of them.</p>",
+            "<h3>16. Common Mistakes</h3>",
+            "<ul><li><b>Assuming CHECK prevents NULL:</b> Add NOT NULL when the field is mandatory.</li><li><b>Using an invalid condition:</b> Make sure the condition represents the actual business rule.</li><li><b>Forgetting the MySQL version:</b> CHECK enforcement requires MySQL 8.0.16 or later.</li><li><b>Assuming CHECK removes invalid data automatically:</b> It rejects violating writes; it does not clean existing records.</li><li><b>Using CHECK to compare other rows:</b> CHECK is intended for conditions on the current row, not cross-row or cross-table validation. Use other database mechanisms or pipeline logic for those rules.</li></ul>",
+            "<div class=\"definition-box\"><b>Key Takeaway:</b> CHECK enforces conditions on stored row values. Combine it with NOT NULL when values are mandatory, and verify that your MySQL version enforces CHECK constraints.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1:</b> Create a practice database and select it.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE check_constraint_practice;\nUSE check_constraint_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2:</b> Create an employees table with age and salary CHECK constraints.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    employee_id INT PRIMARY KEY,\n    employee_name VARCHAR(100) NOT NULL,\n    age INT NOT NULL CHECK (age >= 18),\n    salary DECIMAL(10,2) NOT NULL CHECK (salary >= 0)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3:</b> Insert two valid employee records.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, age, salary)\nVALUES\n    (101, 'Ravi', 25, 35000.00),\n    (102, 'Priya', 30, 42000.00);\n\nSELECT * FROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4:</b> Try inserting an employee whose age is below 18. Observe the CHECK error.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, age, salary)\nVALUES\n    (103, 'Arun', 16, 28000.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5:</b> Try inserting a negative salary. Explain why MySQL rejects it.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (employee_id, employee_name, age, salary)\nVALUES\n    (104, 'Kiran', 24, -5000.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6:</b> Create a products table with a discount between 0 and 100.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE products (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL,\n    price DECIMAL(10,2) NOT NULL CHECK (price >= 0),\n    discount DECIMAL(5,2) NOT NULL\n        CHECK (discount >= 0 AND discount <= 100)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7:</b> Create a table-level CHECK constraint that ensures the end date is on or after the start date.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE project_tasks (\n    task_id INT PRIMARY KEY,\n    task_name VARCHAR(100) NOT NULL,\n    start_date DATE NOT NULL,\n    end_date DATE NOT NULL,\n    CONSTRAINT chk_task_dates\n        CHECK (end_date >= start_date)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8:</b> Try inserting a project task whose end date is earlier than its start date. Observe the constraint violation.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO project_tasks\n    (task_id, task_name, start_date, end_date)\nVALUES\n    (1, 'Load source data', '2026-10-20', '2026-10-15');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 9:</b> Data Engineering exercise: design an order_lines table with CHECK constraints for positive quantity and nonnegative unit price. Explain how these constraints protect data when a pipeline loads records.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Define CHECK constraints, test invalid inserts and updates, combine CHECK with NOT NULL, validate date and numeric ranges, and apply business rules to data-loading tables.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is a CHECK constraint?",
+              "a": "CHECK is a database constraint that requires a specified condition to be satisfied by stored row values."
+            },
+            {
+              "q": "Q2. Why do we use CHECK?",
+              "a": "It enforces business rules such as minimum age, nonnegative salary, positive quantity, or a valid date range."
+            },
+            {
+              "q": "Q3. What happens when an inserted value violates CHECK?",
+              "a": "In MySQL versions that enforce CHECK constraints, the insert or update is rejected when the condition evaluates to FALSE."
+            },
+            {
+              "q": "Q4. Which MySQL versions enforce CHECK constraints?",
+              "a": "MySQL enforces CHECK constraints starting with MySQL 8.0.16. Earlier versions parsed the syntax but did not enforce the constraints."
+            },
+            {
+              "q": "Q5. Does CHECK automatically prevent NULL?",
+              "a": "No. A CHECK condition can evaluate to UNKNOWN when a referenced value is NULL, and the row can pass the constraint. Use NOT NULL when the value is mandatory."
+            },
+            {
+              "q": "Q6. Can CHECK be used with multiple conditions?",
+              "a": "Yes. You can combine conditions using AND, OR, and other supported SQL expressions."
+            },
+            {
+              "q": "Q7. Can CHECK compare two columns in the same row?",
+              "a": "Yes. For example, CHECK (end_date >= start_date) can ensure that a task's end date is not earlier than its start date."
+            },
+            {
+              "q": "Q8. Can CHECK validate values during UPDATE?",
+              "a": "Yes. An update that makes a row violate an enforced CHECK constraint is rejected."
+            },
+            {
+              "q": "Q9. How do you add CHECK to an existing MySQL table?",
+              "a": "Use ALTER TABLE table_name ADD CONSTRAINT constraint_name CHECK (condition). Existing rows must satisfy the enforced condition."
+            },
+            {
+              "q": "Q10. How do you remove a CHECK constraint in MySQL?",
+              "a": "Use ALTER TABLE table_name DROP CHECK constraint_name."
+            },
+            {
+              "q": "Q11. What is the difference between CHECK and NOT NULL?",
+              "a": "CHECK validates a condition, while NOT NULL prohibits SQL NULL. Use both when a value must be present and satisfy a rule."
+            },
+            {
+              "q": "Q12. Can CHECK enforce a rule involving another table?",
+              "a": "CHECK is intended for row-level conditions within the current table. Use foreign keys, triggers where appropriate, or pipeline validation for cross-table rules."
+            },
+            {
+              "q": "Q13. How is CHECK useful in Data Engineering?",
+              "a": "It protects target tables from invalid values, such as negative quantities or invalid date ranges, and helps enforce simple business rules during data loading."
+            }
+          ]
+        },
+        {
+          "n": 26,
+          "title": "Composite Primary Key",
+          "explanation": [
+            "<h3>1. What Is a Composite Primary Key?</h3>",
+            "<p>A <b>Composite Primary Key</b> is a primary key made up of two or more columns that work together to uniquely identify each row in a table.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> A composite primary key combines multiple columns into one primary key constraint. The combination of values must be unique, and none of the participating columns can contain NULL.</div>",
+            "<h3>2. Why Do We Need a Composite Primary Key?</h3>",
+            "<p>Imagine a college database where students can enroll in multiple courses. A student can appear in many rows, and a course can also appear in many rows. Neither student_id nor course_id is unique by itself.</p>",
+            "<table><tr><th>student_id</th><th>course_id</th><th>course_name</th></tr><tr><td>101</td><td>501</td><td>Python</td></tr><tr><td>101</td><td>502</td><td>SQL</td></tr><tr><td>102</td><td>501</td><td>Python</td></tr><tr><td>102</td><td>503</td><td>Linux</td></tr></table>",
+            "<p>Here, student 101 can enroll in Python and SQL, while Python can be taken by multiple students. But the same student should not be enrolled in the same course twice if each student-course pair represents one enrollment.</p>",
+            "<div class=\"diagram\"><pre>student_id + course_id\n          |\n          v\n  Composite Primary Key\n          |\n          v\nUniquely identifies each enrollment\n\n(101, 501) -> Python enrollment for student 101\n(101, 502) -> SQL enrollment for student 101\n(102, 501) -> Python enrollment for student 102</pre></div>",
+            "<h3>3. Creating a Table with a Composite Primary Key</h3>",
+            "<p>In MySQL, list all columns that belong to the primary key inside the same PRIMARY KEY declaration.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE composite_key_practice;\nUSE composite_key_practice;\n\nCREATE TABLE enrollments (\n    student_id INT,\n    course_id INT,\n    enrollment_date DATE,\n    PRIMARY KEY (student_id, course_id)\n);</code></pre></div>",
+            "<p><b>Explanation:</b></p><ul><li><code>student_id</code> identifies the student.</li><li><code>course_id</code> identifies the course.</li><li><code>PRIMARY KEY (student_id, course_id)</code> makes the combination unique.</li><li>Both columns are implicitly NOT NULL because they belong to the primary key.</li></ul>",
+            "<div class=\"definition-box\"><b>Important:</b> A composite primary key is one primary key constraint containing multiple columns, not a separate primary key for each column.</div>",
+            "<h3>4. Inserting Valid Records</h3>",
+            "<p>Insert different student-course combinations.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO enrollments\n    (student_id, course_id, enrollment_date)\nVALUES\n    (101, 501, '2026-10-01'),\n    (101, 502, '2026-10-02'),\n    (102, 501, '2026-10-03'),\n    (102, 503, '2026-10-04');\n\nSELECT * FROM enrollments;</code></pre></div>",
+            "<p>These rows are valid because each combination of student_id and course_id is different.</p>",
+            "<h3>5. What Happens When the Combination Is Duplicated?</h3>",
+            "<p>Try inserting the same student-course pair again.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO enrollments\n    (student_id, course_id, enrollment_date)\nVALUES\n    (101, 501, '2026-10-10');</code></pre></div>",
+            "<p><b>Result:</b> MySQL rejects the insert because the combination <code>(101, 501)</code> already exists.</p>",
+            "<p>The enrollment date is different, but it does not matter because the primary key consists only of student_id and course_id.</p>",
+            "<h3>6. Individual Columns Can Contain Repeated Values</h3>",
+            "<p>With a composite primary key, each individual column can contain repeated values. Only the combination must be unique.</p>",
+            "<table><tr><th>student_id</th><th>course_id</th><th>Result</th></tr><tr><td>101</td><td>501</td><td>Valid</td></tr><tr><td>101</td><td>502</td><td>Valid — student repeats</td></tr><tr><td>102</td><td>501</td><td>Valid — course repeats</td></tr><tr><td>101</td><td>501</td><td>Rejected — combination repeats</td></tr></table>",
+            "<p>This is the main idea behind composite keys: uniqueness applies to the complete combination, not necessarily to each column individually.</p>",
+            "<h3>7. Can a Composite Primary Key Contain NULL?</h3>",
+            "<p>No. Every column that belongs to a primary key must be non-NULL, including columns in a composite primary key.</p>",
+            "<div class=\"code-block\"><pre><code>-- This insert fails because student_id is NULL\nINSERT INTO enrollments\n    (student_id, course_id, enrollment_date)\nVALUES\n    (NULL, 501, '2026-10-05');</code></pre></div>",
+            "<p>MySQL rejects this insert because student_id is part of the primary key.</p>",
+            "<h3>8. Composite Primary Key vs Single-Column Primary Key</h3>",
+            "<table><tr><th>Feature</th><th>Single-Column Key</th><th>Composite Key</th></tr><tr><td>Columns used</td><td>One</td><td>Two or more</td></tr><tr><td>Uniqueness</td><td>One column's value is unique</td><td>The combination is unique</td></tr><tr><td>Example</td><td>employee_id</td><td>student_id + course_id</td></tr><tr><td>Can key columns repeat individually?</td><td>No duplicate key values</td><td>Yes, if the combination remains unique</td></tr><tr><td>NULL allowed?</td><td>No</td><td>No, for every key column</td></tr></table>",
+            "<h3>9. Composite Primary Key vs Composite UNIQUE Constraint</h3>",
+            "<p>Both can enforce uniqueness across multiple columns, but they serve different purposes.</p>",
+            "<ul><li><b>Composite primary key:</b> The table's primary identifier. It cannot contain NULL values.</li><li><b>Composite UNIQUE:</b> An additional uniqueness rule that can coexist with a different primary key. In MySQL, nullable columns in a UNIQUE key generally allow multiple combinations containing NULL.</li></ul>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE course_enrollments (\n    enrollment_id INT PRIMARY KEY,\n    student_id INT NOT NULL,\n    course_id INT NOT NULL,\n    enrollment_date DATE,\n    CONSTRAINT uq_student_course\n        UNIQUE (student_id, course_id)\n);</code></pre></div>",
+            "<p>In this alternative design, enrollment_id is the primary key, while the UNIQUE constraint prevents a student-course pair from being duplicated.</p>",
+            "<h3>10. Using a Composite Primary Key in a JOIN</h3>",
+            "<p>When a relationship is identified by multiple columns, both columns may be needed to join related tables correctly.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE enrollment_results (\n    student_id INT,\n    course_id INT,\n    marks DECIMAL(5,2),\n    PRIMARY KEY (student_id, course_id)\n);\n\nINSERT INTO enrollment_results\n    (student_id, course_id, marks)\nVALUES\n    (101, 501, 85.00),\n    (101, 502, 90.00),\n    (102, 501, 78.00);\n\nSELECT\n    e.student_id,\n    e.course_id,\n    e.enrollment_date,\n    r.marks\nFROM enrollments AS e\nJOIN enrollment_results AS r\n    ON e.student_id = r.student_id\n   AND e.course_id = r.course_id;</code></pre></div>",
+            "<p>The JOIN matches both student_id and course_id. Joining only on student_id would incorrectly match different courses belonging to the same student.</p>",
+            "<h3>11. Composite Keys in Data Engineering</h3>",
+            "<p>Composite keys are useful when a record is identified by a combination of business attributes rather than by a single identifier.</p>",
+            "<ul><li><b>Enrollment systems:</b> student_id + course_id identifies a student-course relationship.</li><li><b>Order details:</b> order_id + line_number can identify a line within an order.</li><li><b>Multi-tenant systems:</b> tenant_id + local_record_id may identify a record within a tenant.</li><li><b>Source-system data:</b> source_system + source_record_id can identify records when IDs are unique only within each source.</li><li><b>Deduplication:</b> A defined combination can help identify duplicate business records during data loading.</li></ul>",
+            "<p>Example: a staging dataset may contain the same source_record_id from two different source systems. Combining the source system with its record ID can make the identifier unique.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE source_records (\n    source_system VARCHAR(50),\n    source_record_id VARCHAR(100),\n    record_payload VARCHAR(500),\n    PRIMARY KEY (source_system, source_record_id)\n);</code></pre></div>",
+            "<p>With this design, the same source_record_id can appear for different source systems, but the same combination cannot be stored twice. Both key columns must be supplied and non-NULL.</p>",
+            "<h3>12. Choosing a Composite Key Carefully</h3>",
+            "<ul><li><b>Use columns that define the actual business identity:</b> Do not include extra columns unless they are part of what makes a record unique.</li><li><b>Keep key columns stable:</b> Frequent changes to primary key values can complicate relationships and data maintenance.</li><li><b>Consider key size:</b> Every additional key column increases the size of the key and may affect indexes and referencing tables.</li><li><b>Use the complete key in joins:</b> Omitting part of the key can produce incorrect matches or duplicate rows.</li><li><b>Consider a surrogate key when appropriate:</b> A single generated ID can be used as the primary key while a UNIQUE constraint preserves business-key uniqueness.</li></ul>",
+            "<div class=\"definition-box\"><b>Key Takeaway:</b> A composite primary key uses two or more columns to uniquely identify a row. Individual values may repeat, but the complete combination must be unique and cannot contain NULL.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1:</b> Create a practice database and select it.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE composite_primary_key_practice;\nUSE composite_primary_key_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2:</b> Create an enrollments table with a composite primary key.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE enrollments (\n    student_id INT,\n    course_id INT,\n    enrollment_date DATE,\n    PRIMARY KEY (student_id, course_id)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3:</b> Insert three different student-course combinations.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO enrollments\n    (student_id, course_id, enrollment_date)\nVALUES\n    (101, 501, '2026-10-01'),\n    (101, 502, '2026-10-02'),\n    (102, 501, '2026-10-03');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4:</b> Insert a duplicate combination and observe the primary key error.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO enrollments\n    (student_id, course_id, enrollment_date)\nVALUES\n    (101, 501, '2026-10-10');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5:</b> Try inserting a row with a NULL value in either primary key column. Explain why the insert fails.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO enrollments\n    (student_id, course_id, enrollment_date)\nVALUES\n    (101, NULL, '2026-10-05');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6:</b> Create a source records table using source_system and source_record_id as a composite primary key.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE source_records (\n    source_system VARCHAR(50),\n    source_record_id VARCHAR(100),\n    record_payload VARCHAR(500),\n    PRIMARY KEY (source_system, source_record_id)\n);\n\nINSERT INTO source_records\n    (source_system, source_record_id, record_payload)\nVALUES\n    ('CRM', '1001', 'Customer from CRM'),\n    ('ERP', '1001', 'Customer from ERP');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7:</b> Attempt to insert another record using the same source_system and source_record_id combination. Observe the error.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO source_records\n    (source_system, source_record_id, record_payload)\nVALUES\n    ('CRM', '1001', 'Duplicate CRM record');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8:</b> Data Engineering exercise: create an order_details table with order_id and line_number as a composite primary key. Insert multiple line items for one order, then try inserting the same line number for that order twice.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Create a composite primary key, understand uniqueness across multiple columns, recognize NULL restrictions, join using the complete key, and identify business cases where composite keys are useful.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is a composite primary key?",
+              "a": "A composite primary key consists of two or more columns that work together to uniquely identify each row in a table."
+            },
+            {
+              "q": "Q2. Why do we need a composite primary key?",
+              "a": "It is useful when no single column uniquely identifies a row, but a combination of columns does. For example, student_id and course_id can identify an enrollment."
+            },
+            {
+              "q": "Q3. Can individual columns in a composite primary key contain duplicate values?",
+              "a": "Yes. Individual columns can repeat, but the complete combination of primary key values must be unique."
+            },
+            {
+              "q": "Q4. Can a composite primary key contain NULL?",
+              "a": "No. Every column participating in a primary key must be non-NULL."
+            },
+            {
+              "q": "Q5. How do you create a composite primary key in MySQL?",
+              "a": "Use PRIMARY KEY (column1, column2) in the CREATE TABLE statement, listing all columns that form the key."
+            },
+            {
+              "q": "Q6. What happens if we insert the same combination twice?",
+              "a": "MySQL rejects the second insert because it duplicates the existing composite primary key."
+            },
+            {
+              "q": "Q7. Is a composite primary key the same as two primary keys?",
+              "a": "No. It is one primary key constraint containing multiple columns. A table can have only one primary key constraint."
+            },
+            {
+              "q": "Q8. What is the difference between a composite primary key and a composite UNIQUE constraint?",
+              "a": "Both enforce uniqueness across multiple columns. A composite primary key is the table's primary identifier and cannot contain NULL, while a composite UNIQUE constraint is an additional uniqueness rule and can generally permit NULL combinations in MySQL."
+            },
+            {
+              "q": "Q9. Why must we use all key columns in a JOIN?",
+              "a": "The complete combination identifies the record. Omitting one key column can match unrelated rows and produce incorrect results or duplicates."
+            },
+            {
+              "q": "Q10. Can a foreign key reference a composite primary key?",
+              "a": "Yes. The referencing foreign key must include the corresponding columns and reference the composite key in the appropriate order, with compatible column definitions."
+            },
+            {
+              "q": "Q11. How are composite primary keys useful in Data Engineering?",
+              "a": "They can identify records using combinations such as source_system plus source_record_id, and help enforce uniqueness for business entities, relationship tables, and staged data."
+            },
+            {
+              "q": "Q12. When might a surrogate key be preferable?",
+              "a": "A surrogate key can be useful when a composite business key is wide, frequently changes, or is inconvenient for relationships. A separate UNIQUE constraint can still enforce business-key uniqueness."
+            }
+          ]
+        },
+        {
+          "n": 27,
+          "title": "Referential Integrity Basics",
+          "explanation": [
+            "<h3>1. What Is Referential Integrity?</h3>",
+            "<p><b>Referential integrity</b> is a database principle that ensures relationships between tables remain valid. When one table references another table, the referenced record must exist unless the relationship is optional and the foreign key is NULL.</p>",
+            "<div class=\"definition-box\"><b>Definition:</b> Referential integrity ensures that foreign key values correctly reference existing keys in a related table, preventing invalid relationships between records.</div>",
+            "<h3>2. Why Do We Need Referential Integrity?</h3>",
+            "<p>Imagine an online shopping database with two tables: customers and orders. Each order belongs to a customer, so an order must reference a customer that exists.</p>",
+            "<table><tr><th>customers table</th><th></th><th>orders table</th></tr><tr><td>customer_id = 101</td><td>→</td><td>order_id = 5001, customer_id = 101</td></tr><tr><td>customer_id = 102</td><td>→</td><td>order_id = 5002, customer_id = 102</td></tr><tr><td>customer_id = 103</td><td></td><td>No order required</td></tr></table>",
+            "<p>If an order references customer_id 999 but no customer with that ID exists, the relationship is invalid. Referential integrity helps prevent this inconsistency.</p>",
+            "<LearningViz type_id=\"SQL_PRIMARY_FOREIGN_KEY_CONSTRAINTS\" />",
+            "<h3>3. Parent Table and Child Table</h3>",
+            "<p>Referential integrity commonly uses a primary key in the parent table and a foreign key in the child table.</p>",
+            "<div class=\"diagram\"><pre>CUSTOMERS (Parent)\n+-------------+----------------+\n| customer_id | customer_name  |\n+-------------+----------------+\n| 101         | Ravi           |\n| 102         | Priya          |\n+-------------+----------------+\n       ^\n       | Referenced key\n       |\nORDERS (Child)\n+----------+-------------+\n| order_id | customer_id |\n+----------+-------------+\n| 5001     | 101         |\n| 5002     | 102         |\n+----------+-------------+\n\norders.customer_id references customers.customer_id</pre></div>",
+            "<p>The customer ID in each order must refer to a customer that exists in the parent table. The same customer can have multiple orders.</p>",
+            "<h3>4. Creating Tables with Referential Integrity</h3>",
+            "<p>Let's create a customer table and an order table with a foreign key relationship.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE integrity_practice;\nUSE integrity_practice;\n\nCREATE TABLE customers (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100) NOT NULL\n);\n\nCREATE TABLE orders (\n    order_id INT PRIMARY KEY,\n    customer_id INT NOT NULL,\n    order_amount DECIMAL(10,2) NOT NULL,\n    CONSTRAINT fk_orders_customers\n        FOREIGN KEY (customer_id)\n        REFERENCES customers(customer_id)\n);</code></pre></div>",
+            "<p><b>Explanation:</b></p><ul><li><code>customers.customer_id</code> is the parent primary key.</li><li><code>orders.order_id</code> uniquely identifies each order.</li><li><code>orders.customer_id</code> is a foreign key referencing the customer table.</li><li><code>NOT NULL</code> means every order must specify a customer ID.</li></ul>",
+            "<h3>5. Inserting Valid Records</h3>",
+            "<p>Insert customers before inserting orders that reference them.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO customers (customer_id, customer_name)\nVALUES\n    (101, 'Ravi'),\n    (102, 'Priya');\n\nINSERT INTO orders (order_id, customer_id, order_amount)\nVALUES\n    (5001, 101, 1500.00),\n    (5002, 102, 2500.00),\n    (5003, 101, 800.00);</code></pre></div>",
+            "<p>These operations succeed because every customer_id in the orders table refers to an existing customer. Customer 101 can have more than one order.</p>",
+            "<h3>6. Invalid Child References</h3>",
+            "<p>Now try inserting an order for a customer who does not exist.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO orders (order_id, customer_id, order_amount)\nVALUES (5004, 999, 1000.00);</code></pre></div>",
+            "<p><b>Result:</b> MySQL rejects the insert because customer 999 does not exist in the customers table. The foreign key preserves referential integrity.</p>",
+            "<div class=\"diagram\"><pre>Insert order with customer_id = 999\n                  |\n                  v\nDoes customer 999 exist?\n                  |\n                  v\n                No\n                  |\n                  v\n             Insert rejected</pre></div>",
+            "<h3>7. What Happens When a Parent Record Is Deleted?</h3>",
+            "<p>Suppose customer 101 has orders. Attempt to delete that customer.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM customers\nWHERE customer_id = 101;</code></pre></div>",
+            "<p>With MySQL's default restrictive foreign key behavior, the deletion is rejected while orders still reference customer 101. This prevents existing orders from becoming orphaned records.</p>",
+            "<p>You must decide how the business should handle related orders before deleting the customer. Possible choices include retaining the customer record, deleting dependent records when appropriate, or configuring a suitable foreign key action.</p>",
+            "<h3>8. ON DELETE and ON UPDATE Actions</h3>",
+            "<p>Foreign keys can define how MySQL handles changes to referenced parent keys.</p>",
+            "<table><tr><th>Action</th><th>Behavior</th></tr><tr><td>RESTRICT</td><td>Rejects a parent change that would invalidate existing child references.</td></tr><tr><td>CASCADE</td><td>Propagates a parent delete or key update to related child rows.</td></tr><tr><td>SET NULL</td><td>Sets the child foreign key to NULL when the relevant parent action occurs, provided the column permits NULL.</td></tr><tr><td>NO ACTION</td><td>In MySQL InnoDB, behaves like RESTRICT for foreign key checks.</td></tr></table>",
+            "<p>Example using ON DELETE CASCADE:</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers_cascade (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100) NOT NULL\n);\n\nCREATE TABLE orders_cascade (\n    order_id INT PRIMARY KEY,\n    customer_id INT NOT NULL,\n    order_amount DECIMAL(10,2) NOT NULL,\n    CONSTRAINT fk_orders_customers_cascade\n        FOREIGN KEY (customer_id)\n        REFERENCES customers_cascade(customer_id)\n        ON DELETE CASCADE\n        ON UPDATE CASCADE\n);</code></pre></div>",
+            "<p>With this configuration, deleting a customer automatically deletes that customer's related orders. Use CASCADE carefully because one parent deletion can remove many child records.</p>",
+            "<h3>9. Referential Integrity and NULL</h3>",
+            "<p>A foreign key column may contain NULL if it is not declared NOT NULL. In that case, NULL means the child row does not specify a parent relationship.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE support_tickets (\n    ticket_id INT PRIMARY KEY,\n    ticket_description VARCHAR(200) NOT NULL,\n    customer_id INT,\n    FOREIGN KEY (customer_id)\n        REFERENCES customers(customer_id)\n);</code></pre></div>",
+            "<p>Here, a ticket can have a NULL customer_id because the column is nullable. A non-NULL customer_id must still reference an existing customer.</p>",
+            "<p>If every ticket must belong to a customer, declare <code>customer_id INT NOT NULL</code> and keep the foreign key.</p>",
+            "<h3>10. Referential Integrity vs Primary Key vs Foreign Key</h3>",
+            "<table><tr><th>Concept</th><th>Purpose</th><th>Example</th></tr><tr><td>Primary key</td><td>Uniquely identifies a row</td><td>customers.customer_id</td></tr><tr><td>Foreign key</td><td>References a key in a related table</td><td>orders.customer_id</td></tr><tr><td>Referential integrity</td><td>Ensures references remain valid</td><td>An order cannot reference a nonexistent customer</td></tr></table>",
+            "<p>The primary key identifies the parent record, the foreign key establishes the relationship, and referential integrity is the rule that keeps that relationship valid.</p>",
+            "<h3>11. Finding Orphan Records with SQL</h3>",
+            "<p>An orphan record is a child record whose referenced parent is missing. In a table with an enforced foreign key, such a record normally cannot be created through ordinary operations while enforcement is active. However, orphan records can appear in imported files, staging tables, legacy databases, or systems without enforced constraints.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    o.order_id,\n    o.customer_id,\n    o.order_amount\nFROM staging_orders AS o\nLEFT JOIN customers AS c\n    ON o.customer_id = c.customer_id\nWHERE c.customer_id IS NULL;</code></pre></div>",
+            "<p>This query identifies staging orders that have no matching customer. It is useful for data-quality checks before loading records into a target table with foreign key constraints.</p>",
+            "<h3>12. Referential Integrity in Data Engineering</h3>",
+            "<p>Data Engineers often combine data from files, APIs, applications, and multiple databases. Referential integrity helps ensure that related datasets remain consistent.</p>",
+            "<ul><li><b>Data ingestion:</b> Validate that incoming orders reference known customers.</li><li><b>Data transformation:</b> Identify missing dimension records before loading fact data.</li><li><b>Data quality:</b> Detect orphan records and invalid identifiers.</li><li><b>Database design:</b> Define relationships between customers, orders, products, and transactions.</li><li><b>Reliable pipelines:</b> Decide whether invalid records should be rejected, quarantined, or corrected using verified data.</li></ul>",
+            "<p>For example, an order file may arrive before the customer file. A pipeline should not assume the customer is invalid just because it has not arrived yet. It may need to wait, retry, or send the order to a pending-validation area until the parent record becomes available.</p>",
+            "<div class=\"definition-box\"><b>Key Takeaway:</b> Referential integrity ensures that relationships between tables remain valid. Primary keys identify records, foreign keys reference them, and database constraints help prevent orphaned records.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1:</b> Create a database and select it.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE DATABASE referential_integrity_practice;\nUSE referential_integrity_practice;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2:</b> Create a customers parent table and an orders child table with a foreign key.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE customers (\n    customer_id INT PRIMARY KEY,\n    customer_name VARCHAR(100) NOT NULL\n);\n\nCREATE TABLE orders (\n    order_id INT PRIMARY KEY,\n    customer_id INT NOT NULL,\n    order_amount DECIMAL(10,2) NOT NULL,\n    CONSTRAINT fk_orders_customers\n        FOREIGN KEY (customer_id)\n        REFERENCES customers(customer_id)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3:</b> Insert customers and orders that reference existing customer IDs.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO customers (customer_id, customer_name)\nVALUES\n    (101, 'Ravi'),\n    (102, 'Priya');\n\nINSERT INTO orders (order_id, customer_id, order_amount)\nVALUES\n    (5001, 101, 1500.00),\n    (5002, 102, 2500.00),\n    (5003, 101, 800.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4:</b> Attempt to insert an order referencing customer 999. Observe the foreign key error.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO orders (order_id, customer_id, order_amount)\nVALUES (5004, 999, 1000.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5:</b> Attempt to delete customer 101 while orders still reference that customer. Explain why the default foreign key behavior prevents the deletion.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM customers\nWHERE customer_id = 101;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6:</b> Retrieve orders with customer names using a JOIN.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    o.order_id,\n    c.customer_name,\n    o.order_amount\nFROM orders AS o\nJOIN customers AS c\n    ON o.customer_id = c.customer_id;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7:</b> Create a separate staging_orders table without a foreign key. Insert an order with an unknown customer ID and use a LEFT JOIN to identify the orphan record.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE staging_orders (\n    order_id INT PRIMARY KEY,\n    customer_id INT,\n    order_amount DECIMAL(10,2)\n);\n\nINSERT INTO staging_orders\n    (order_id, customer_id, order_amount)\nVALUES\n    (6001, 101, 1500.00),\n    (6002, 999, 1000.00);\n\nSELECT s.*\nFROM staging_orders AS s\nLEFT JOIN customers AS c\n    ON s.customer_id = c.customer_id\nWHERE c.customer_id IS NULL;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8:</b> Data Engineering exercise: explain how a pipeline should handle an order that arrives before its customer record. Consider waiting for the parent record, retrying validation, or quarantining the order rather than silently discarding it.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Understand parent-child relationships, enforce foreign key rules, test invalid references and parent deletion, and detect orphan records in staging data.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is referential integrity?",
+              "a": "Referential integrity is the principle that relationships between tables remain valid. Non-NULL foreign key values must reference existing keys in the parent table."
+            },
+            {
+              "q": "Q2. What is the relationship between a primary key and a foreign key?",
+              "a": "The primary key identifies a row in the parent table, while the foreign key in the child table references that key."
+            },
+            {
+              "q": "Q3. What is an orphan record?",
+              "a": "An orphan record is a child record whose referenced parent record does not exist."
+            },
+            {
+              "q": "Q4. What happens if we insert a child record with a nonexistent parent ID?",
+              "a": "When an enforced foreign key applies, MySQL rejects the insert because the referenced parent key does not exist."
+            },
+            {
+              "q": "Q5. Can multiple child records reference the same parent?",
+              "a": "Yes. For example, multiple orders can reference the same customer."
+            },
+            {
+              "q": "Q6. What happens when we delete a parent record that has child records?",
+              "a": "With the default restrictive behavior, MySQL prevents the deletion while child rows reference the parent. Configured actions such as CASCADE can change this behavior."
+            },
+            {
+              "q": "Q7. What is ON DELETE CASCADE?",
+              "a": "It automatically deletes related child records when the referenced parent record is deleted."
+            },
+            {
+              "q": "Q8. Can a foreign key contain NULL?",
+              "a": "Yes, if the foreign key column permits NULL. A non-NULL foreign key value must still reference an existing parent key."
+            },
+            {
+              "q": "Q9. How do you find orphan records in SQL?",
+              "a": "Use a LEFT JOIN from the child or staging table to the parent table and filter for unmatched parent keys, often using WHERE parent.primary_key IS NULL."
+            },
+            {
+              "q": "Q10. Does a JOIN enforce referential integrity?",
+              "a": "No. A JOIN retrieves related records but does not enforce the relationship. A foreign key constraint enforces referential integrity in the database."
+            },
+            {
+              "q": "Q11. Why is referential integrity important in Data Engineering?",
+              "a": "It helps maintain consistent relationships between datasets, prevents invalid references in relational targets, and supports data-quality checks during ingestion and transformation."
+            },
+            {
+              "q": "Q12. What should a pipeline do when a child record arrives before its parent?",
+              "a": "Depending on business requirements, it can wait, retry validation, or quarantine the child record until the parent arrives. It should avoid silently dropping the record."
+            }
+          ]
+        },
+        {
+          "n": 28,
+          "title": "What Is DML",
+          "explanation": [
+            "<h3>1. What Is DML?</h3>",
+            "<p><b>DML (Data Manipulation Language)</b> is a category of SQL commands used to retrieve, insert, modify, and delete data stored in database tables.</p>",
+            "<p>DML works with the data inside tables rather than defining the table structure itself. For example, adding a new employee, updating a salary, or deleting an outdated record are data manipulation operations.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> DML is used to work with the records stored inside database tables.</div>",
+            "<h3>2. Why Do We Need DML?</h3>",
+            "<p>Databases are useful only when applications and users can work with the data stored in them. DML allows us to perform these everyday operations.</p>",
+            "<ul><li>Add new customer, employee, or transaction records.</li><li>Retrieve records to generate reports.</li><li>Update incorrect or outdated information.</li><li>Delete records that are no longer required.</li><li>Load and maintain data during data engineering pipelines.</li></ul>",
+            "<h3>3. Main DML Commands</h3>",
+            "<table><thead><tr><th>Command</th><th>Purpose</th><th>Example</th></tr></thead><tbody><tr><td>SELECT</td><td>Retrieve data</td><td>Read employee records</td></tr><tr><td>INSERT</td><td>Add new records</td><td>Add a new employee</td></tr><tr><td>UPDATE</td><td>Modify existing records</td><td>Change an employee's salary</td></tr><tr><td>DELETE</td><td>Remove records</td><td>Delete a specific employee record</td></tr></tbody></table>",
+            "<p><b>Note:</b> SQL terminology varies slightly between database systems and learning materials. SELECT is often classified as DQL (Data Query Language), while some materials include it under DML because it retrieves data. In this roadmap, SELECT is included to understand everyday data manipulation and retrieval operations.</p>",
+            "<h3>4. Create a Sample Table</h3>",
+            "<p>Before practicing DML, create a table to store employee information. CREATE TABLE is a DDL command, not a DML command.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2)\n);</code></pre></div>",
+            "<h3>5. INSERT — Add New Records</h3>",
+            "<p>The INSERT command adds new rows to a table.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00),\n    (2, 'Priya', 'HR', 32000.00),\n    (3, 'Arun', 'Data', 45000.00);</code></pre></div>",
+            "<p>Here, three employee records are inserted into the employees table. Specifying column names makes the statement clearer and helps avoid errors when the table structure changes.</p>",
+            "<h3>6. SELECT — Retrieve Records</h3>",
+            "<p>SELECT reads data from one or more tables.</p>",
+            "<div class=\"code-block\"><pre><code>-- Retrieve all columns and rows\nSELECT * FROM employees;\n\n-- Retrieve selected columns\nSELECT emp_name, salary\nFROM employees;\n\n-- Retrieve only Data department employees\nSELECT *\nFROM employees\nWHERE department = 'Data';</code></pre></div>",
+            "<p>Use WHERE to filter records. In real projects, selecting only the required columns and rows can reduce unnecessary data transfer and improve efficiency.</p>",
+            "<h3>7. UPDATE — Modify Existing Records</h3>",
+            "<p>UPDATE changes the values of existing rows.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET salary = 48000.00\nWHERE emp_id = 3;</code></pre></div>",
+            "<p>This query changes the salary of the employee whose ID is 3.</p>",
+            "<div class=\"definition-box\"><b>Important:</b> Always check the WHERE condition before executing UPDATE. Without WHERE, every row in the table can be updated.</div>",
+            "<h3>8. DELETE — Remove Records</h3>",
+            "<p>DELETE removes rows from a table. The WHERE clause determines which rows are deleted.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM employees\nWHERE emp_id = 2;</code></pre></div>",
+            "<p>This statement deletes the employee record with ID 2.</p>",
+            "<div class=\"definition-box\"><b>Warning:</b> DELETE FROM employees without a WHERE clause removes all rows from the table. Check your target rows and transaction settings before running destructive queries.</div>",
+            "<h3>9. DML and DDL Difference</h3>",
+            "<table><thead><tr><th>Feature</th><th>DML</th><th>DDL</th></tr></thead><tbody><tr><td>Full form</td><td>Data Manipulation Language</td><td>Data Definition Language</td></tr><tr><td>Main purpose</td><td>Work with table data</td><td>Define or change database structures</td></tr><tr><td>Examples</td><td>INSERT, UPDATE, DELETE</td><td>CREATE, ALTER, DROP</td></tr><tr><td>Typical operation</td><td>Change employee salary</td><td>Create an employees table</td></tr></tbody></table>",
+            "<h3>10. Transactions and DML in MySQL</h3>",
+            "<p>With transactional storage engines such as InnoDB, you can use transactions to control whether changes are committed or rolled back.</p>",
+            "<div class=\"code-block\"><pre><code>START TRANSACTION;\n\nUPDATE employees\nSET salary = 50000.00\nWHERE emp_id = 1;\n\n-- Keep the change\nCOMMIT;\n\n-- Alternatively, use ROLLBACK instead of COMMIT\n-- to undo uncommitted transactional changes.</code></pre></div>",
+            "<p>COMMIT makes the transaction's changes permanent. ROLLBACK cancels uncommitted changes within the transaction. Autocommit settings, storage engine, and statement behavior affect transaction handling.</p>",
+            "<h3>11. DML in Data Engineering</h3>",
+            "<p>Data engineers use SQL data manipulation operations when loading, correcting, transforming, and maintaining datasets.</p>",
+            "<div class=\"diagram\"><pre>Source Data\n     |\n     v\nINSERT / LOAD\n     |\n     v\nDatabase Tables\n     |\n     v\nSELECT / TRANSFORM\n     |\n     v\nUPDATE or DELETE when required\n     |\n     v\nValidated Data for Analytics</pre></div>",
+            "<ul><li><b>INSERT:</b> Load new records into staging or target tables.</li><li><b>SELECT:</b> Extract records for transformations, validation, and reporting.</li><li><b>UPDATE:</b> Correct existing records or update selected attributes.</li><li><b>DELETE:</b> Remove records when required by retention rules or data-cleaning logic.</li></ul>",
+            "<p>For large production pipelines, prefer controlled, repeatable operations, suitable filters, transactions where appropriate, and validation queries before changing important datasets.</p>",
+            "<h3>12. Common Mistakes</h3>",
+            "<ul><li>Using UPDATE without checking the WHERE condition.</li><li>Deleting every row accidentally by omitting WHERE.</li><li>Inserting values in the wrong column order when column names are omitted.</li><li>Using single quotes incorrectly around string values.</li><li>Assuming DELETE removes the table structure; it removes rows, not the table itself.</li><li>Assuming every DML statement can always be rolled back; transaction behavior depends on the database and operation.</li></ul>",
+            "<h3>13. Key Takeaways</h3>",
+            "<ul><li>DML is used to work with records stored in database tables.</li><li>INSERT adds rows, SELECT retrieves rows, UPDATE modifies rows, and DELETE removes rows.</li><li>WHERE is essential when only specific records should be changed or deleted.</li><li>DDL commands such as CREATE TABLE define database structures rather than manipulating individual records.</li><li>DML is a fundamental skill for SQL development and data engineering pipelines.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create the Table</b></p>",
+            "<p>Create an employees table with emp_id, emp_name, department, and salary columns using the schema in the explanation.</p>",
+            "<p class=\"practice-note\"><b>Step 2: Insert Records</b></p>",
+            "<p>Insert at least five employees into the table. Include employees from IT, HR, and Data departments.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00),\n    (2, 'Priya', 'HR', 32000.00),\n    (3, 'Arun', 'Data', 45000.00),\n    (4, 'Meena', 'Data', 52000.00),\n    (5, 'Kiran', 'IT', 40000.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Retrieve Data</b></p>",
+            "<p>Write queries to display all employees, only employee names and salaries, and employees who work in the Data department.</p>",
+            "<p class=\"practice-note\"><b>Step 4: Update a Record</b></p>",
+            "<p>Increase the salary of employee 3 to 48000.00. Then use SELECT with a WHERE condition to verify the result.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET salary = 48000.00\nWHERE emp_id = 3;\n\nSELECT *\nFROM employees\nWHERE emp_id = 3;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Delete a Record</b></p>",
+            "<p>Delete employee 2 and verify that the record no longer exists.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM employees\nWHERE emp_id = 2;\n\nSELECT *\nFROM employees\nWHERE emp_id = 2;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Test Your Understanding</b></p>",
+            "<ul><li>What happens if you execute UPDATE without WHERE?</li><li>What happens if you execute DELETE without WHERE?</li><li>Which command creates the table structure?</li><li>Which command retrieves selected columns?</li><li>How can you verify a change before continuing with a data pipeline?</li></ul>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Be able to insert, retrieve, update, and delete specific records safely, and explain the difference between DML and DDL.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is DML?",
+              "a": "DML stands for Data Manipulation Language. It refers to SQL operations used to work with data stored in database tables."
+            },
+            {
+              "q": "Q2. What are the main DML commands?",
+              "a": "INSERT adds records, UPDATE modifies records, and DELETE removes records. SELECT retrieves records and is often taught with DML, although it is also commonly classified separately as DQL."
+            },
+            {
+              "q": "Q3. What is the difference between INSERT and UPDATE?",
+              "a": "INSERT adds new rows to a table, whereas UPDATE changes values in existing rows."
+            },
+            {
+              "q": "Q4. What is the purpose of SELECT?",
+              "a": "SELECT retrieves data from database tables. It can return all columns or only specified columns and can filter rows with WHERE."
+            },
+            {
+              "q": "Q5. What happens if UPDATE is executed without WHERE?",
+              "a": "All rows in the target table are updated according to the SET clause."
+            },
+            {
+              "q": "Q6. What happens if DELETE is executed without WHERE?",
+              "a": "All rows in the target table are deleted, but the table structure remains."
+            },
+            {
+              "q": "Q7. Does DELETE remove a table?",
+              "a": "No. DELETE removes rows from a table. DROP TABLE removes the table structure and its data."
+            },
+            {
+              "q": "Q8. What is the difference between DML and DDL?",
+              "a": "DML works with data in tables, while DDL defines or changes database structures. INSERT and UPDATE are DML examples; CREATE TABLE and ALTER TABLE are DDL examples."
+            },
+            {
+              "q": "Q9. Why should column names be specified in INSERT?",
+              "a": "Specifying column names makes the query clearer and helps ensure values are assigned to the intended columns, even if the table's column order changes."
+            },
+            {
+              "q": "Q10. What are COMMIT and ROLLBACK?",
+              "a": "COMMIT makes a transaction's changes permanent. ROLLBACK cancels uncommitted transactional changes when supported by the database and storage engine."
+            },
+            {
+              "q": "Q11. Is SELECT DML or DQL?",
+              "a": "Terminology varies. Many learning materials classify SELECT as DQL (Data Query Language), while others include it under DML in a broader sense because it retrieves data."
+            },
+            {
+              "q": "Q12. How is DML used in data engineering?",
+              "a": "Data engineers use SQL to load new records, extract data, update existing values, and remove records when required as part of data ingestion, transformation, validation, and maintenance."
+            }
+          ]
+        },
+        {
+          "n": 29,
+          "title": "INSERT INTO",
+          "explanation": [
+            "<h3>1. What Is INSERT INTO?</h3>",
+            "<p><b>INSERT INTO</b> is an SQL statement used to add new rows of data into an existing database table. It is commonly used when adding employees, customers, orders, transactions, or records received from source systems.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> INSERT INTO adds new records to an existing table without creating a new table.</div>",
+            "<h3>2. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO table_name (column1, column2, column3)\nVALUES (value1, value2, value3);</code></pre></div>",
+            "<p><b>Explanation:</b></p>",
+            "<ul><li><b>INSERT INTO:</b> Specifies that new records will be added.</li><li><b>table_name:</b> The table receiving the data.</li><li><b>Column names:</b> Identify the columns where values will be inserted.</li><li><b>VALUES:</b> Provides the values for the new row.</li></ul>",
+            "<h3>3. Create a Sample Table</h3>",
+            "<p>Let's create an employees table to understand INSERT INTO with practical examples. CREATE TABLE is a DDL statement; INSERT INTO is used afterward to add data.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2)\n);</code></pre></div>",
+            "<h3>4. Insert a Single Record</h3>",
+            "<p>To insert one employee, specify the column names and their corresponding values.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00);</code></pre></div>",
+            "<p>This statement adds one employee to the employees table. The first value goes into emp_id, the second into emp_name, the third into department, and the fourth into salary.</p>",
+            "<h3>5. Insert Multiple Records</h3>",
+            "<p>MySQL allows multiple rows to be inserted in one INSERT statement. This is often more efficient than sending a separate statement for each row.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES\n    (2, 'Priya', 'HR', 32000.00),\n    (3, 'Arun', 'Data', 45000.00),\n    (4, 'Meena', 'Data', 52000.00);</code></pre></div>",
+            "<p>Three new rows are added in one statement. Each set of parentheses represents one row, and the values must correspond to the specified columns.</p>",
+            "<h3>6. Insert Data into Selected Columns</h3>",
+            "<p>You do not need to provide a value for every column if the omitted columns can accept their default values or NULL, or if they are generated automatically.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees (emp_id, emp_name)\nVALUES (5, 'Kiran');</code></pre></div>",
+            "<p>Here, department and salary are omitted. Because these columns allow NULL and have no DEFAULT value in our example table, MySQL assigns NULL to them.</p>",
+            "<div class=\"definition-box\"><b>Important:</b> An omitted column must be nullable, have a usable default, or be generated automatically. Otherwise, the INSERT can fail.</div>",
+            "<h3>7. Insert Using DEFAULT Values</h3>",
+            "<p>If a column has a DEFAULT value, MySQL can use that value when the column is omitted or when DEFAULT is explicitly specified.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE staff (\n    staff_id INT PRIMARY KEY,\n    staff_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50) DEFAULT 'General'\n);\n\nINSERT INTO staff (staff_id, staff_name)\nVALUES (1, 'Suresh');\n\nINSERT INTO staff (staff_id, staff_name, department)\nVALUES (2, 'Anita', DEFAULT);</code></pre></div>",
+            "<p>Both inserted rows use 'General' as the department because the DEFAULT value is applied.</p>",
+            "<h3>8. Insert Without Specifying Column Names</h3>",
+            "<p>MySQL allows you to omit the column list when supplying values for every column in the table's defined order.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\nVALUES (6, 'Divya', 'Finance', 40000.00);</code></pre></div>",
+            "<p>This statement depends on the exact number and order of columns. It is generally safer to specify column names because table structures can change over time.</p>",
+            "<h3>9. Verify Inserted Records</h3>",
+            "<p>After inserting data, use SELECT to check that the expected rows exist.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees;\n\nSELECT *\nFROM employees\nWHERE emp_id = 1;</code></pre></div>",
+            "<p>The first query displays all employee records. The second retrieves the row for employee ID 1.</p>",
+            "<h3>10. INSERT INTO and Data Engineering</h3>",
+            "<p>In data engineering, INSERT INTO is used to load data into staging tables, reference tables, and target tables. For example, a pipeline may extract customer records from a source system and insert them into a MySQL destination.</p>",
+            "<div class=\"diagram\"><pre>Source System\n      |\n      v\nExtract Records\n      |\n      v\nValidate and Transform\n      |\n      v\nINSERT INTO Target Table\n      |\n      v\nVerify Loaded Records</pre></div>",
+            "<p><b>Example:</b> Insert customer data into a staging table before transforming it for analytics.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO customer_staging\n    (customer_id, customer_name, city)\nVALUES\n    (101, 'Ravi Kumar', 'Bengaluru'),\n    (102, 'Priya Sharma', 'Hyderabad');</code></pre></div>",
+            "<p>For large data loads, engineers may use batch inserts, bulk-loading tools, transactions, and validation checks. The best method depends on the data volume and pipeline requirements.</p>",
+            "<h3>11. Common Errors and Best Practices</h3>",
+            "<ul><li><b>Duplicate primary key:</b> Inserting an emp_id that already exists can cause a duplicate-key error.</li><li><b>Column/value mismatch:</b> The number of values must match the number of specified columns.</li><li><b>Wrong data type:</b> Values must be compatible with the target column types.</li><li><b>Missing required values:</b> NOT NULL columns without defaults need suitable values.</li><li><b>Unescaped text:</b> Use single quotes for string literals and handle apostrophes correctly.</li><li><b>Unverified loads:</b> Use SELECT queries or row-count checks to validate the inserted data.</li></ul>",
+            "<p><b>Best practice:</b> Specify column names, validate source data, and use appropriate transactions when loading important records.</p>",
+            "<h3>12. Key Takeaways</h3>",
+            "<ul><li>INSERT INTO adds rows to an existing table.</li><li>VALUES specifies the data to insert.</li><li>Multiple rows can be inserted in a single statement.</li><li>Omitted columns need an appropriate default, nullable definition, or generated value.</li><li>Specifying column names improves query reliability.</li><li>INSERT INTO is a fundamental SQL operation for loading data in data engineering pipelines.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create a Table</b></p>",
+            "<p>Create a products table with product_id, product_name, category, and price columns.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE products (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL,\n    category VARCHAR(50),\n    price DECIMAL(10, 2)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Insert One Product</b></p>",
+            "<p>Insert a product with ID 1, name 'Laptop', category 'Electronics', and price 55000.00.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO products\n    (product_id, product_name, category, price)\nVALUES\n    (1, 'Laptop', 'Electronics', 55000.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Insert Multiple Products</b></p>",
+            "<p>Insert at least three more products using a single INSERT statement.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO products\n    (product_id, product_name, category, price)\nVALUES\n    (2, 'Mouse', 'Electronics', 750.00),\n    (3, 'Notebook', 'Stationery', 80.00),\n    (4, 'Keyboard', 'Electronics', 1200.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Insert Selected Columns</b></p>",
+            "<p>Insert a product with ID 5 and name 'Pen' without specifying category or price. Check the resulting row and observe the NULL values.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO products (product_id, product_name)\nVALUES (5, 'Pen');\n\nSELECT *\nFROM products\nWHERE product_id = 5;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Verify the Data</b></p>",
+            "<p>Retrieve all products, display only product names and prices, and count the number of inserted records.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT * FROM products;\n\nSELECT product_name, price\nFROM products;\n\nSELECT COUNT(*) AS total_products\nFROM products;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Test Error Handling</b></p>",
+            "<p>Try inserting a product using an existing product_id. Observe the primary-key error. Then try inserting a row without product_name and observe the NOT NULL constraint.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Insert single and multiple records, insert only selected columns, understand defaults and NULL values, and verify the loaded data.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is INSERT INTO in SQL?",
+              "a": "INSERT INTO is an SQL statement used to add new rows to an existing database table."
+            },
+            {
+              "q": "Q2. What is the basic syntax of INSERT INTO?",
+              "a": "INSERT INTO table_name (column1, column2) VALUES (value1, value2);"
+            },
+            {
+              "q": "Q3. Can we insert multiple records in one statement?",
+              "a": "Yes. In MySQL, multiple rows can be inserted by separating each set of values with a comma after the VALUES keyword."
+            },
+            {
+              "q": "Q4. Why should we specify column names in INSERT INTO?",
+              "a": "Specifying column names makes it clear which value belongs to each column and reduces errors caused by changes in column order."
+            },
+            {
+              "q": "Q5. Can we insert data into only selected columns?",
+              "a": "Yes. Specify the required columns. Omitted columns must allow NULL, have a default value, or be generated automatically."
+            },
+            {
+              "q": "Q6. What happens if we insert a duplicate primary key?",
+              "a": "MySQL normally rejects the row with a duplicate-key error because primary-key values must be unique."
+            },
+            {
+              "q": "Q7. What happens if the number of values does not match the specified columns?",
+              "a": "MySQL returns an error because each specified column must have a corresponding value or supported default expression."
+            },
+            {
+              "q": "Q8. Can INSERT INTO insert NULL values?",
+              "a": "Yes, if the target column allows NULL. An attempt to insert NULL into a NOT NULL column normally fails."
+            },
+            {
+              "q": "Q9. What is the difference between INSERT INTO and CREATE TABLE?",
+              "a": "CREATE TABLE creates a new table structure, while INSERT INTO adds records to an existing table."
+            },
+            {
+              "q": "Q10. How do you check whether a record was inserted?",
+              "a": "Use a SELECT query, often with a WHERE condition that identifies the inserted record."
+            },
+            {
+              "q": "Q11. What is the difference between single-row and multi-row INSERT?",
+              "a": "A single-row INSERT adds one row per statement, while a multi-row INSERT adds several rows in one statement. Multi-row inserts can reduce statement overhead."
+            },
+            {
+              "q": "Q12. How is INSERT INTO used in data engineering?",
+              "a": "It loads source records into staging or target tables during ingestion and transformation pipelines. Engineers should validate data and handle duplicate records and failures appropriately."
+            }
+          ]
+        },
+        {
+          "n": 30,
+          "title": "Inserting Multiple Rows",
+          "explanation": [
+            "<h3>1. What Is Inserting Multiple Rows?</h3>",
+            "<p><b>Inserting multiple rows</b> means adding two or more records to a database table using a single INSERT INTO statement. In MySQL, we can provide multiple sets of values separated by commas after the VALUES keyword.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> Multiple-row INSERT allows us to insert several records into a table with one SQL statement instead of executing a separate INSERT statement for every row.</div>",
+            "<h3>2. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO table_name (column1, column2, column3)\nVALUES\n    (value1, value2, value3),\n    (value4, value5, value6),\n    (value7, value8, value9);</code></pre></div>",
+            "<p>Each set of parentheses represents one row. Separate each row with a comma and finish the statement with a semicolon.</p>",
+            "<h3>3. Create a Sample Table</h3>",
+            "<p>First, create a table to store employee details.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2)\n);</code></pre></div>",
+            "<h3>4. Insert Multiple Rows in One Statement</h3>",
+            "<p>Suppose we want to add four employees. We can insert all four records in one statement.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00),\n    (2, 'Priya', 'HR', 32000.00),\n    (3, 'Arun', 'Data', 45000.00),\n    (4, 'Meena', 'Data', 52000.00);</code></pre></div>",
+            "<p>This statement inserts four rows into the employees table. The column order in the column list determines the order of values in every row.</p>",
+            "<h3>5. Understand How It Works</h3>",
+            "<div class=\"diagram\"><pre>INSERT INTO employees\n          |\n          v\n      VALUES\n          |\n    +-----+-----+\n    |     |     |\n   Row 1 Row 2 Row 3 ...\n    |     |     |\n    +-----+-----+\n          |\n          v\n Multiple rows inserted</pre></div>",
+            "<p>The database processes the supplied row values as part of one SQL statement. Each row must provide the correct number of values for the specified columns, and every value must satisfy the applicable data types and constraints.</p>",
+            "<h3>6. Verify the Inserted Rows</h3>",
+            "<p>Use SELECT to confirm that the records were inserted.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees;\n\nSELECT COUNT(*) AS total_employees\nFROM employees;</code></pre></div>",
+            "<p>The first query displays all employee records. The second returns the total number of rows in the table.</p>",
+            "<h3>7. Multiple INSERT Statements vs One Multi-Row INSERT</h3>",
+            "<p>Both approaches can add several records, but their SQL syntax differs.</p>",
+            "<p><b>Approach A: Separate statements</b></p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES (5, 'Kiran', 'IT', 40000.00);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES (6, 'Divya', 'HR', 38000.00);</code></pre></div>",
+            "<p><b>Approach B: One statement for multiple rows</b></p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES\n    (5, 'Kiran', 'IT', 40000.00),\n    (6, 'Divya', 'HR', 38000.00);</code></pre></div>",
+            "<p>For these examples, both approaches aim to insert the same two records. A multi-row statement can reduce statement and network overhead when inserting batches of data.</p>",
+            "<h3>8. Rules to Remember</h3>",
+            "<ul><li>Separate each row with a comma.</li><li>Every row must provide values for the specified columns in the same order.</li><li>Primary keys must be unique.</li><li>NOT NULL columns must receive non-NULL values unless the database supplies an appropriate generated value.</li><li>String values are generally written inside single quotes.</li><li>Use a semicolon to terminate the statement.</li></ul>",
+            "<h3>9. What Happens if One Row Has an Error?</h3>",
+            "<p>Consider a multi-row INSERT where one row violates a primary-key or NOT NULL constraint. With ordinary MySQL INSERT behavior, a constraint error can cause the statement to fail. For transactional tables such as InnoDB, the failed statement's changes are rolled back as a statement, so valid rows from that same statement are not partially inserted. Other storage engines and error-handling clauses may behave differently.</p>",
+            "<div class=\"code-block\"><pre><code>-- Assume employee ID 1 already exists.\nINSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES\n    (7, 'Sanjay', 'IT', 42000.00),\n    (1, 'Duplicate', 'HR', 30000.00);</code></pre></div>",
+            "<p>The duplicate primary key can cause this statement to fail. Check the existing data and correct duplicate identifiers before retrying the insert.</p>",
+            "<h3>10. Inserting Multiple Rows in Data Engineering</h3>",
+            "<p>Data engineers often process source data in batches. A batch may contain hundreds or thousands of records that need to be loaded into a staging or destination table.</p>",
+            "<div class=\"diagram\"><pre>Source Dataset\n      |\n      v\nValidate Batch\n      |\n      v\nINSERT Multiple Rows\n      |\n      v\nTarget Database Table\n      |\n      v\nCheck Row Counts and Quality</pre></div>",
+            "<p>For example, a pipeline can insert several customer records into a staging table.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO customer_staging\n    (customer_id, customer_name, city)\nVALUES\n    (101, 'Ravi Kumar', 'Bengaluru'),\n    (102, 'Priya Sharma', 'Hyderabad'),\n    (103, 'Arun Kumar', 'Chennai');</code></pre></div>",
+            "<p>For large datasets, do not place millions of rows into one enormous SQL statement. Use appropriate batch sizes or bulk-loading methods, handle failures, and validate row counts. A suitable batch size depends on record size, database limits, and workload.</p>",
+            "<h3>11. Common Mistakes</h3>",
+            "<ul><li>Forgetting the comma between row-value groups.</li><li>Providing a different number of values in a row.</li><li>Inserting duplicate primary-key values.</li><li>Using text values without appropriate quotes.</li><li>Mixing up the order of values and columns.</li><li>Assuming that a multi-row INSERT always improves performance regardless of batch size or workload.</li></ul>",
+            "<h3>12. Key Takeaways</h3>",
+            "<ul><li>Use INSERT INTO with multiple VALUES groups to insert several rows in one statement.</li><li>Separate row groups with commas.</li><li>Verify inserted records using SELECT and COUNT(*).</li><li>Check constraints and duplicate keys before loading data.</li><li>Multi-row INSERT is useful for batch loading in data engineering pipelines.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create the Products Table</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE products (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL,\n    category VARCHAR(50),\n    price DECIMAL(10, 2)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Insert Five Products at Once</b></p>",
+            "<p>Write one INSERT statement to add all five products below.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO products\n    (product_id, product_name, category, price)\nVALUES\n    (1, 'Laptop', 'Electronics', 55000.00),\n    (2, 'Mouse', 'Electronics', 750.00),\n    (3, 'Notebook', 'Stationery', 80.00),\n    (4, 'Keyboard', 'Electronics', 1200.00),\n    (5, 'Water Bottle', 'Accessories', 350.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Display All Products</b></p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM products;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Count the Inserted Records</b></p>",
+            "<div class=\"code-block\"><pre><code>SELECT COUNT(*) AS total_products\nFROM products;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Filter the Inserted Data</b></p>",
+            "<p>Display only products in the Electronics category.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT product_id, product_name, price\nFROM products\nWHERE category = 'Electronics';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Test Error Handling</b></p>",
+            "<p>Try inserting a new product using an existing product_id. Observe the duplicate-key error. Then correct the ID and insert the record successfully.</p>",
+            "<p class=\"practice-note\"><b>Step 7: Challenge</b></p>",
+            "<p>Create an orders table with order_id, customer_name, and order_amount. Insert at least ten orders using one multi-row INSERT statement and verify the number of records with COUNT(*).</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Insert multiple records in a single statement, verify the results, and recognize errors caused by duplicate keys or mismatched values.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is inserting multiple rows?",
+              "a": "It means adding two or more records to a table using one INSERT INTO statement."
+            },
+            {
+              "q": "Q2. What is the syntax for inserting multiple rows in MySQL?",
+              "a": "INSERT INTO table_name (column1, column2) VALUES (value1, value2), (value3, value4);"
+            },
+            {
+              "q": "Q3. How do we separate multiple rows in a VALUES clause?",
+              "a": "Separate each parenthesized row of values with a comma."
+            },
+            {
+              "q": "Q4. Can each row have a different number of values?",
+              "a": "No. Each row must provide values that match the specified column list. Use DEFAULT or an appropriate expression when a column needs a default value."
+            },
+            {
+              "q": "Q5. What is the advantage of multi-row INSERT?",
+              "a": "It can reduce SQL statement and network overhead compared with sending a separate INSERT statement for each row."
+            },
+            {
+              "q": "Q6. How can we check how many rows were inserted?",
+              "a": "Run SELECT COUNT(*) FROM table_name; to count all rows currently in the table. To measure only the rows from a particular load, use suitable identifiers or load-tracking logic."
+            },
+            {
+              "q": "Q7. What happens if a row violates a primary-key constraint?",
+              "a": "The INSERT can fail because primary-key values must be unique. For a transactional InnoDB table, an ordinary failed multi-row INSERT is rolled back as a statement."
+            },
+            {
+              "q": "Q8. Is one multi-row INSERT always faster?",
+              "a": "Not always. It often reduces statement overhead, but performance depends on batch size, indexes, constraints, network latency, and database workload."
+            },
+            {
+              "q": "Q9. Can we insert multiple rows without specifying column names?",
+              "a": "Yes, if values are supplied for all required columns in the table's defined order. Specifying column names is generally safer."
+            },
+            {
+              "q": "Q10. What is the difference between multi-row INSERT and multiple INSERT statements?",
+              "a": "A multi-row INSERT adds several rows in one statement, whereas multiple INSERT statements send a separate statement for each row or group of rows."
+            },
+            {
+              "q": "Q11. How is multi-row INSERT useful in data engineering?",
+              "a": "It allows a pipeline to load records into staging or target tables in batches, potentially reducing statement overhead and improving ingestion efficiency."
+            },
+            {
+              "q": "Q12. What should we validate before inserting a batch?",
+              "a": "Check column mappings, data types, required values, duplicate keys, and applicable constraints. After loading, verify row counts and data quality."
+            }
+          ]
         }
   ]
 }
