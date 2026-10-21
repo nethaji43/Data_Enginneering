@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Data Modeling — Data Engineering Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  :root{ --ring-color:#A371F7; }
+  body{ background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(163,113,247,0.08), transparent), var(--bg); }
+  .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:8px;}
+
+  .section{margin-top:34px; border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden;}
+  .section.hidden{display:none;}
+  .section-head{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .section-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px;}
+  .star{color:#A371F7; font-size:14px;}
+  .section-count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px;}
+
+  .section .note, .section .diagram{margin-left:20px; margin-right:20px;}
+  .section .note:first-child{margin-top:14px;}
+  .section .diagram{margin-top:14px; margin-bottom:18px;}
+
+  .items{padding:6px 8px 16px;}
+  .item{display:flex; align-items:flex-start; gap:12px; padding:9px 12px; border-radius:9px; transition:background .12s;}
+  .item:hover{background:var(--surface-2);}
+  .check{
+    width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg); cursor:default;
+    transition:all .15s; background:none;
+  }
+  .item.done .check{background:#A371F7; border-color:#A371F7;}
+  .item-num{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); flex-shrink:0; width:22px; margin-top:2px;}
+  .item-body{flex:1; min-width:0;}
+  a.item-text{font-size:14.5px; color:var(--text); text-decoration:none; transition:color .15s;}
+  a.item-text:hover{color:#A371F7;}
+  .item.done .item-text{color:var(--text-dim);}
+  .item-text code{font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:#7EE787;}
+  .item-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .item-tag{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-faint); background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:2px 7px;}
+  .item.item-hidden{display:none;}
+
+  /* Fallback in case assets/style.css doesn't have this yet */
+  .item-arrow{color:var(--text-faint); font-size:11px; opacity:.55; margin-left:5px; transition:opacity .15s, color .15s;}
+  a.item-text:hover .item-arrow{opacity:1; color:#A371F7;}
+</style>
+</head>
+<body>
+<div class="wrap narrow">
+
+  <a class="back" href="../../index.html">&larr; BACK TO ROADMAP</a>
+  <p class="crumb"><b>Database & Data Concepts</b> &middot; Topic 18 of 74</p>
+
+  <div class="hero">
+    <div>
+      <h1>Data Modeling</h1>
+      <p class="sub">Representing business data, relationships, and analytical structures — with extra focus on dimensional modeling, grain, and star/snowflake schemas. Click any item to open its notes, practice, and Q&amp;A.</p>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="60" height="60" viewBox="0 0 64 64">
+        <circle class="ring-track" cx="32" cy="32" r="27"></circle>
+        <circle id="ringFill" class="ring-fill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+      </svg>
+      <div>
+        <div class="ring-num" id="progressNum">0/195</div>
+        <div class="ring-label">LEARNED</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note note-info" style="margin-top:22px;">
+    <span class="note-icon">&#9432;</span>
+    <span><strong>Goal:</strong> Learn how to represent business data, define relationships between datasets, choose the right level of detail, and organize data for operational systems and analytical workloads.</span>
+  </div>
+  <div class="note note-info" style="margin-top:0;">
+    <span class="note-icon">&#9432;</span>
+    <span><strong>Boundary:</strong> Topic 16 covers how to design database tables and relationships. Topic 17 covers reducing redundancy and when controlled redundancy makes sense. Topic 18 covers representing business entities, processes, relationships, and analytical data in a model that meets business requirements.</span>
+  </div>
+
+  <input class="search" id="search" type="text" placeholder="Search — e.g. grain, star schema, fact table..." style="margin-top:20px;" />
+
+  <div id="sections"></div>
+
+  <div class="footer">
+    <span class="footer-note">PROGRESS SAVED IN THIS BROWSER &middot; SYNCS WITH THE MAIN ROADMAP</span>
+  </div>
+
+</div>
+
+<script src="../../assets/common.js"></script>
+<script>
+const TOPIC_ID = 18;                 // matches topic.n = 18 (Data Modeling) in index.html
+const CONTENT_SLUG = 'data-modeling'; // matches /content/data-modeling.json, used for item.html links
+const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
+
+const SECTIONS = [
+  { title:'18.1 Data Modeling Fundamentals', items:[
+      {t:'What is data modeling?'}, {t:'Why data modeling matters in Data Engineering'},
+      {t:'Data model vs database schema'}, {t:'Data modeling vs database design'},
+      {t:'Data modeling vs normalization'}, {t:'Data model components'}, {t:'Entities'}, {t:'Attributes'},
+      {t:'Relationships'}, {t:'Constraints'}, {t:'Business rules'}, {t:'Data flow between systems'},
+      {t:'Source systems and target systems'}, {t:'Model requirements before implementation'},
+      {t:'Data modeling lifecycle'},
+    ], note:{type:'info', text:'Data models describe how data is organized and related. They help translate business requirements into structures that can be implemented in databases and analytical systems.'}
+  },
+  { title:'18.2 Types of Data Models', items:[
+      {t:'What is a conceptual data model?'}, {t:'What is a logical data model?'},
+      {t:'What is a physical data model?'}, {t:'Conceptual vs logical vs physical'},
+      {t:'When each model is used'}, {t:'Business-level modeling'}, {t:'Technology-independent modeling'},
+      {t:'Database-specific modeling'}, {t:'Moving from conceptual to logical'}, {t:'Moving from logical to physical'},
+    ], example:'Business Requirements\n        \u2193\nConceptual Model\n        \u2193\nLogical Model\n        \u2193\nPhysical Model\n        \u2193\nDatabase Implementation'
+  },
+  { title:'18.3 Relational Data Modeling', items:[
+      {t:'Relational model overview'}, {t:'Tables and attributes'}, {t:'Primary keys and foreign keys'},
+      {t:'One-to-one relationships'}, {t:'One-to-many relationships'}, {t:'Many-to-many relationships'},
+      {t:'Junction tables'}, {t:'Relationship cardinality'}, {t:'Optional vs mandatory relationships'},
+      {t:'Referential integrity'}, {t:'Model relationships across tables'}, {t:'Relational model limitations'},
+    ], note:{type:'info', text:'Scope boundary: basic keys and relationships were covered in Topics 5 and 16. Here, focus on representing them correctly within a complete model.'}
+  },
+  { title:'18.4 ER Modeling', items:[
+      {t:'Entity-relationship modeling'}, {t:'Identify entities from requirements'}, {t:'Identify attributes'},
+      {t:'Identify business relationships'}, {t:'Define cardinality'}, {t:'Define optionality'},
+      {t:'Identify associative entities'}, {t:'Model hierarchical relationships'}, {t:'Create ER diagrams'},
+      {t:'Validate ER diagrams against requirements'},
+  ]},
+  { title:'18.5 Data Modeling Approaches', items:[
+      {t:'Relational data modeling'}, {t:'Entity-relationship modeling'}, {t:'Dimensional data modeling'},
+      {t:'Hierarchical data modeling'}, {t:'Graph data modeling'}, {t:'Document data modeling'},
+      {t:'Key-value data modeling'}, {t:'Choosing a model based on workload'},
+      {t:'Structured vs semi-structured data modeling'}, {t:'Operational vs analytical modeling'},
+    ], note:{type:'info', text:'Relational, entity-relationship, hierarchical and graph approaches represent data and relationships in different ways. The appropriate approach depends on the structure and requirements of the system.'}
+  },
+  { title:'18.6 Dimensional Modeling Fundamentals', important:true,
+    intro:{type:'info', text:'This is one of the highest-priority sections for your Data Engineering goal.'},
+    items:[
+      {t:'What is dimensional modeling?'}, {t:'Why dimensional modeling is used'},
+      {t:'Dimensional modeling vs relational modeling'}, {t:'Business process identification'},
+      {t:'Identify facts'}, {t:'Identify dimensions'}, {t:'Identify measures'},
+      {t:'Identify descriptive attributes'}, {t:'Define dimensional relationships'},
+      {t:'Choose a dimensional model'}, {t:'Design for analytical queries'},
+  ]},
+  { title:'18.7 Grain', important:true, items:[
+      {t:'What is grain?'}, {t:'Define the grain before designing a fact table'}, {t:'Transaction-level grain'},
+      {t:'Order-level grain'}, {t:'Order-item-level grain'}, {t:'Daily summary grain'}, {t:'Monthly summary grain'},
+      {t:'Different grains across datasets'}, {t:'Grain and aggregation'}, {t:'Grain and duplicate records'},
+      {t:'Grain and fact table design'}, {t:'Validate the chosen grain'},
+    ], example:'Sales Fact Table\n\nGrain: one row per order item\n\nIf an order contains three products, the fact table contains three\norder-item records.',
+    note:{type:'info', text:'The grain determines what each row means and which measures can be analyzed correctly.'}
+  },
+  { title:'18.8 Fact Tables', important:true, items:[
+      {t:'What is a fact table?'}, {t:'Business events and processes'}, {t:'Fact table grain'},
+      {t:'Foreign keys in fact tables'}, {t:'Measures in fact tables'}, {t:'Additive measures'},
+      {t:'Semi-additive measures'}, {t:'Non-additive measures'}, {t:'Transaction fact tables'},
+      {t:'Periodic snapshot fact tables'}, {t:'Accumulating snapshot fact tables'}, {t:'Fact table design mistakes'},
+  ]},
+  { title:'18.9 Dimension Tables', important:true, items:[
+      {t:'What is a dimension table?'}, {t:'Descriptive attributes'}, {t:'Dimension keys'}, {t:'Surrogate keys'},
+      {t:'Natural keys'}, {t:'Dimension attributes'}, {t:'Dimension hierarchies'}, {t:'Date dimension'},
+      {t:'Customer dimension'}, {t:'Product dimension'}, {t:'Location dimension'},
+      {t:'Degenerate dimensions concept'}, {t:'Role-playing dimensions concept'},
+  ]},
+  { title:'18.10 Star Schema', important:true, items:[
+      {t:'What is a star schema?'}, {t:'Fact table at the center'}, {t:'Dimension tables around the fact table'},
+      {t:'Fact-to-dimension relationships'}, {t:'Denormalized dimensions'}, {t:'Advantages of star schemas'},
+      {t:'Limitations of star schemas'}, {t:'Star schema query patterns'}, {t:'Star schema for reporting'},
+      {t:'Design a sales star schema'},
+    ], example:'Conceptual star-schema layout:\n\nDim_Customer                    Dim_Date\n(customer key, name, city)      (date attributes)\n            \\                  /\n             \\                /\n                Fact_Sales\n           (keys, quantity, sales)\n             /                \\\n            /                  \\\nDim_Product                    Dim_Store\n(product attributes)           (store, city, region)\n\nEach dimension connects to the sales fact table.',
+    note:{type:'info', text:'A star schema uses a central fact table connected to descriptive dimension tables. It is widely used for analytical reporting because the structure is intuitive and reduces the need for complex joins between descriptive tables.'}
+  },
+  { title:'18.11 Snowflake Schema', important:true, items:[
+      {t:'What is a snowflake schema?'}, {t:'Normalized dimension tables'}, {t:'Dimension hierarchies'},
+      {t:'Product and category relationships'}, {t:'Location and region relationships'},
+      {t:'Star vs snowflake schema'}, {t:'Benefits of snowflake schemas'}, {t:'Drawbacks of snowflake schemas'},
+      {t:'When to use each design'}, {t:'Convert a star-style dimension into a snowflake design'},
+    ], note:{type:'info', text:'The snowflake schema splits some dimension attributes into related tables, whereas a star schema generally keeps related descriptive attributes together in wider dimension tables.'}
+  },
+  { title:'18.12 Fact Table Types', items:[
+      {t:'Transaction fact table'}, {t:'Periodic snapshot fact table'}, {t:'Accumulating snapshot fact table'},
+      {t:'Transaction vs snapshot facts'}, {t:'Choose the correct fact table type'},
+      {t:'Model order transactions'}, {t:'Model daily inventory'}, {t:'Model order lifecycle'},
+      {t:'Compare fact table grains'},
+  ]},
+  { title:'18.13 Measures & Aggregation Behavior', items:[
+      {t:'What is a measure?'}, {t:'Facts vs measures'}, {t:'Additive measures'}, {t:'Semi-additive measures'},
+      {t:'Non-additive measures'}, {t:'Revenue and quantity'}, {t:'Account balances'},
+      {t:'Percentages and ratios'}, {t:'Avoid incorrect aggregation'}, {t:'Define aggregation rules'},
+    ], note:{type:'info', text:'For example, sales revenue can generally be summed across transactions. An account balance usually cannot be summed meaningfully across different dates without considering the time context.'}
+  },
+  { title:'18.14 Dimension Relationships & Advanced Concepts', items:[
+      {t:'One-to-many fact-to-dimension relationships'}, {t:'Role-playing dimensions'},
+      {t:'Degenerate dimensions'}, {t:'Junk dimensions'}, {t:'Bridge tables'}, {t:'Multiple fact tables'},
+      {t:'Conformed dimensions'}, {t:'Shared dimensions across business processes'},
+      {t:'Fact-to-fact relationship risks'}, {t:'Many-to-many dimensional relationships'},
+    ], note:{type:'info', text:'Learn the purpose and common use cases first. Advanced implementation details can wait until the dedicated warehouse topic.'}
+  },
+  { title:'18.15 Slowly Changing Dimensions — Introduction', items:[
+      {t:'Why dimensions change'}, {t:'Current vs historical attributes'}, {t:'SCD Type 1 concept'},
+      {t:'SCD Type 2 concept'}, {t:'Effective start date'}, {t:'Effective end date'}, {t:'Current-record flag'},
+      {t:'Historical dimension records'}, {t:'Choose an appropriate history strategy'},
+    ], note:{type:'info', text:'Your previous topics introduced these ideas, so here focus on how historical changes affect the model rather than implementing a full SCD pipeline.'}
+  },
+  { title:'18.16 Modeling Different Workloads', items:[
+      {t:'OLTP data models'}, {t:'Analytical data models'}, {t:'Reporting and BI models'},
+      {t:'Data integration models'}, {t:'Event data models'}, {t:'Time-series data models'},
+      {t:'Modeling for historical analysis'}, {t:'Modeling for frequently updated data'},
+      {t:'Modeling for read-heavy workloads'}, {t:'Match model structure to requirements'},
+  ]},
+  { title:'18.17 Model Quality & Validation', items:[
+      {t:'Validate business requirements'}, {t:'Validate entity relationships'}, {t:'Validate grain'},
+      {t:'Check key uniqueness'}, {t:'Check referential integrity'}, {t:'Identify missing dimensions'},
+      {t:'Identify duplicate facts'}, {t:'Validate measures'}, {t:'Validate aggregation behavior'},
+      {t:'Check historical tracking requirements'}, {t:'Document assumptions and definitions'},
+  ]},
+  { title:'18.18 Data Modeling Tools', items:[
+      {t:'ER diagram tools'}, {t:'Draw.io / diagrams.net'}, {t:'MySQL Workbench'}, {t:'dbdiagram.io concept'},
+      {t:'Model tables and relationships'}, {t:'Generate schema scripts'},
+      {t:'Review models with stakeholders'}, {t:'Document model definitions'},
+  ]},
+  { title:'18.19 Practical Projects', items:[
+      {t:'Project 1 — E-commerce sales model', tags:['Customers','Products','Orders','Order items','Dates','Stores']},
+      {t:'Project 2 — Inventory model', tags:['one row per product + store + date?','quantity on hand additive across products?','summable across dates?','how is history retained?']},
+      {t:'Project 3 — Build and compare two models'},
+    ], examples:[
+      'Project 1 deliverables:\n\n- business requirements\n- grain definition\n- fact and dimension tables\n- keys\n- a star-schema diagram',
+      'Project 2: model daily inventory levels by product and store.\n\nAnswer these questions before designing:\n- Is each row one product, one store, and one date?\n- Is quantity on hand additive across products?\n- Can quantity on hand be summed across dates?\n- How will historical inventory be retained?',
+      'Project 3: use the same sales requirements to create\n\n1. A normalized operational model\n2. A dimensional star schema\n\nThen compare query complexity, redundancy, historical analysis,\nand ease of reporting.'
+    ]
+  },
+];
+
+// flatten with global sequential numbering (1..N) — this n is what item.html?n= refers to
+let counter = 0;
+SECTIONS.forEach(sec => sec.items.forEach(it => { counter++; it.n = counter; }));
+const TOTAL = counter;
+
+function mdInline(str){
+  return str.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+let progress = deReadStore(ITEMS_KEY);
+let query = '';
+
+const NOTE_ICON = {info:'\u24D8', practice:'\u2605', warning:'\u26A0'};
+
+function render(){
+  const root = document.getElementById('sections');
+  root.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  SECTIONS.forEach(sec=>{
+    const doneCount = sec.items.filter(it=>progress[it.n]).length;
+    const matchingItems = sec.items.filter(it=> !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q)));
+    const secEl = document.createElement('div');
+    secEl.className = 'section' + (matchingItems.length===0 ? ' hidden' : '');
+
+    secEl.innerHTML = `<div class="section-head">
+        <span class="section-title">${sec.title}</span>
+        ${sec.important ? '<span class="star" title="Very important">&#9733;</span>' : ''}
+        <span class="section-count">${doneCount}/${sec.items.length}</span>
+      </div>`;
+
+    if(sec.intro){
+      secEl.innerHTML += `<div class="note note-${sec.intro.type}"><span class="note-icon">${NOTE_ICON[sec.intro.type]}</span><span>${mdInline(sec.intro.text)}</span></div>`;
+    }
+
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'items';
+    sec.items.forEach(it=>{
+      const isDone = !!progress[it.n];
+      const visible = !q || it.t.toLowerCase().includes(q) || (it.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      const row = document.createElement('div');
+      row.className = 'item' + (isDone?' done':'') + (visible?'':' item-hidden');
+      row.innerHTML = `
+        <span class="item-num">${it.n}</span>
+        <span class="check" data-n="${it.n}">${isDone?'\u2713':''}</span>
+        <span class="item-body">
+          <a class="item-text" href="../../item.html?topic=${CONTENT_SLUG}&n=${it.n}">${mdInline(it.t)}<span class="item-arrow">&rarr;</span></a>
+          ${it.tags ? `<div class="item-tags">${it.tags.map(tg=>`<span class="item-tag">${tg}</span>`).join('')}</div>` : ''}
+        </span>
+      `;
+      // Checkbox is display-only — progress is only set from item.html's
+      // "Mark as learned" button, so no click handler here.
+      itemsWrap.appendChild(row);
+    });
+    secEl.appendChild(itemsWrap);
+
+    const diagrams = sec.examples || (sec.example ? [sec.example] : []);
+    diagrams.forEach(txt=>{
+      const ex = document.createElement('div');
+      ex.className = 'diagram';
+      ex.textContent = txt;
+      secEl.appendChild(ex);
+    });
+
+    if(sec.note){
+      const n = document.createElement('div');
+      n.className = `note note-${sec.note.type}`;
+      n.innerHTML = `<span class="note-icon">${NOTE_ICON[sec.note.type]}</span><span>${mdInline(sec.note.text)}</span>`;
+      n.style.marginBottom = '18px';
+      secEl.appendChild(n);
+    } else {
+      secEl.style.paddingBottom = '2px';
+    }
+
+    root.appendChild(secEl);
+  });
+
+  updateRing();
+}
+
+function updateRing(){
+  const done = Object.keys(progress).filter(k=>progress[k]).length;
+  document.getElementById('progressNum').textContent = `${done}/${TOTAL}`;
+  deUpdateRing(document.getElementById('ringFill'), done, TOTAL);
+}
+
+document.getElementById('search').addEventListener('input', e=>{ query = e.target.value; render(); });
+
+// Re-read whenever we come back from an item detail page, so a
+// Completed click there is reflected here immediately.
+window.addEventListener('focus', ()=>{ progress = deReadStore(ITEMS_KEY); render(); });
+
+render();
+</script>
+</body>
+</html>
