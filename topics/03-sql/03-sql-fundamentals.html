@@ -83,18 +83,69 @@ const ITEMS_KEY = deTopicItemsKey(TOPIC_ID);
 
 
 const SECTIONS = [
-  { title:'SQL Fundamentals', important:true, items:[
+  // 1. SQL INTRODUCTION
+  { title:'SQL Introduction & Setup', important:true, items:[
       {t:'What is SQL'},
       {t:'Database, Table, Row and Column'},
-      {t:'Schema basics'},
-      {t:'Data Types'},
-      {t:'`SELECT`'},
-      {t:'`FROM`'},
-      {t:'`DISTINCT`'},
-      {t:'Column Aliases using `AS`'},
-      {t:'`LIMIT` / `TOP` / `FETCH` / `OFFSET`'},
+      {t:'Schema Basics'},
+      {t:'SQL vs MySQL'},
+      {t:'MySQL Installation and Setup'},
+      {t:'MySQL Workbench and Database Connection'},
+      {t:'Your First SQL Query'},
   ]},
 
+  // 2. DDL — CREATE DATABASE AND TABLES
+  { title:'SQL Table & Database Basics (DDL)', important:true, items:[
+      {t:'What is DDL'},
+      {t:'`CREATE DATABASE`'},
+      {t:'`SHOW DATABASES`'},
+      {t:'`USE` Database'},
+      {t:'`SHOW TABLES`'},
+      {t:'`CREATE TABLE`'},
+      {t:'Data Types'},
+      {t:'`DESCRIBE` / `DESC` Table'},
+      {t:'`ALTER TABLE`'},
+      {t:'`DROP TABLE`'},
+      {t:'`TRUNCATE TABLE`'},
+  ]},
+
+  // 3. CONSTRAINTS AND KEYS
+  { title:'Constraints & Keys', important:true, items:[
+      {t:'What are Constraints'},
+      {t:'`PRIMARY KEY`'},
+      {t:'`FOREIGN KEY`'},
+      {t:'`UNIQUE`'},
+      {t:'`NOT NULL`'},
+      {t:'`DEFAULT`'},
+      {t:'`CHECK`'},
+      {t:'Composite Primary Key'},
+      {t:'Referential Integrity Basics'},
+  ]},
+
+  // 4. DML — INSERT AND MODIFY DATA
+  { title:'SQL Data Manipulation (DML)', important:true, items:[
+      {t:'What is DML'},
+      {t:'`INSERT INTO`'},
+      {t:'Inserting Multiple Rows'},
+      {t:'`UPDATE`'},
+      {t:'`DELETE`'},
+      {t:'`INSERT ... SELECT`'},
+      {t:'Previewing Data Before `UPDATE` or `DELETE`'},
+  ]},
+
+  // 5. BASIC DATA RETRIEVAL
+  { title:'SQL Fundamentals — Retrieving Data', important:true, items:[
+      {t:'`SELECT`'},
+      {t:'`FROM`'},
+      {t:'Selecting Specific Columns'},
+      {t:'Selecting All Columns with `*`'},
+      {t:'`DISTINCT`'},
+      {t:'Column Aliases using `AS`'},
+      {t:'`LIMIT`'},
+      {t:'`TOP` / `FETCH` / `OFFSET` — Other Database Alternatives'},
+  ]},
+
+  // 6. FILTERING
   { title:'Filtering Data', important:true, items:[
       {t:'`WHERE`'},
       {t:'Comparison Operators', tags:['=','!= / <>','>','<','>=','<=']},
@@ -109,6 +160,7 @@ const SECTIONS = [
       {t:'`IS NOT NULL`'},
   ]},
 
+  // 7. SORTING
   { title:'Sorting & Basic Results', items:[
       {t:'`ORDER BY`'},
       {t:'`ASC`'},
@@ -116,6 +168,7 @@ const SECTIONS = [
       {t:'Multiple Column Sorting'},
   ]},
 
+  // 8. AGGREGATION
   { title:'Aggregate Functions', important:true, items:[
       {t:'`COUNT()` — `COUNT(*)` vs `COUNT(column)`'},
       {t:'`SUM()`'},
@@ -127,12 +180,14 @@ const SECTIONS = [
       {t:'`DISTINCT` with Aggregate Functions'},
   ]},
 
+  // 9. JOINS
   { title:'SQL Joins — Extremely Important', important:true, items:[
       {t:'Why Joins are Used'},
+      {t:'Understanding Primary and Foreign Key Relationships'},
       {t:'`INNER JOIN`'},
       {t:'`LEFT JOIN`'},
       {t:'`RIGHT JOIN`'},
-      {t:'`FULL OUTER JOIN`'},
+      {t:'`FULL OUTER JOIN` — Concept and MySQL Alternatives'},
       {t:'`CROSS JOIN`'},
       {t:'`SELF JOIN`'},
       {t:'Join Multiple Tables'},
@@ -141,41 +196,48 @@ const SECTIONS = [
       {t:'Understanding Missing Matches in Joins'},
   ]},
 
+  // 10. SET OPERATIONS
   { title:'Set Operations', items:[
       {t:'`UNION`'},
       {t:'`UNION ALL`'},
-      {t:'`INTERSECT`'},
-      {t:'`EXCEPT`'},
-    ],
+      {t:'`INTERSECT` — Database Compatibility'},
+      {t:'`EXCEPT` — Database Compatibility'},
+  ],
     note:{
       type:'info',
-      text:"Learn database-specific alternatives later, if a particular database doesn't support all of these."
+      text:"MySQL support depends on the server version. Learn alternatives where needed."
     }
   },
 
-  { title:'SQL Data Manipulation (DML)', important:true, items:[
-      {t:'`INSERT`'},
-      {t:'`UPDATE`'},
-      {t:'`DELETE`'},
+  // 11. CONDITIONAL AND NULL HANDLING
+  { title:'Conditional & NULL Handling', important:true, items:[
+      {t:'`CASE WHEN`'},
+      {t:'`COALESCE()`'},
+      {t:'`NULLIF()`'},
+      {t:'Handling `NULL` Values'},
   ]},
 
-  { title:'SQL Table & Database Basics (DDL)', items:[
-      {t:'`CREATE DATABASE`'},
-      {t:'`CREATE TABLE`'},
-      {t:'`ALTER TABLE`'},
-      {t:'`DROP TABLE`'},
-      {t:'`TRUNCATE TABLE`'},
+  // 12. STRING FUNCTIONS
+  { title:'String Functions', items:[
+      {t:'`CONCAT()`'},
+      {t:'`UPPER()`'},
+      {t:'`LOWER()`'},
+      {t:'`TRIM()`'},
+      {t:'`LENGTH()` / `CHAR_LENGTH()` / `LEN()`'},
+      {t:'`SUBSTRING()`'},
+      {t:'`REPLACE()`'},
   ]},
 
-  { title:'Constraints & Keys', important:true, items:[
-      {t:'`PRIMARY KEY`'},
-      {t:'`FOREIGN KEY`'},
-      {t:'`UNIQUE`'},
-      {t:'`NOT NULL`'},
-      {t:'`DEFAULT`'},
-      {t:'`CHECK`'},
+  // 13. DATE AND TIME FUNCTIONS
+  { title:'Date & Time Functions', items:[
+      {t:'Current Date/Time'},
+      {t:'Extracting Year, Month and Day'},
+      {t:'Date Formatting'},
+      {t:'Date Arithmetic'},
+      {t:'Date Difference'},
   ]},
 
+  // 14. SUBQUERIES
   { title:'Subqueries', important:true, items:[
       {t:'Scalar Subqueries'},
       {t:'Multi-row Subqueries'},
@@ -185,6 +247,7 @@ const SECTIONS = [
       {t:'`EXISTS` vs `IN`'},
   ]},
 
+  // 15. COMMON TABLE EXPRESSIONS
   { title:'Common Table Expressions (CTEs)', important:true, items:[
       {t:'What is a CTE'},
       {t:'`WITH`'},
@@ -192,6 +255,7 @@ const SECTIONS = [
       {t:'CTE vs Subquery'},
   ]},
 
+  // 16. WINDOW FUNCTIONS
   { title:'Window Functions — Extremely Important for Data Engineering', important:true, items:[
       {t:'What is a Window Function'},
       {t:'`OVER()`'},
@@ -205,31 +269,7 @@ const SECTIONS = [
       {t:'Moving Average'},
   ]},
 
-  { title:'Conditional & NULL Handling', important:true, items:[
-      {t:'`CASE WHEN`'},
-      {t:'`COALESCE()`'},
-      {t:'`NULLIF()`'},
-      {t:'Handling `NULL` Values'},
-  ]},
-
-  { title:'String Functions', items:[
-      {t:'`CONCAT()`'},
-      {t:'`UPPER()`'},
-      {t:'`LOWER()`'},
-      {t:'`TRIM()`'},
-      {t:'`LENGTH()` / `LEN()`'},
-      {t:'`SUBSTRING()`'},
-      {t:'`REPLACE()`'},
-  ]},
-
-  { title:'Date & Time Functions', items:[
-      {t:'Current Date/Time'},
-      {t:'Extracting Year, Month and Day'},
-      {t:'Date Formatting'},
-      {t:'Date Arithmetic'},
-      {t:'Date Difference'},
-  ]},
-
+  // 17. SQL QUERY EXECUTION
   { title:'SQL Query Concepts', important:true, items:[
       {t:'SQL Query Execution Order'},
       {t:'Logical Query Processing Order'},

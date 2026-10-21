@@ -51,6 +51,133 @@
   .nav-links a{color:var(--text-dim); text-decoration:none;}
   .nav-links a:hover{color:#58A6FF;}
   .nav-links span.disabled{color:var(--text-faint); opacity:.4;}
+  
+/* SQL lesson content */
+.explanation h3 {
+  font-size: 17px;
+  line-height: 1.4;
+  margin: 26px 0 10px;
+  color: var(--text);
+}
+
+.explanation h3:first-child {
+  margin-top: 0;
+}
+
+.explanation ul,
+.explanation ol {
+  padding-left: 24px;
+  margin: 8px 0 18px;
+}
+
+.explanation li {
+  margin-bottom: 7px;
+}
+
+/* SQL code and sample data */
+.sql-code-block {
+  overflow-x: auto;
+  white-space: pre;
+  padding: 16px;
+  margin: 12px 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+/* Definition callouts */
+.sql-definition-box {
+  padding: 14px 16px;
+  margin: 12px 0 18px;
+  border-left: 3px solid #58A6FF;
+  border-radius: 0 8px 8px 0;
+  background: var(--surface);
+  font-size: 14.5px;
+}
+
+/* Workflow diagrams */
+.sql-diagram {
+  padding: 14px 16px;
+  margin: 12px 0 18px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+/* Tables inside explanations */
+.explanation table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0 20px;
+  font-size: 13.5px;
+  display: block;
+  overflow-x: auto;
+}
+
+.explanation th,
+.explanation td {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.explanation th {
+  background: var(--surface);
+  font-weight: 600;
+}
+
+.explanation tr:nth-child(even) {
+  background: var(--surface);
+}
+
+/* Make practice content fit your existing .practice-item cards */
+.practice-item h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.practice-item p {
+  margin: 0 0 10px;
+}
+
+.practice-item p:last-child {
+  margin-bottom: 0;
+}
+
+.practice-item ol,
+.practice-item ul {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.practice-item li {
+  margin-bottom: 5px;
+}
+
+/* Small screens */
+@media (max-width: 600px) {
+  .explanation {
+    font-size: 14.5px;
+  }
+
+  .sql-code-block {
+    font-size: 12px;
+    padding: 12px;
+  }
+
+  .practice-item {
+    padding: 12px;
+  }
+}
+
 </style>
 </head>
 <body>

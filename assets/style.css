@@ -142,3 +142,240 @@ a.item-text:hover .item-arrow{opacity:1; color:#E3B341;}
 .prompt-item{display:flex; gap:11px; align-items:flex-start; padding:9px 15px; font-size:14.5px; line-height:1.55; border-top:1px solid rgba(163,113,247,0.15);}
 .prompt-item:first-of-type{border-top:none;}
 .prompt-num{font-family:'JetBrains Mono',monospace; font-size:12px; color:#A371F7; flex-shrink:0; margin-top:1px;}
+
+
+/* ============================================================
+   LESSON SECTION DESIGN — CSS ONLY
+   HTML remains unchanged
+   ============================================================ */
+
+/* Shared spacing and section separation */
+.item-head + .block,
+#practiceBlock,
+#qnaBlock {
+  margin-top: 38px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+/* Shared section headings */
+.item-head + .block > .block-label,
+#practiceBlock > .block-label,
+#qnaBlock > .block-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 22px;
+  padding: 0 0 13px;
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+/* Explanation heading */
+.item-head + .block > .block-label {
+  color: #79B8FF;
+  border-bottom-color: rgba(88, 166, 255, .3);
+}
+
+.item-head + .block > .block-label::before {
+  content: "01";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(88, 166, 255, .1);
+  border: 1px solid rgba(88, 166, 255, .3);
+  letter-spacing: 0;
+}
+
+/* Explanation content */
+.explanation {
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.explanation h3 {
+  margin-top: 30px;
+  margin-bottom: 12px;
+  font-size: 17px;
+}
+
+.explanation h3:first-child {
+  margin-top: 0;
+}
+
+.explanation p {
+  margin-bottom: 16px;
+}
+
+/* Practice heading */
+#practiceBlock > .block-label {
+  color: #7EE787;
+  border-bottom-color: rgba(126, 231, 135, .3);
+}
+
+#practiceBlock > .block-label::before {
+  content: "02";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(126, 231, 135, .1);
+  border: 1px solid rgba(126, 231, 135, .3);
+  letter-spacing: 0;
+}
+
+/*
+  Practice fragments are direct children of #practiceList.
+  Style each fragment without requiring additional HTML wrappers.
+*/
+#practiceList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Numbered practice instructions become cards */
+#practiceList .practice-note {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid #7EE787;
+  border-radius: 9px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+#practiceList .practice-note b {
+  color: #7EE787;
+}
+
+/* Code examples inside practice */
+#practiceList .code-block {
+  margin: 0;
+  padding: 15px 17px;
+  background: #080D13;
+  border: 1px solid #303B49;
+  border-radius: 9px;
+  color: #7EE787;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow-x: auto;
+}
+
+/* Understanding-check diagrams */
+#practiceList .diagram {
+  margin: 0;
+  padding: 17px;
+  background: rgba(88, 166, 255, .055);
+  border: 1px solid rgba(88, 166, 255, .25);
+  border-radius: 10px;
+  color: #B9D7FF;
+  font-size: 13px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Final practice goal */
+#practiceList .definition-box {
+  margin: 0;
+  padding: 16px 18px;
+  background: rgba(126, 231, 135, .07);
+  border: 1px solid rgba(126, 231, 135, .3);
+  border-left: 3px solid #7EE787;
+  border-radius: 9px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+#practiceList .definition-box b {
+  color: #7EE787;
+}
+
+/* Q&A heading */
+#qnaBlock > .block-label {
+  color: #D2A8FF;
+  border-bottom-color: rgba(163, 113, 247, .3);
+}
+
+#qnaBlock > .block-label::before {
+  content: "03";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(163, 113, 247, .1);
+  border: 1px solid rgba(163, 113, 247, .3);
+  letter-spacing: 0;
+}
+
+/* Q&A cards */
+#qnaList {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+#qnaList .qna-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color .15s ease;
+}
+
+#qnaList .qna-item:hover {
+  border-color: #625080;
+}
+
+#qnaList .qna-q {
+  padding: 16px 17px;
+  line-height: 1.6;
+}
+
+#qnaList .qna-a-inner {
+  line-height: 1.8;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .item-head + .block,
+  #practiceBlock,
+  #qnaBlock {
+    margin-top: 28px;
+    padding-top: 20px;
+  }
+
+  #practiceList .practice-note,
+  #practiceList .definition-box {
+    padding: 12px 13px;
+  }
+
+  #practiceList .code-block,
+  #practiceList .diagram {
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  #qnaList .qna-q {
+    padding: 13px;
+  }
+}
