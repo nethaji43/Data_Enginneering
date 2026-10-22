@@ -4244,6 +4244,1315 @@
               "a": "Check column mappings, data types, required values, duplicate keys, and applicable constraints. After loading, verify row counts and data quality."
             }
           ]
+        },
+        {
+          "n": 31,
+          "title": "UPDATE",
+          "explanation": [
+            "<h3>1. What Is UPDATE?</h3>",
+            "<p><b>UPDATE</b> is an SQL statement used to modify existing data in one or more rows of a database table. It changes column values without creating new rows.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> UPDATE changes the values of existing records in a table.</div>",
+            "<h3>2. Why Do We Need UPDATE?</h3>",
+            "<p>Database records sometimes need corrections or changes. For example, an employee may receive a salary increase, a customer may change their city, or an order's status may change after delivery.</p>",
+            "<ul><li>Correct incorrect information.</li><li>Update employee salaries or department details.</li><li>Change order and payment statuses.</li><li>Maintain accurate customer records.</li><li>Correct or enrich data during data engineering transformations.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>UPDATE table_name\nSET column1 = value1,\n    column2 = value2\nWHERE condition;</code></pre></div>",
+            "<p><b>Explanation:</b></p>",
+            "<ul><li><b>UPDATE:</b> Specifies the table to modify.</li><li><b>SET:</b> Defines the new values for the selected columns.</li><li><b>WHERE:</b> Identifies the rows that should be updated.</li></ul>",
+            "<div class=\"definition-box\"><b>Critical Rule:</b> Always check the WHERE condition. If WHERE is omitted, UPDATE changes the specified columns in every row of the table.</div>",
+            "<h3>4. Create a Sample Table</h3>",
+            "<p>We will use an employees table for the following examples.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2),\n    city VARCHAR(50)\n);</code></pre></div>",
+            "<p>Insert some sample records before practicing UPDATE.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO employees\n    (emp_id, emp_name, department, salary, city)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00, 'Bengaluru'),\n    (2, 'Priya', 'HR', 32000.00, 'Hyderabad'),\n    (3, 'Arun', 'Data', 45000.00, 'Chennai'),\n    (4, 'Meena', 'Data', 52000.00, 'Bengaluru');</code></pre></div>",
+            "<h3>5. Update a Single Column</h3>",
+            "<p>Suppose employee 1 receives a salary increase. Update only the salary column for that employee.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET salary = 38000.00\nWHERE emp_id = 1;</code></pre></div>",
+            "<p>The WHERE condition identifies employee 1, so only that employee's salary is changed.</p>",
+            "<h3>6. Update Multiple Columns</h3>",
+            "<p>You can change more than one column in the same UPDATE statement.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET department = 'Data',\n    city = 'Bengaluru'\nWHERE emp_id = 2;</code></pre></div>",
+            "<p>This changes employee 2's department and city in one statement. Separate assignments in SET with commas.</p>",
+            "<h3>7. Update Multiple Rows</h3>",
+            "<p>When a condition matches several records, UPDATE changes every matching row.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET salary = salary + 2000\nWHERE department = 'Data';</code></pre></div>",
+            "<p>This adds 2000 to the salary of every employee in the Data department. The expression uses each row's existing salary to calculate its new salary.</p>",
+            "<h3>8. UPDATE Without WHERE</h3>",
+            "<p>If WHERE is omitted, all rows are affected by the specified assignments.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET city = 'Bengaluru';</code></pre></div>",
+            "<p>This statement sets the city to Bengaluru for every employee, regardless of their previous city.</p>",
+            "<div class=\"definition-box\"><b>Production Safety:</b> Before running UPDATE, execute a SELECT query using the same WHERE condition to inspect the target rows. Confirm the expected number of rows and use a transaction where appropriate.</div>",
+            "<h3>9. UPDATE with Different WHERE Conditions</h3>",
+            "<p><b>Using equality:</b></p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET city = 'Tirupati'\nWHERE emp_id = 3;</code></pre></div>",
+            "<p><b>Using comparison operators:</b></p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET salary = salary + 1000\nWHERE salary < 40000;</code></pre></div>",
+            "<p><b>Using multiple conditions:</b></p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET salary = salary + 1500\nWHERE department = 'IT'\n  AND city = 'Bengaluru';</code></pre></div>",
+            "<p>Conditions determine which records are modified. Be careful with AND and OR because they can change the number of rows matched.</p>",
+            "<h3>10. UPDATE Using a CASE Expression</h3>",
+            "<p>CASE allows different matching rows to receive different values within one statement.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET salary = CASE\n    WHEN department = 'IT' THEN salary + 2000\n    WHEN department = 'HR' THEN salary + 1000\n    ELSE salary\nEND;</code></pre></div>",
+            "<p>This example increases IT salaries by 2000, HR salaries by 1000, and leaves other salaries unchanged. Because there is no WHERE clause, every row is processed, although rows in other departments retain their current salary.</p>",
+            "<h3>11. Verify Updated Data</h3>",
+            "<p>Use SELECT to check the values after updating records.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE emp_id = 1;\n\nSELECT emp_id, emp_name, salary\nFROM employees\nWHERE department = 'Data';</code></pre></div>",
+            "<p>Always verify important changes instead of assuming the statement affected the intended rows.</p>",
+            "<h3>12. UPDATE and Transactions in MySQL</h3>",
+            "<p>With a transactional storage engine such as InnoDB, a transaction allows you to review changes before committing them.</p>",
+            "<div class=\"code-block\"><pre><code>START TRANSACTION;\n\nUPDATE employees\nSET salary = salary + 1000\nWHERE department = 'IT';\n\n-- Inspect the result before finalizing\nSELECT emp_id, emp_name, salary\nFROM employees\nWHERE department = 'IT';\n\n-- Choose one of the following:\nCOMMIT;\n-- Or use ROLLBACK instead if the changes should be cancelled.</code></pre></div>",
+            "<p>COMMIT makes the transaction's changes permanent. ROLLBACK cancels uncommitted changes. Run one of these final commands as appropriate; do not run both expecting the rollback to undo a committed transaction.</p>",
+            "<h3>13. UPDATE in Data Engineering</h3>",
+            "<p>Data engineers use UPDATE to correct existing records, maintain dimension tables, update processing statuses, and enrich datasets.</p>",
+            "<div class=\"diagram\"><pre>Incoming Data\n      |\n      v\nValidate Records\n      |\n      v\nIdentify Existing Rows\n      |\n      v\nUPDATE Matching Records\n      |\n      v\nVerify Changes\n      |\n      v\nContinue Data Pipeline</pre></div>",
+            "<p>For example, a pipeline may update a customer's city when the source system provides a corrected address.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE customers\nSET city = 'Bengaluru'\nWHERE customer_id = 101;</code></pre></div>",
+            "<p>In production, confirm that customer_id uniquely identifies the intended customer. For recurring ingestion pipelines, engineers may use upsert patterns or slowly changing dimension strategies instead of a simple UPDATE, depending on the requirements.</p>",
+            "<h3>14. Common Mistakes</h3>",
+            "<ul><li>Forgetting WHERE and accidentally changing all rows.</li><li>Using the wrong column in the WHERE condition.</li><li>Using AND or OR incorrectly.</li><li>Updating a value without checking the existing value.</li><li>Assuming that a successful statement necessarily changed the expected number of rows.</li><li>Using UPDATE on production data without validation or a recovery plan.</li></ul>",
+            "<h3>15. Key Takeaways</h3>",
+            "<ul><li>UPDATE modifies existing rows.</li><li>SET specifies the new column values.</li><li>WHERE selects which rows should change.</li><li>One statement can update one row, several rows, or every row.</li><li>SELECT, transactions, and row-count checks help make updates safer.</li><li>UPDATE is important for data cleaning, data maintenance, and data engineering pipelines.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create and Populate the Table</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2),\n    city VARCHAR(50)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary, city)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00, 'Bengaluru'),\n    (2, 'Priya', 'HR', 32000.00, 'Hyderabad'),\n    (3, 'Arun', 'Data', 45000.00, 'Chennai'),\n    (4, 'Meena', 'Data', 52000.00, 'Bengaluru'),\n    (5, 'Kiran', 'IT', 39000.00, 'Tirupati');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Update One Employee</b></p>",
+            "<p>Change Ravi's salary to 40000.00 using emp_id.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET salary = 40000.00\nWHERE emp_id = 1;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Update Multiple Columns</b></p>",
+            "<p>Change Priya's department to Finance and city to Bengaluru.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET department = 'Finance',\n    city = 'Bengaluru'\nWHERE emp_id = 2;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Update Multiple Rows</b></p>",
+            "<p>Increase every employee in the Data department's salary by 2500.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET salary = salary + 2500\nWHERE department = 'Data';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Use Multiple Conditions</b></p>",
+            "<p>Increase salary by 1000 for IT employees based in Bengaluru.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET salary = salary + 1000\nWHERE department = 'IT'\n  AND city = 'Bengaluru';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Verify All Changes</b></p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nORDER BY emp_id;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Production Safety Exercise</b></p>",
+            "<p>Before running an UPDATE, write a SELECT query with the same WHERE condition. Count the matching rows and confirm that they are the intended targets. Do not execute a broad UPDATE on important data without understanding its impact.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Update a single row, modify multiple columns, update several matching rows, use multiple conditions, and verify the results safely.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is UPDATE in SQL?",
+              "a": "UPDATE is a SQL statement used to modify existing values in one or more rows of a table."
+            },
+            {
+              "q": "Q2. What is the basic syntax of UPDATE?",
+              "a": "UPDATE table_name SET column_name = value WHERE condition;"
+            },
+            {
+              "q": "Q3. What is the purpose of SET?",
+              "a": "SET specifies the new values to assign to the selected columns."
+            },
+            {
+              "q": "Q4. Why is WHERE important in UPDATE?",
+              "a": "WHERE limits the update to rows that match a condition. Without WHERE, all rows are affected by the specified assignments."
+            },
+            {
+              "q": "Q5. Can UPDATE modify multiple columns?",
+              "a": "Yes. Use comma-separated assignments in the SET clause."
+            },
+            {
+              "q": "Q6. Can UPDATE modify multiple rows?",
+              "a": "Yes. Every row matching the WHERE condition can be updated."
+            },
+            {
+              "q": "Q7. How can we increase a salary by 2000?",
+              "a": "Use UPDATE employees SET salary = salary + 2000 WHERE emp_id = 1; to increase the salary of employee 1 by 2000."
+            },
+            {
+              "q": "Q8. What happens if UPDATE is executed without WHERE?",
+              "a": "Every row in the table is updated for the specified columns. This can cause unintended changes if used accidentally."
+            },
+            {
+              "q": "Q9. Can UPDATE use AND and OR?",
+              "a": "Yes. They combine conditions in the WHERE clause. AND requires both conditions to be true, while OR matches rows where at least one condition is true."
+            },
+            {
+              "q": "Q10. How do we verify an UPDATE?",
+              "a": "Run a SELECT query using the relevant condition and inspect the updated values. Row-count information can also help confirm the effect."
+            },
+            {
+              "q": "Q11. Can UPDATE be rolled back in MySQL?",
+              "a": "For uncommitted changes made to transactional tables such as InnoDB, ROLLBACK can undo the changes in the current transaction. Once committed, ordinary ROLLBACK cannot undo them."
+            },
+            {
+              "q": "Q12. How is UPDATE used in data engineering?",
+              "a": "It can correct existing records, enrich data, update processing statuses, and maintain target tables. Production pipelines should validate matching rows and consider transactions or upsert strategies when appropriate."
+            }
+          ]
+        },
+        {
+          "n": 32,
+          "title": "DELETE",
+          "explanation": [
+            "<h3>1. What Is DELETE?</h3>",
+            "<p><b>DELETE</b> is an SQL statement used to remove existing rows from a database table. You can delete a specific record using a WHERE condition or delete all rows by omitting the WHERE clause.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> DELETE removes records from a table while keeping the table structure intact.</div>",
+            "<h3>2. Why Do We Need DELETE?</h3>",
+            "<p>Database records may need to be removed when data is incorrect, duplicated, expired, or no longer required.</p>",
+            "<ul><li>Remove incorrect or duplicate records.</li><li>Delete test data after testing.</li><li>Remove records according to data-retention policies.</li><li>Clean up staging tables after processing.</li><li>Maintain data quality in data engineering pipelines.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM table_name\nWHERE condition;</code></pre></div>",
+            "<p><b>Explanation:</b></p>",
+            "<ul><li><b>DELETE FROM:</b> Specifies the table from which rows will be removed.</li><li><b>table_name:</b> The target table.</li><li><b>WHERE:</b> Identifies the rows to delete.</li></ul>",
+            "<div class=\"definition-box\"><b>Critical Rule:</b> Always inspect the WHERE condition before executing DELETE. Without WHERE, all rows in the table are deleted.</div>",
+            "<h3>4. Create a Sample Table</h3>",
+            "<p>Let's create an employees table and insert some sample records.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00),\n    (2, 'Priya', 'HR', 32000.00),\n    (3, 'Arun', 'Data', 45000.00),\n    (4, 'Meena', 'Data', 52000.00),\n    (5, 'Kiran', 'IT', 39000.00);</code></pre></div>",
+            "<h3>5. Delete a Single Row</h3>",
+            "<p>To delete one employee, use a condition that identifies the employee's unique ID.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM employees\nWHERE emp_id = 2;</code></pre></div>",
+            "<p>This removes the record for employee 2, Priya. The other employee records remain unchanged.</p>",
+            "<h3>6. Delete Multiple Rows</h3>",
+            "<p>A DELETE statement can remove multiple rows when several records match the WHERE condition.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM employees\nWHERE department = 'Data';</code></pre></div>",
+            "<p>This removes every employee record belonging to the Data department. In our sample data, employees 3 and 4 match the condition.</p>",
+            "<h3>7. Delete Using Multiple Conditions</h3>",
+            "<p>Use AND or OR to combine conditions and control which rows are removed.</p>",
+            "<div class=\"code-block\"><pre><code>-- Delete IT employees earning less than 38000\nDELETE FROM employees\nWHERE department = 'IT'\n  AND salary < 38000;</code></pre></div>",
+            "<p>AND requires both conditions to be true for a row to match.</p>",
+            "<div class=\"code-block\"><pre><code>-- Delete employees from either HR or Finance\nDELETE FROM employees\nWHERE department = 'HR'\n   OR department = 'Finance';</code></pre></div>",
+            "<p>OR matches rows where at least one condition is true. Review combined conditions carefully because they determine the deletion scope.</p>",
+            "<h3>8. DELETE Without WHERE</h3>",
+            "<p>When WHERE is omitted, DELETE removes all rows from the target table.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM employees;</code></pre></div>",
+            "<p>The employees table still exists, but it contains no rows after a successful deletion, assuming no other restrictions prevent the operation.</p>",
+            "<div class=\"definition-box\"><b>Production Safety:</b> Never run DELETE without WHERE unless you intentionally want to remove every row. Verify the target records first and ensure an appropriate recovery plan exists.</div>",
+            "<h3>9. Verify Before and After Deleting</h3>",
+            "<p>Before deleting, use SELECT with the same condition to inspect the affected rows.</p>",
+            "<div class=\"code-block\"><pre><code>-- Step 1: Preview the rows\nSELECT *\nFROM employees\nWHERE department = 'Data';\n\n-- Step 2: Delete the matching rows\nDELETE FROM employees\nWHERE department = 'Data';\n\n-- Step 3: Verify the result\nSELECT *\nFROM employees\nWHERE department = 'Data';</code></pre></div>",
+            "<p>The final SELECT should return no matching rows if the deletion succeeds and no matching records are added afterward.</p>",
+            "<h3>10. DELETE and NULL Values</h3>",
+            "<p>Use IS NULL to identify rows where a column contains SQL NULL. Do not use = NULL because NULL represents an unknown or missing value.</p>",
+            "<div class=\"code-block\"><pre><code>-- Find rows with no department\nSELECT *\nFROM employees\nWHERE department IS NULL;\n\n-- Delete rows with no department\nDELETE FROM employees\nWHERE department IS NULL;</code></pre></div>",
+            "<p>Always preview the records before deleting them, particularly when NULL may be a valid value in your application.</p>",
+            "<h3>11. DELETE vs TRUNCATE vs DROP</h3>",
+            "<table><thead><tr><th>Feature</th><th>DELETE</th><th>TRUNCATE</th><th>DROP</th></tr></thead><tbody><tr><td>Main purpose</td><td>Remove selected or all rows</td><td>Remove all rows</td><td>Remove the table itself</td></tr><tr><td>WHERE support</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Table structure remains</td><td>Yes</td><td>Yes</td><td>No</td></tr><tr><td>Typical use</td><td>Delete selected records</td><td>Clear a table</td><td>Remove an unwanted table</td></tr></tbody></table>",
+            "<p><b>Important MySQL note:</b> TRUNCATE TABLE is a DDL operation and generally causes an implicit commit; it is not rolled back like an ordinary transactional DELETE. DROP TABLE removes the table definition and its data. Foreign-key relationships can restrict TRUNCATE and DROP operations.</p>",
+            "<h3>12. DELETE and Transactions in MySQL</h3>",
+            "<p>When using a transactional storage engine such as InnoDB, a transaction can help you review a deletion before committing it.</p>",
+            "<div class=\"code-block\"><pre><code>START TRANSACTION;\n\nDELETE FROM employees\nWHERE emp_id = 5;\n\n-- Check the remaining rows\nSELECT * FROM employees;\n\n-- Keep the deletion\nCOMMIT;\n\n-- Alternatively, use ROLLBACK instead of COMMIT\n-- if you want to cancel the uncommitted deletion.</code></pre></div>",
+            "<p>COMMIT makes the deletion permanent. ROLLBACK cancels the uncommitted change. Choose the appropriate final command; a committed deletion cannot be undone by a later ordinary ROLLBACK.</p>",
+            "<h3>13. DELETE in Data Engineering</h3>",
+            "<p>Data engineers may use DELETE to remove duplicate staging records, clean up temporary data, enforce retention rules, or remove invalid records after validation.</p>",
+            "<div class=\"diagram\"><pre>Incoming Data\n      |\n      v\nValidate Records\n      |\n      v\nIdentify Invalid or Expired Rows\n      |\n      v\nPreview Matching Records\n      |\n      v\nDELETE Approved Rows\n      |\n      v\nVerify Data Quality</pre></div>",
+            "<p>Example: remove staging records that have already been processed, provided the table has a reliable processing status and the business rules permit deletion.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM staging_orders\nWHERE processing_status = 'PROCESSED';</code></pre></div>",
+            "<p>In a production pipeline, make sure the condition targets only records that are safe to remove. Retention requirements, audit needs, foreign keys, and recovery policies may favor archiving or soft deletion instead.</p>",
+            "<h3>14. Common Mistakes</h3>",
+            "<ul><li>Forgetting WHERE and deleting every row.</li><li>Using the wrong column or value in the condition.</li><li>Using = NULL instead of IS NULL.</li><li>Ignoring foreign-key constraints that prevent deletion of referenced records.</li><li>Assuming DELETE removes the table structure.</li><li>Deleting production data without previewing records or planning recovery.</li></ul>",
+            "<h3>15. Key Takeaways</h3>",
+            "<ul><li>DELETE removes rows from a table.</li><li>WHERE determines which rows are deleted.</li><li>Without WHERE, all rows are targeted.</li><li>SELECT helps preview and verify the deletion.</li><li>DELETE differs from TRUNCATE and DROP.</li><li>Use transactions and recovery procedures when appropriate for important data.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create a Table</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00),\n    (2, 'Priya', 'HR', 32000.00),\n    (3, 'Arun', 'Data', 45000.00),\n    (4, 'Meena', 'Data', 52000.00),\n    (5, 'Kiran', 'IT', 39000.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Preview a Single Record</b></p>",
+            "<p>Find employee 2 before deleting the record.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE emp_id = 2;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Delete One Record</b></p>",
+            "<p>Delete employee 2 and verify that the record no longer exists.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM employees\nWHERE emp_id = 2;\n\nSELECT *\nFROM employees\nWHERE emp_id = 2;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Delete Multiple Records</b></p>",
+            "<p>Preview and then delete employees in the Data department.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'Data';\n\nDELETE FROM employees\nWHERE department = 'Data';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Delete Using Multiple Conditions</b></p>",
+            "<p>Preview and delete IT employees earning less than 38000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'IT'\n  AND salary < 38000;\n\nDELETE FROM employees\nWHERE department = 'IT'\n  AND salary < 38000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Verify the Remaining Records</b></p>",
+            "<div class=\"code-block\"><pre><code>SELECT * FROM employees;\n\nSELECT COUNT(*) AS remaining_employees\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Think Before Executing</b></p>",
+            "<p>Explain what would happen if you ran DELETE FROM employees without WHERE. Do not execute this statement on important data merely to test your answer.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Delete one row, delete multiple matching rows, use conditions safely, and verify the result before and after deletion.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is DELETE in SQL?",
+              "a": "DELETE is an SQL statement used to remove existing rows from a table."
+            },
+            {
+              "q": "Q2. What is the basic syntax of DELETE?",
+              "a": "DELETE FROM table_name WHERE condition;"
+            },
+            {
+              "q": "Q3. What is the purpose of WHERE in DELETE?",
+              "a": "WHERE selects the rows to remove. Without WHERE, all rows in the target table are targeted."
+            },
+            {
+              "q": "Q4. Can DELETE remove multiple rows?",
+              "a": "Yes. DELETE removes every row that matches the specified WHERE condition."
+            },
+            {
+              "q": "Q5. What happens if DELETE is executed without WHERE?",
+              "a": "All rows in the table are targeted for deletion, but the table structure remains."
+            },
+            {
+              "q": "Q6. Does DELETE remove a table?",
+              "a": "No. DELETE removes rows. DROP TABLE removes the table definition and its data."
+            },
+            {
+              "q": "Q7. What is the difference between DELETE and TRUNCATE?",
+              "a": "DELETE can remove selected rows using WHERE. TRUNCATE TABLE removes all rows and is treated as DDL in MySQL, with different transaction behavior."
+            },
+            {
+              "q": "Q8. How do we delete rows where a column is NULL?",
+              "a": "Use WHERE column_name IS NULL. Do not use column_name = NULL."
+            },
+            {
+              "q": "Q9. How can we verify records before deleting them?",
+              "a": "Run SELECT with the same WHERE condition to inspect the rows that would be deleted. You can also use COUNT(*) to estimate the number of matching rows."
+            },
+            {
+              "q": "Q10. Can DELETE be rolled back in MySQL?",
+              "a": "For uncommitted DELETE operations on transactional tables such as InnoDB, ROLLBACK can undo the changes. After COMMIT, ordinary ROLLBACK cannot restore the deleted rows."
+            },
+            {
+              "q": "Q11. What is a foreign-key restriction on DELETE?",
+              "a": "A foreign key may prevent deleting a parent row while child rows reference it, unless the relationship is configured with an appropriate action such as ON DELETE CASCADE."
+            },
+            {
+              "q": "Q12. How is DELETE used in data engineering?",
+              "a": "It can remove invalid, expired, or already-processed records when business rules permit. Production pipelines should validate the target rows and follow retention, audit, and recovery requirements."
+            }
+          ]
+        },
+        {
+          "n": 33,
+          "title": "INSERT ... SELECT",
+          "explanation": [
+            "<h3>1. What Is INSERT ... SELECT?</h3>",
+            "<p><b>INSERT ... SELECT</b> is an SQL technique used to copy data from one table into another table by selecting rows from a source table and inserting the results into a destination table.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> INSERT ... SELECT retrieves existing data from a source table and inserts the selected results into another table without manually typing every row.</div>",
+            "<h3>2. Why Do We Need INSERT ... SELECT?</h3>",
+            "<p>In real-world databases, data is often already stored in one table and needs to be copied into another table for reporting, transformation, archiving, or data processing.</p>",
+            "<ul><li>Copy selected records into another table.</li><li>Move filtered data into a reporting table.</li><li>Load data from staging tables into destination tables.</li><li>Copy only records that satisfy specific conditions.</li><li>Prepare datasets for analytics and data engineering pipelines.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO destination_table (column1, column2, column3)\nSELECT column1, column2, column3\nFROM source_table\nWHERE condition;</code></pre></div>",
+            "<p><b>Explanation:</b></p>",
+            "<ul><li><b>INSERT INTO:</b> Specifies the destination table.</li><li><b>Destination columns:</b> Define where the selected values will be inserted.</li><li><b>SELECT:</b> Retrieves the source values.</li><li><b>FROM:</b> Identifies the source table.</li><li><b>WHERE:</b> Optionally filters which source rows are copied.</li></ul>",
+            "<div class=\"definition-box\"><b>Important:</b> The SELECT result must contain the same number of columns as the destination column list, with compatible data types and a suitable order.</div>",
+            "<h3>4. Create the Source Table</h3>",
+            "<p>Let's create an employees table containing existing records.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00),\n    (2, 'Priya', 'HR', 32000.00),\n    (3, 'Arun', 'Data', 45000.00),\n    (4, 'Meena', 'Data', 52000.00),\n    (5, 'Kiran', 'IT', 39000.00);</code></pre></div>",
+            "<h3>5. Create the Destination Table</h3>",
+            "<p>The destination table receives the selected records. In this example, we use a separate table for employees in the Data department.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE data_employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2)\n);</code></pre></div>",
+            "<h3>6. Copy All Selected Rows</h3>",
+            "<p>Use INSERT ... SELECT to copy all employee records from the source table into the destination table.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO data_employees\n    (emp_id, emp_name, department, salary)\nSELECT emp_id, emp_name, department, salary\nFROM employees;</code></pre></div>",
+            "<p>This inserts all five source records into data_employees, provided the destination table is empty and the rows satisfy its constraints.</p>",
+            "<h3>7. Copy Rows Using WHERE</h3>",
+            "<p>Often, we need only a subset of source data. The WHERE clause filters the records before they are inserted.</p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO data_employees\n    (emp_id, emp_name, department, salary)\nSELECT emp_id, emp_name, department, salary\nFROM employees\nWHERE department = 'Data';</code></pre></div>",
+            "<p>This copies only employees whose department is Data. With the sample records, Arun and Meena match the condition.</p>",
+            "<p><b>Note:</b> If you already ran the previous example, these employee IDs will conflict with existing primary keys in data_employees. Use a fresh destination table or clear the test destination before repeating the examples.</p>",
+            "<h3>8. Copy Only Selected Columns</h3>",
+            "<p>You can select only the columns required by the destination table.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employee_names (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL\n);\n\nINSERT INTO employee_names (emp_id, emp_name)\nSELECT emp_id, emp_name\nFROM employees;</code></pre></div>",
+            "<p>This copies only employee IDs and names. The source and destination column lists do not have to contain every column from the source table.</p>",
+            "<h3>9. INSERT ... SELECT with Calculated Values</h3>",
+            "<p>The SELECT statement can calculate values while preparing rows for insertion.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employee_salary_review (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100),\n    current_salary DECIMAL(10, 2),\n    proposed_salary DECIMAL(10, 2)\n);\n\nINSERT INTO employee_salary_review\n    (emp_id, emp_name, current_salary, proposed_salary)\nSELECT\n    emp_id,\n    emp_name,\n    salary,\n    salary * 1.10\nFROM employees\nWHERE salary < 50000;</code></pre></div>",
+            "<p>This copies employees earning less than 50000 and calculates a proposed salary that is 10% higher. It stores the proposed amount for review; it does not update the original employees table.</p>",
+            "<h3>10. INSERT ... SELECT with JOIN</h3>",
+            "<p>Data can be selected from multiple related tables using JOIN before inserting it into a destination table.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employee_department_report (\n    emp_id INT,\n    emp_name VARCHAR(100),\n    department_name VARCHAR(100)\n);\n\n-- Assume departments has department_code and department_name,\n-- and employees has department_code.\nINSERT INTO employee_department_report\n    (emp_id, emp_name, department_name)\nSELECT\n    e.emp_id,\n    e.emp_name,\n    d.department_name\nFROM employees AS e\nJOIN departments AS d\n    ON e.department_code = d.department_code;</code></pre></div>",
+            "<p>This example assumes the employees and departments tables contain the specified department_code columns. The JOIN retrieves matching department names before the rows are inserted into the report table.</p>",
+            "<h3>11. INSERT ... SELECT vs INSERT ... VALUES</h3>",
+            "<table><thead><tr><th>Feature</th><th>INSERT ... VALUES</th><th>INSERT ... SELECT</th></tr></thead><tbody><tr><td>Data source</td><td>Values supplied in the statement</td><td>Rows retrieved by a SELECT query</td></tr><tr><td>Best suited for</td><td>New manually specified records</td><td>Copying or transforming existing data</td></tr><tr><td>Filtering</td><td>Values are specified directly</td><td>WHERE can filter source rows</td></tr><tr><td>Calculations</td><td>Expressions can supply values</td><td>SELECT can transform or calculate values</td></tr><tr><td>Typical use</td><td>Insert a new customer</td><td>Load filtered staging data into a target table</td></tr></tbody></table>",
+            "<h3>12. Common Errors and Best Practices</h3>",
+            "<ul><li><b>Duplicate primary key:</b> The destination may already contain a source ID.</li><li><b>Column mismatch:</b> The number of selected expressions must match the destination column list.</li><li><b>Incorrect column order:</b> Map source expressions to destination columns carefully.</li><li><b>Constraint violations:</b> NOT NULL, UNIQUE, CHECK, and foreign-key rules can reject rows.</li><li><b>Unexpected row count:</b> Test the SELECT separately to see which rows will be inserted.</li><li><b>Repeated pipeline runs:</b> Re-running a copy operation may insert duplicates or fail on unique keys unless the process is designed to handle them.</li></ul>",
+            "<p><b>Best practice:</b> Run the SELECT portion first, validate the result, and then perform the insert. For important loads, consider transactions, unique keys, load tracking, and an appropriate duplicate-handling strategy.</p>",
+            "<h3>13. INSERT ... SELECT in Data Engineering</h3>",
+            "<p>This pattern is especially useful when moving data between pipeline stages. For example, validated records can be copied from a staging table into a reporting table.</p>",
+            "<div class=\"diagram\"><pre>Source / Staging Table\n          |\n          v\n     SELECT Query\n          |\n     Filter / Transform\n          |\n          v\n INSERT INTO Target Table\n          |\n          v\n Validate Loaded Data</pre></div>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO valid_orders\n    (order_id, customer_id, order_amount)\nSELECT order_id, customer_id, order_amount\nFROM staging_orders\nWHERE order_amount > 0;</code></pre></div>",
+            "<p>This example copies orders with positive amounts. Real pipelines may require additional checks for duplicate order IDs, missing customers, valid dates, and other business rules before loading.</p>",
+            "<h3>14. Key Takeaways</h3>",
+            "<ul><li>INSERT ... SELECT copies query results into a destination table.</li><li>WHERE filters the source records that will be inserted.</li><li>SELECT can calculate values and join source tables.</li><li>Destination columns and selected expressions must align correctly.</li><li>Check primary keys, constraints, and duplicate handling before loading.</li><li>This pattern is widely used for data migration, staging, transformation, and reporting.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create the Source Table</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE source_products (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL,\n    category VARCHAR(50),\n    price DECIMAL(10, 2)\n);\n\nINSERT INTO source_products\n    (product_id, product_name, category, price)\nVALUES\n    (1, 'Laptop', 'Electronics', 55000.00),\n    (2, 'Mouse', 'Electronics', 750.00),\n    (3, 'Notebook', 'Stationery', 80.00),\n    (4, 'Keyboard', 'Electronics', 1200.00),\n    (5, 'Bottle', 'Accessories', 350.00);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Create a Destination Table</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE electronics_products (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL,\n    category VARCHAR(50),\n    price DECIMAL(10, 2)\n);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Preview the Source Rows</b></p>",
+            "<p>Run the SELECT query first to check which products will be copied.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT product_id, product_name, category, price\nFROM source_products\nWHERE category = 'Electronics';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Insert the Selected Rows</b></p>",
+            "<div class=\"code-block\"><pre><code>INSERT INTO electronics_products\n    (product_id, product_name, category, price)\nSELECT product_id, product_name, category, price\nFROM source_products\nWHERE category = 'Electronics';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Verify the Inserted Records</b></p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM electronics_products;\n\nSELECT COUNT(*) AS total_products\nFROM electronics_products;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Copy Only Selected Columns</b></p>",
+            "<p>Create a separate table with product IDs and names, then copy those columns from source_products.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE product_names (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100) NOT NULL\n);\n\nINSERT INTO product_names (product_id, product_name)\nSELECT product_id, product_name\nFROM source_products;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Calculate Values During Insertion</b></p>",
+            "<p>Create a price_review table and copy products priced below 1000, calculating a proposed price that is 5% higher.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE price_review (\n    product_id INT PRIMARY KEY,\n    product_name VARCHAR(100),\n    current_price DECIMAL(10, 2),\n    proposed_price DECIMAL(10, 2)\n);\n\nINSERT INTO price_review\n    (product_id, product_name, current_price, proposed_price)\nSELECT\n    product_id,\n    product_name,\n    price,\n    price * 1.05\nFROM source_products\nWHERE price < 1000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8: Test Your Understanding</b></p>",
+            "<ul><li>What happens if the destination already contains the same primary key?</li><li>Why should you run SELECT before INSERT ... SELECT?</li><li>Can SELECT filter rows and calculate values before insertion?</li><li>How would you prevent a recurring data pipeline from loading the same records twice?</li></ul>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Copy all or filtered records between tables, select only required columns, calculate values during insertion, and verify the destination data.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is INSERT ... SELECT?",
+              "a": "It is an SQL pattern that selects records from a source query and inserts the resulting rows into a destination table."
+            },
+            {
+              "q": "Q2. What is the basic syntax?",
+              "a": "INSERT INTO destination_table (column1, column2) SELECT column1, column2 FROM source_table WHERE condition;"
+            },
+            {
+              "q": "Q3. What is the difference between INSERT ... VALUES and INSERT ... SELECT?",
+              "a": "INSERT ... VALUES uses values supplied directly in the statement. INSERT ... SELECT gets the values from a query, often using existing database tables."
+            },
+            {
+              "q": "Q4. Can INSERT ... SELECT copy only selected rows?",
+              "a": "Yes. Use a WHERE clause in the SELECT query to filter the rows before insertion."
+            },
+            {
+              "q": "Q5. Must the source and destination tables have identical structures?",
+              "a": "No. The destination can have a different structure, provided the selected expressions match the destination column list in number and compatible data types."
+            },
+            {
+              "q": "Q6. Can INSERT ... SELECT select only some columns?",
+              "a": "Yes. Specify the required destination columns and select the corresponding source expressions."
+            },
+            {
+              "q": "Q7. Can INSERT ... SELECT perform calculations?",
+              "a": "Yes. The SELECT clause can calculate expressions, such as multiplying a price by 1.05, before inserting the results."
+            },
+            {
+              "q": "Q8. Can INSERT ... SELECT use JOIN?",
+              "a": "Yes. The SELECT query can join multiple tables and insert the combined query results into the destination table."
+            },
+            {
+              "q": "Q9. What happens if a selected row violates a destination primary key?",
+              "a": "The insertion can fail because the destination requires unique primary-key values. Validate duplicate keys and design the load to handle conflicts appropriately."
+            },
+            {
+              "q": "Q10. Why should we run SELECT before INSERT ... SELECT?",
+              "a": "Running SELECT first lets you inspect the source rows, verify filters, check the expected row count, and catch data issues before inserting."
+            },
+            {
+              "q": "Q11. Does INSERT ... SELECT delete data from the source table?",
+              "a": "No. It inserts query results into the destination table; it does not delete the source rows."
+            },
+            {
+              "q": "Q12. How is INSERT ... SELECT used in data engineering?",
+              "a": "It is used to copy validated or filtered data from staging tables into target tables, create reporting datasets, and perform SQL-based transformations during data loading."
+            }
+          ]
+        },
+        {
+          "n": 34,
+          "title": "Previewing Data Before UPDATE or DELETE",
+          "explanation": [
+            "<h3>1. What Is Previewing Data Before UPDATE or DELETE?</h3>",
+            "<p><b>Previewing data</b> means using a SELECT query to inspect the rows that will be affected before executing an UPDATE or DELETE statement.</p>",
+            "<p>In databases, an incorrect UPDATE can change many records, and an incorrect DELETE can remove important data. Previewing the target rows helps you confirm that your WHERE condition selects exactly the records you intend to modify or remove.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> First use SELECT to check the target records, then execute UPDATE or DELETE only after confirming the result.</div>",
+            "<h3>2. Why Is Previewing Important?</h3>",
+            "<ul><li>Prevents accidental updates to unrelated records.</li><li>Reduces the risk of deleting important data.</li><li>Helps identify incorrect WHERE conditions.</li><li>Allows you to check how many rows match a condition.</li><li>Supports safer database maintenance and data engineering pipelines.</li></ul>",
+            "<h3>3. Create a Sample Table</h3>",
+            "<p>We will use an employees table to practice safe UPDATE and DELETE operations.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2),\n    city VARCHAR(50)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary, city)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00, 'Bengaluru'),\n    (2, 'Priya', 'HR', 32000.00, 'Hyderabad'),\n    (3, 'Arun', 'Data', 45000.00, 'Chennai'),\n    (4, 'Meena', 'Data', 52000.00, 'Bengaluru'),\n    (5, 'Kiran', 'IT', 39000.00, 'Tirupati');</code></pre></div>",
+            "<h3>4. Preview Before UPDATE</h3>",
+            "<p>Suppose you want to increase the salary of employees in the IT department by 2000. Before updating, inspect the matching records.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, emp_name, department, salary\nFROM employees\nWHERE department = 'IT';</code></pre></div>",
+            "<p>The query should return Ravi and Kiran in our sample data. Confirm that these are the employees whose salaries should change.</p>",
+            "<p>After checking the results, execute the UPDATE using the same condition.</p>",
+            "<div class=\"code-block\"><pre><code>UPDATE employees\nSET salary = salary + 2000\nWHERE department = 'IT';</code></pre></div>",
+            "<p>Finally, verify the updated salaries.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, emp_name, salary\nFROM employees\nWHERE department = 'IT';</code></pre></div>",
+            "<h3>5. Preview Before DELETE</h3>",
+            "<p>Suppose you want to delete employees who belong to the HR department. First, check which records match the condition.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'HR';</code></pre></div>",
+            "<p>Check the returned rows carefully. If Priya is the intended record, you can proceed with the deletion.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM employees\nWHERE department = 'HR';</code></pre></div>",
+            "<p>Verify that no HR records remain.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'HR';</code></pre></div>",
+            "<h3>6. Use the Same WHERE Condition</h3>",
+            "<p>The most important rule is to use the same filtering condition in the preview query and the final UPDATE or DELETE statement.</p>",
+            "<div class=\"code-block\"><pre><code>-- Preview\nSELECT *\nFROM employees\nWHERE city = 'Bengaluru';\n\n-- Update the same matching records\nUPDATE employees\nSET city = 'Mysuru'\nWHERE city = 'Bengaluru';</code></pre></div>",
+            "<p>If the conditions differ, the final statement may affect different records from those you inspected. Be particularly careful with AND, OR, comparison operators, and parentheses.</p>",
+            "<h3>7. Count the Rows Before Changing Data</h3>",
+            "<p>COUNT(*) helps estimate how many records match your condition before you run a destructive statement.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT COUNT(*) AS matching_rows\nFROM employees\nWHERE department = 'Data';</code></pre></div>",
+            "<p>If the result is 2, two employee records currently match the condition. This is a useful additional check, but it does not replace inspecting the actual rows.</p>",
+            "<h3>8. Understand a Dangerous WHERE Condition</h3>",
+            "<p>Consider this example:</p>",
+            "<div class=\"code-block\"><pre><code>-- Intended to update one employee\nUPDATE employees\nSET salary = 50000\nWHERE emp_id = 3 OR 1 = 1;</code></pre></div>",
+            "<p>The condition OR 1 = 1 is always true, so every row matches it. This query updates all employee salaries to 50000 rather than updating only employee 3.</p>",
+            "<p>Preview the condition to identify the problem before running the update.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE emp_id = 3 OR 1 = 1;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Safety Rule:</b> Never assume a WHERE condition is correct just because the SQL syntax is valid. Inspect the matching rows and confirm the intended scope.</div>",
+            "<h3>9. Use Transactions for Extra Protection</h3>",
+            "<p>With a transactional MySQL table such as InnoDB, a transaction can provide an additional safety layer. You can perform the change, inspect the result, and choose whether to commit or roll back.</p>",
+            "<div class=\"code-block\"><pre><code>START TRANSACTION;\n\nUPDATE employees\nSET salary = salary + 1000\nWHERE emp_id = 1;\n\n-- Inspect the change\nSELECT *\nFROM employees\nWHERE emp_id = 1;\n\n-- If correct, execute:\nCOMMIT;\n\n-- Otherwise, execute ROLLBACK instead of COMMIT.</code></pre></div>",
+            "<p>Use either COMMIT or ROLLBACK as appropriate. Do not commit a change and then expect a normal rollback to undo it. Also, transactions do not replace backups or proper production safeguards.</p>",
+            "<h3>10. Important Limitation of Previewing</h3>",
+            "<p>A SELECT preview and a later UPDATE or DELETE are usually separate statements. Data may change between the two statements if another user or process modifies the same records.</p>",
+            "<p>For critical operations, consider an appropriate transaction and locking strategy, a stable primary-key selection, suitable isolation settings, and a tested recovery plan. The correct approach depends on the application and workload.</p>",
+            "<h3>11. Previewing Data in Data Engineering</h3>",
+            "<p>Data engineers often update or delete records during data cleaning, staging-table maintenance, and pipeline processing. Previewing is useful before correcting invalid data or removing expired records.</p>",
+            "<div class=\"diagram\"><pre>Identify Target Condition\n          |\n          v\nSELECT Matching Records\n          |\n          v\nCheck Rows and Row Count\n          |\n          v\nConfirm Business Rules\n          |\n          v\nExecute UPDATE or DELETE\n          |\n          v\nVerify the Final Result</pre></div>",
+            "<p>Example: before removing invalid orders from a staging table, check exactly which rows have invalid amounts.</p>",
+            "<div class=\"code-block\"><pre><code>-- Preview invalid orders\nSELECT order_id, customer_id, order_amount\nFROM staging_orders\nWHERE order_amount <= 0;\n\n-- Delete only after validating the selection\nDELETE FROM staging_orders\nWHERE order_amount <= 0;</code></pre></div>",
+            "<p>In production, confirm whether those records should be deleted, quarantined, or retained for auditing before choosing the action.</p>",
+            "<h3>12. Common Mistakes</h3>",
+            "<ul><li>Executing UPDATE or DELETE before checking the target rows.</li><li>Using a different WHERE condition in the preview and final statement.</li><li>Forgetting parentheses when combining AND and OR conditions.</li><li>Assuming COUNT(*) alone proves the correct records were selected.</li><li>Ignoring concurrent changes between preview and modification.</li><li>Assuming a transaction or rollback replaces backups and recovery planning.</li></ul>",
+            "<h3>13. Key Takeaways</h3>",
+            "<ul><li>Use SELECT to preview records before UPDATE or DELETE.</li><li>Use COUNT(*) as an additional check on the number of matching rows.</li><li>Keep the preview and modification conditions consistent.</li><li>Verify the results after executing the statement.</li><li>For critical changes, use appropriate transactions and recovery procedures.</li><li>Previewing is a core habit for safe SQL development and production data engineering.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create the Practice Table</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2),\n    city VARCHAR(50)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary, city)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00, 'Bengaluru'),\n    (2, 'Priya', 'HR', 32000.00, 'Hyderabad'),\n    (3, 'Arun', 'Data', 45000.00, 'Chennai'),\n    (4, 'Meena', 'Data', 52000.00, 'Bengaluru'),\n    (5, 'Kiran', 'IT', 39000.00, 'Tirupati');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Preview Before UPDATE</b></p>",
+            "<p>Find all employees whose salary is below 40000. Inspect the rows before increasing their salaries by 1000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, emp_name, salary\nFROM employees\nWHERE salary < 40000;\n\nUPDATE employees\nSET salary = salary + 1000\nWHERE salary < 40000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Verify the Update</b></p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, emp_name, salary\nFROM employees\nORDER BY emp_id;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Preview Before DELETE</b></p>",
+            "<p>Find all employees in the HR department and count the matching records before deleting them.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'HR';\n\nSELECT COUNT(*) AS matching_rows\nFROM employees\nWHERE department = 'HR';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Delete and Verify</b></p>",
+            "<p>After confirming the intended rows, execute the DELETE and verify that no HR records remain.</p>",
+            "<div class=\"code-block\"><pre><code>DELETE FROM employees\nWHERE department = 'HR';\n\nSELECT *\nFROM employees\nWHERE department = 'HR';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Identify a Dangerous Condition</b></p>",
+            "<p>Run the following SELECT query and explain why it returns every employee rather than just employee 3. Do not execute the corresponding UPDATE.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE emp_id = 3 OR 1 = 1;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Production Safety Challenge</b></p>",
+            "<p>Write a SELECT query to preview employees in the Data department earning more than 45000. Then write a matching UPDATE that increases their salary by 500. Explain how you would verify the affected rows before and after the update.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Preview target records, count matching rows, use consistent WHERE conditions, recognize dangerous conditions, and verify changes safely.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What does previewing data before UPDATE or DELETE mean?",
+              "a": "It means running a SELECT query to inspect the rows that match the intended condition before changing or removing them."
+            },
+            {
+              "q": "Q2. Why should we preview data before UPDATE?",
+              "a": "Previewing helps confirm that only the intended records will be modified and reduces the risk of accidental changes."
+            },
+            {
+              "q": "Q3. Why should we preview data before DELETE?",
+              "a": "DELETE can permanently remove records after a transaction is committed. Previewing helps identify the exact records that will be targeted."
+            },
+            {
+              "q": "Q4. Should the SELECT and UPDATE use the same WHERE condition?",
+              "a": "Yes. Using the same condition helps ensure the update targets the records you inspected, although concurrent changes can still affect the result."
+            },
+            {
+              "q": "Q5. How can we count matching rows before deleting them?",
+              "a": "Use SELECT COUNT(*) AS matching_rows FROM table_name WHERE condition;"
+            },
+            {
+              "q": "Q6. What happens if WHERE is omitted from UPDATE?",
+              "a": "Every row in the target table is affected by the specified column assignments."
+            },
+            {
+              "q": "Q7. What happens if WHERE is omitted from DELETE?",
+              "a": "All rows in the target table are targeted for deletion, but the table structure remains."
+            },
+            {
+              "q": "Q8. Why is OR 1 = 1 dangerous in a WHERE condition?",
+              "a": "Because 1 = 1 is always true, the entire OR condition becomes true for every row, potentially causing an UPDATE or DELETE to affect all records."
+            },
+            {
+              "q": "Q9. Is SELECT previewing enough for every production change?",
+              "a": "No. For critical operations, also consider transactions, appropriate locking or isolation, stable row identifiers, backups, and recovery procedures."
+            },
+            {
+              "q": "Q10. Can another user change data after the preview?",
+              "a": "Yes. If another transaction changes the data before the modification runs, the actual target rows or values may differ. Appropriate transaction and concurrency controls can reduce this risk."
+            },
+            {
+              "q": "Q11. Can ROLLBACK undo an UPDATE or DELETE?",
+              "a": "For uncommitted changes on transactional tables such as InnoDB, ROLLBACK can undo the changes in the current transaction. A committed transaction cannot be undone by an ordinary ROLLBACK."
+            },
+            {
+              "q": "Q12. How is previewing useful in data engineering?",
+              "a": "It helps data engineers inspect invalid, duplicate, or expired records before correcting or removing them from staging and target tables, supporting safer pipeline operations."
+            }
+          ]
+        },
+        {
+          "n": 35,
+          "title": "SELECT",
+          "explanation": [
+            "<h3>1. What Is SELECT?</h3>",
+            "<p><b>SELECT</b> is an SQL statement used to retrieve data from one or more database tables. It allows us to display specific columns, filter records, sort results, calculate values, and summarize data.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> SELECT retrieves the data you want to see from a database without changing the stored records.</div>",
+            "<h3>2. Why Do We Need SELECT?</h3>",
+            "<ul><li>View records stored in database tables.</li><li>Find specific employees, customers, or orders.</li><li>Filter data using conditions.</li><li>Sort records and select only required columns.</li><li>Calculate totals and summaries for reports.</li><li>Read source data for data engineering pipelines.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column1, column2\nFROM table_name\nWHERE condition\nORDER BY column1;</code></pre></div>",
+            "<p><b>Explanation:</b></p>",
+            "<ul><li><b>SELECT:</b> Specifies which columns or expressions to return.</li><li><b>FROM:</b> Identifies the source table or tables.</li><li><b>WHERE:</b> Filters rows according to a condition.</li><li><b>ORDER BY:</b> Sorts the returned rows.</li></ul>",
+            "<p>WHERE and ORDER BY are optional. A basic SELECT statement can contain only SELECT and FROM.</p>",
+            "<h3>4. Create a Sample Table</h3>",
+            "<p>We will use an employees table for the following examples.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2),\n    city VARCHAR(50)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary, city)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00, 'Bengaluru'),\n    (2, 'Priya', 'HR', 32000.00, 'Hyderabad'),\n    (3, 'Arun', 'Data', 45000.00, 'Chennai'),\n    (4, 'Meena', 'Data', 52000.00, 'Bengaluru'),\n    (5, 'Kiran', 'IT', 39000.00, 'Tirupati');</code></pre></div>",
+            "<h3>5. SELECT All Columns</h3>",
+            "<p>Use the asterisk (*) to retrieve all columns from a table.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees;</code></pre></div>",
+            "<p>This returns all columns and all rows from employees.</p>",
+            "<div class=\"definition-box\"><b>Best Practice:</b> SELECT * is useful when exploring a table. In production queries, prefer listing the columns you need to make the query clearer and reduce unnecessary data transfer.</div>",
+            "<h3>6. SELECT Specific Columns</h3>",
+            "<p>When you need only certain information, specify the column names.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, salary\nFROM employees;</code></pre></div>",
+            "<p>This returns only the employee names and salaries, rather than all five columns.</p>",
+            "<h3>7. SELECT with WHERE</h3>",
+            "<p>WHERE filters rows before they are returned.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'Data';</code></pre></div>",
+            "<p>This returns employees whose department is Data.</p>",
+            "<p>Other useful conditions include:</p>",
+            "<div class=\"code-block\"><pre><code>-- Salary greater than 40000\nSELECT * FROM employees\nWHERE salary > 40000;\n\n-- Employees from Bengaluru\nSELECT * FROM employees\nWHERE city = 'Bengaluru';\n\n-- Combine conditions\nSELECT * FROM employees\nWHERE department = 'IT'\n  AND salary > 36000;</code></pre></div>",
+            "<h3>8. SELECT with DISTINCT</h3>",
+            "<p>DISTINCT removes duplicate combinations from the selected result columns.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department\nFROM employees;</code></pre></div>",
+            "<p>This returns each distinct department value once. If a selected column contains NULL, DISTINCT returns one NULL value for that distinct value.</p>",
+            "<p>When multiple columns are selected, DISTINCT applies to the complete combination of those columns.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department, city\nFROM employees;</code></pre></div>",
+            "<h3>9. SELECT with ORDER BY</h3>",
+            "<p>ORDER BY sorts the result set. ASC means ascending order, and DESC means descending order.</p>",
+            "<div class=\"code-block\"><pre><code>-- Lowest salary first\nSELECT emp_name, salary\nFROM employees\nORDER BY salary ASC;\n\n-- Highest salary first\nSELECT emp_name, salary\nFROM employees\nORDER BY salary DESC;</code></pre></div>",
+            "<p>If you do not specify ASC or DESC, MySQL uses ascending order by default. If multiple rows have equal sort values, add another column to ORDER BY when you need a predictable tie-breaker.</p>",
+            "<h3>10. SELECT with LIMIT</h3>",
+            "<p>LIMIT restricts the number of rows returned by a query.</p>",
+            "<div class=\"code-block\"><pre><code>-- Return the first three rows\nSELECT *\nFROM employees\nLIMIT 3;\n\n-- Return the three highest-paid employees\nSELECT emp_name, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 3;</code></pre></div>",
+            "<p>Without ORDER BY, the selected rows are not guaranteed to appear in a particular order. Use ORDER BY when the identity or ranking of the returned rows matters.</p>",
+            "<h3>11. SELECT with Aggregate Functions</h3>",
+            "<p>Aggregate functions calculate a summary from multiple rows.</p>",
+            "<div class=\"code-block\"><pre><code>-- Count employees\nSELECT COUNT(*) AS total_employees\nFROM employees;\n\n-- Calculate average salary\nSELECT AVG(salary) AS average_salary\nFROM employees;\n\n-- Find the highest salary\nSELECT MAX(salary) AS highest_salary\nFROM employees;\n\n-- Calculate total salaries\nSELECT SUM(salary) AS total_salary\nFROM employees;</code></pre></div>",
+            "<p>COUNT(*) counts rows. SUM, AVG, MIN, and MAX generally ignore NULL values in the expression they evaluate.</p>",
+            "<h3>12. SELECT with GROUP BY</h3>",
+            "<p>GROUP BY groups rows that share the same value so that aggregate functions can summarize each group.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT department,\n       COUNT(*) AS employee_count,\n       AVG(salary) AS average_salary\nFROM employees\nGROUP BY department;</code></pre></div>",
+            "<p>This produces one summary row per department, including the number of employees and average salary in each department.</p>",
+            "<h3>13. SELECT with HAVING</h3>",
+            "<p>HAVING filters groups after GROUP BY has formed them. WHERE filters individual rows before grouping.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT department,\n       AVG(salary) AS average_salary\nFROM employees\nGROUP BY department\nHAVING AVG(salary) > 38000;</code></pre></div>",
+            "<p>This returns only departments whose average salary is greater than 38000.</p>",
+            "<h3>14. SELECT with LIKE</h3>",
+            "<p>LIKE matches text using pattern characters. In MySQL, % matches zero or more characters, while _ matches exactly one character.</p>",
+            "<div class=\"code-block\"><pre><code>-- Names beginning with A\nSELECT * FROM employees\nWHERE emp_name LIKE 'A%';\n\n-- Names ending with a\nSELECT * FROM employees\nWHERE emp_name LIKE '%a';\n\n-- Names with 'ri' somewhere in the text\nSELECT * FROM employees\nWHERE emp_name LIKE '%ri%';</code></pre></div>",
+            "<p>Case sensitivity depends on the collation used by the column or expression.</p>",
+            "<h3>15. SELECT with IN and BETWEEN</h3>",
+            "<p>IN checks whether a value matches any value in a list. BETWEEN checks whether a value lies within an inclusive range.</p>",
+            "<div class=\"code-block\"><pre><code>-- Select IT or Data employees\nSELECT * FROM employees\nWHERE department IN ('IT', 'Data');\n\n-- Salaries from 35000 through 45000, inclusive\nSELECT * FROM employees\nWHERE salary BETWEEN 35000 AND 45000;</code></pre></div>",
+            "<h3>16. SELECT with NULL</h3>",
+            "<p>SQL NULL represents a missing or unknown value. Use IS NULL or IS NOT NULL to test for NULL values.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE city IS NULL;\n\nSELECT *\nFROM employees\nWHERE city IS NOT NULL;</code></pre></div>",
+            "<p>Do not use city = NULL because comparisons with NULL do not work like ordinary equality comparisons.</p>",
+            "<h3>17. SELECT in Data Engineering</h3>",
+            "<p>SELECT is one of the most frequently used SQL statements in data engineering. Engineers use it to extract source records, validate datasets, investigate errors, transform data, and prepare analytical outputs.</p>",
+            "<div class=\"diagram\"><pre>Source Tables\n      |\n      v\n     SELECT\n      |\n      v\nFilter / Join / Aggregate\n      |\n      v\nValidate Results\n      |\n      v\nAnalytics or Target Dataset</pre></div>",
+            "<p>Example: retrieve completed orders with positive amounts for a downstream analytics process.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id,\n       customer_id,\n       order_amount\nFROM orders\nWHERE status = 'COMPLETED'\n  AND order_amount > 0;</code></pre></div>",
+            "<p>This example assumes the orders table contains the specified columns. In production, select only the fields required by the pipeline and consider indexing, filtering, and data-volume requirements.</p>",
+            "<h3>18. Common Mistakes</h3>",
+            "<ul><li>Using SELECT * when only a few columns are required.</li><li>Forgetting WHERE and retrieving more data than intended.</li><li>Using WHERE instead of HAVING for an aggregate condition.</li><li>Assuming results are sorted without ORDER BY.</li><li>Using = NULL instead of IS NULL.</li><li>Using LIMIT without ORDER BY when a consistent selection is required.</li><li>Forgetting that DISTINCT applies to the complete combination of selected columns.</li></ul>",
+            "<h3>19. Key Takeaways</h3>",
+            "<ul><li>SELECT retrieves data without changing the stored records.</li><li>FROM identifies the data source.</li><li>WHERE filters rows.</li><li>DISTINCT removes duplicate result combinations.</li><li>ORDER BY sorts results and LIMIT restricts the returned row count.</li><li>GROUP BY and aggregate functions summarize data, while HAVING filters groups.</li><li>SELECT is essential for SQL analysis and data engineering pipelines.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create the Practice Table</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2),\n    city VARCHAR(50)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary, city)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00, 'Bengaluru'),\n    (2, 'Priya', 'HR', 32000.00, 'Hyderabad'),\n    (3, 'Arun', 'Data', 45000.00, 'Chennai'),\n    (4, 'Meena', 'Data', 52000.00, 'Bengaluru'),\n    (5, 'Kiran', 'IT', 39000.00, 'Tirupati');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Retrieve All Records</b></p>",
+            "<p>Write a query to display every column from employees.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT * FROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Select Specific Columns</b></p>",
+            "<p>Display only employee names, departments, and salaries.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, department, salary\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Filter Records</b></p>",
+            "<p>Find employees earning more than 38000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, emp_name, salary\nFROM employees\nWHERE salary > 38000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Find Unique Values</b></p>",
+            "<p>Display each department only once.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Sort and Limit Results</b></p>",
+            "<p>Display the two highest-paid employees.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 2;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Aggregate and Group Data</b></p>",
+            "<p>Count employees in each department and calculate their average salary.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT department,\n       COUNT(*) AS employee_count,\n       AVG(salary) AS average_salary\nFROM employees\nGROUP BY department;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8: Filter Groups</b></p>",
+            "<p>Display departments whose average salary is greater than 38000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT department,\n       AVG(salary) AS average_salary\nFROM employees\nGROUP BY department\nHAVING AVG(salary) > 38000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 9: Use LIKE, IN, and BETWEEN</b></p>",
+            "<p>Write queries to find names starting with A, employees in IT or Data, and employees whose salaries are between 35000 and 45000 inclusive.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT * FROM employees\nWHERE emp_name LIKE 'A%';\n\nSELECT * FROM employees\nWHERE department IN ('IT', 'Data');\n\nSELECT * FROM employees\nWHERE salary BETWEEN 35000 AND 45000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 10: Data Engineering Challenge</b></p>",
+            "<p>Write a SELECT query that retrieves employee IDs, names, and salaries for employees based in Bengaluru who earn at least 35000. Sort the results by salary from highest to lowest.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, emp_name, salary\nFROM employees\nWHERE city = 'Bengaluru'\n  AND salary >= 35000\nORDER BY salary DESC;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Retrieve specific columns, filter and sort records, remove duplicate result combinations, use aggregates, and build SELECT queries for analytical datasets.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is SELECT in SQL?",
+              "a": "SELECT is an SQL statement used to retrieve data from one or more tables without changing the stored records."
+            },
+            {
+              "q": "Q2. What does SELECT * mean?",
+              "a": "The asterisk selects all columns from the specified source. The rows returned depend on other clauses such as WHERE."
+            },
+            {
+              "q": "Q3. What is the purpose of FROM?",
+              "a": "FROM identifies the table or other data source from which the query retrieves data."
+            },
+            {
+              "q": "Q4. What is the difference between WHERE and HAVING?",
+              "a": "WHERE filters individual rows before grouping. HAVING filters groups after GROUP BY has formed them."
+            },
+            {
+              "q": "Q5. What does DISTINCT do?",
+              "a": "DISTINCT removes duplicate combinations from the selected result columns."
+            },
+            {
+              "q": "Q6. What is the purpose of ORDER BY?",
+              "a": "ORDER BY sorts query results in ascending order by default or descending order when DESC is specified."
+            },
+            {
+              "q": "Q7. What does LIMIT do in MySQL?",
+              "a": "LIMIT restricts the number of rows returned by a query. Use ORDER BY when you need a predictable selection, such as the highest-paid employees."
+            },
+            {
+              "q": "Q8. What are aggregate functions?",
+              "a": "Aggregate functions summarize values across rows. Common examples include COUNT(), SUM(), AVG(), MIN(), and MAX()."
+            },
+            {
+              "q": "Q9. What is GROUP BY used for?",
+              "a": "GROUP BY groups rows that share values in specified columns so that aggregate functions can calculate summaries for each group."
+            },
+            {
+              "q": "Q10. How do we check for NULL values?",
+              "a": "Use IS NULL to find NULL values and IS NOT NULL to find non-NULL values. Do not use ordinary equality comparisons with NULL."
+            },
+            {
+              "q": "Q11. Does SELECT change data in a table?",
+              "a": "A normal SELECT query reads and returns data without modifying the stored rows."
+            },
+            {
+              "q": "Q12. How is SELECT used in data engineering?",
+              "a": "Data engineers use SELECT to extract source data, filter records, join tables, validate datasets, calculate aggregates, and prepare data for downstream pipelines and analytics."
+            }
+          ]
+        },
+        {
+          "n": 36,
+          "title": "FROM",
+          "explanation": [
+            "<h3>1. What Is FROM in SQL?</h3>",
+            "<p><b>FROM</b> is an SQL clause that specifies the table or data source from which a query retrieves data. It is commonly used with SELECT to identify where the required records are stored.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> FROM tells SQL which table or tables to read data from.</div>",
+            "<h3>2. Why Do We Need FROM?</h3>",
+            "<ul><li>Identify the source table for a query.</li><li>Retrieve data from the correct database table.</li><li>Read data from multiple tables using joins.</li><li>Use aliases to make complex queries easier to read.</li><li>Extract source data for data engineering pipelines and reports.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column1, column2\nFROM table_name;</code></pre></div>",
+            "<p><b>Explanation:</b></p>",
+            "<ul><li><b>SELECT:</b> Specifies the columns or expressions to return.</li><li><b>FROM:</b> Identifies the source table.</li><li><b>table_name:</b> The name of the table containing the required data.</li></ul>",
+            "<h3>4. Create a Sample Table</h3>",
+            "<p>Let's create an employees table to understand how FROM works.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2),\n    city VARCHAR(50)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary, city)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00, 'Bengaluru'),\n    (2, 'Priya', 'HR', 32000.00, 'Hyderabad'),\n    (3, 'Arun', 'Data', 45000.00, 'Chennai'),\n    (4, 'Meena', 'Data', 52000.00, 'Bengaluru'),\n    (5, 'Kiran', 'IT', 39000.00, 'Tirupati');</code></pre></div>",
+            "<h3>5. FROM with SELECT *</h3>",
+            "<p>Use FROM with an asterisk to retrieve all columns from a table.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees;</code></pre></div>",
+            "<p>This query retrieves all columns and all rows from the employees table.</p>",
+            "<h3>6. FROM with Specific Columns</h3>",
+            "<p>You can select only the columns you need while using FROM to identify their source.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, salary\nFROM employees;</code></pre></div>",
+            "<p>This returns employee names and salaries from employees. The FROM clause identifies the source, while SELECT determines which columns appear in the result.</p>",
+            "<h3>7. FROM with WHERE</h3>",
+            "<p>FROM identifies the source table, and WHERE filters the rows retrieved from that source.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, department, salary\nFROM employees\nWHERE department = 'Data';</code></pre></div>",
+            "<p>This query reads from employees and returns only records whose department is Data.</p>",
+            "<h3>8. FROM with Table Aliases</h3>",
+            "<p>A table alias is a temporary name used to refer to a table within a query. Aliases make queries shorter and are especially useful when joining multiple tables.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT e.emp_name, e.salary\nFROM employees AS e;</code></pre></div>",
+            "<p>Here, e is an alias for employees. You can use e.emp_name and e.salary to refer to columns from that table.</p>",
+            "<p>In MySQL, the AS keyword is optional for table aliases.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT e.emp_name\nFROM employees e;</code></pre></div>",
+            "<h3>9. FROM with Multiple Tables</h3>",
+            "<p>A query can use more than one table in the FROM clause. When the tables are related, JOIN is usually the clearest way to combine their records.</p>",
+            "<p>Suppose we have a departments table.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE departments (\n    department_id INT PRIMARY KEY,\n    department_name VARCHAR(50)\n);\n\nINSERT INTO departments\n    (department_id, department_name)\nVALUES\n    (1, 'IT'),\n    (2, 'HR'),\n    (3, 'Data');</code></pre></div>",
+            "<p>To combine employees with their department names, the employee table needs a department identifier that matches departments.department_id. The following example assumes employees has a department_id column mapped to that key.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT e.emp_name, d.department_name\nFROM employees AS e\nJOIN departments AS d\n    ON e.department_id = d.department_id;</code></pre></div>",
+            "<p>The JOIN condition determines how records from the two source tables match. If the tables have no matching relationship condition, combining them can produce incorrect or unexpectedly large results.</p>",
+            "<h3>10. FROM with a Subquery</h3>",
+            "<p>FROM can also use the result of a subquery as a temporary data source. In MySQL, a derived table in FROM must have an alias.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT high_salary.emp_name,\n       high_salary.salary\nFROM (\n    SELECT emp_name, salary\n    FROM employees\n    WHERE salary > 40000\n) AS high_salary;</code></pre></div>",
+            "<p>The inner query selects employees earning more than 40000. The outer query reads the resulting rows through the alias high_salary.</p>",
+            "<h3>11. FROM and the Logical Query Processing Order</h3>",
+            "<p>Although SELECT is written first in a basic query, SQL logically processes the main clauses in a different order.</p>",
+            "<div class=\"diagram\"><pre>FROM / JOIN\n     |\n     v\nWHERE\n     |\n     v\nGROUP BY\n     |\n     v\nHAVING\n     |\n     v\nSELECT\n     |\n     v\nDISTINCT\n     |\n     v\nORDER BY\n     |\n     v\nLIMIT</pre></div>",
+            "<p>This is a simplified logical order for a typical SELECT query, not a guarantee of the database engine's physical execution plan. The optimizer may execute operations differently while preserving the query's required results.</p>",
+            "<h3>12. FROM in Data Engineering</h3>",
+            "<p>Data engineers use FROM to identify source tables when extracting, validating, joining, and transforming data.</p>",
+            "<div class=\"diagram\"><pre>Source Database\n      |\n      v\nFROM source_table\n      |\n      v\nSELECT Required Columns\n      |\n      v\nFilter / Join / Aggregate\n      |\n      v\nValidated Dataset</pre></div>",
+            "<p>For example, a pipeline may read order records from an orders table.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id,\n       customer_id,\n       order_amount\nFROM orders\nWHERE order_amount > 0;</code></pre></div>",
+            "<p>The FROM clause identifies orders as the source. WHERE filters out records whose order amount is not positive.</p>",
+            "<h3>13. Common Mistakes</h3>",
+            "<ul><li>Using a table name that does not exist or is misspelled.</li><li>Referencing a column that is not present in the source table.</li><li>Using an alias incorrectly or referring to the original table name after assigning a different alias in contexts where the alias replaces it.</li><li>Combining tables without an appropriate join condition.</li><li>Forgetting an alias for a derived table in MySQL.</li><li>Assuming FROM itself filters rows; use WHERE for row filtering.</li></ul>",
+            "<h3>14. Key Takeaways</h3>",
+            "<ul><li>FROM identifies the data source of a query.</li><li>SELECT determines which columns or expressions to return.</li><li>FROM works with WHERE, JOIN, GROUP BY, and other clauses.</li><li>Table aliases make complex queries easier to understand.</li><li>FROM can reference tables, joins, and derived tables.</li><li>Understanding FROM is essential for SQL querying and data engineering.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create the Employees Table</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2),\n    city VARCHAR(50)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary, city)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00, 'Bengaluru'),\n    (2, 'Priya', 'HR', 32000.00, 'Hyderabad'),\n    (3, 'Arun', 'Data', 45000.00, 'Chennai'),\n    (4, 'Meena', 'Data', 52000.00, 'Bengaluru'),\n    (5, 'Kiran', 'IT', 39000.00, 'Tirupati');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Retrieve Data Using FROM</b></p>",
+            "<p>Display all columns from employees.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Select Specific Columns</b></p>",
+            "<p>Display employee names and cities.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, city\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Use FROM with WHERE</b></p>",
+            "<p>Retrieve employees who work in the IT department.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, emp_name, department\nFROM employees\nWHERE department = 'IT';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Use a Table Alias</b></p>",
+            "<p>Write a query using e as the alias for employees and return employee names and salaries.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT e.emp_name, e.salary\nFROM employees AS e;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Use a Derived Table</b></p>",
+            "<p>Retrieve employees earning more than 40000 using a subquery in FROM.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT high_salary.emp_name,\n       high_salary.salary\nFROM (\n    SELECT emp_name, salary\n    FROM employees\n    WHERE salary > 40000\n) AS high_salary;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Explain the Query</b></p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, salary\nFROM employees\nWHERE salary >= 40000\nORDER BY salary DESC;</code></pre></div>",
+            "<p>Identify the purpose of SELECT, FROM, WHERE, and ORDER BY in this query.</p>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Identify source tables, select required columns, filter source rows, use table aliases, and understand a derived table in FROM.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is FROM in SQL?",
+              "a": "FROM is a clause that identifies the table or data source from which a query retrieves data."
+            },
+            {
+              "q": "Q2. Why is FROM used with SELECT?",
+              "a": "FROM tells the database where to retrieve the data requested by SELECT."
+            },
+            {
+              "q": "Q3. What is the difference between SELECT and FROM?",
+              "a": "SELECT specifies which columns or expressions to return, while FROM specifies the source table or tables."
+            },
+            {
+              "q": "Q4. Can FROM reference multiple tables?",
+              "a": "Yes. Multiple tables can be combined using JOIN or other supported table expressions. Related tables should generally be joined using an appropriate condition."
+            },
+            {
+              "q": "Q5. What is a table alias?",
+              "a": "A table alias is a temporary name used to refer to a table within a query. For example, FROM employees AS e assigns the alias e."
+            },
+            {
+              "q": "Q6. Is AS required for a table alias in MySQL?",
+              "a": "No. Both FROM employees AS e and FROM employees e are valid ways to define a table alias in MySQL."
+            },
+            {
+              "q": "Q7. Can FROM contain a subquery?",
+              "a": "Yes. A subquery in FROM can act as a derived table. In MySQL, the derived table must have an alias."
+            },
+            {
+              "q": "Q8. Does FROM filter rows?",
+              "a": "No. FROM identifies the data source. WHERE filters rows according to specified conditions."
+            },
+            {
+              "q": "Q9. What happens if tables are combined without a join condition?",
+              "a": "The query can produce a Cartesian product, where every row from one source is combined with every row from another source, potentially creating many unintended rows."
+            },
+            {
+              "q": "Q10. What is the logical processing order of FROM and SELECT?",
+              "a": "In a typical SELECT query, FROM and JOIN are logically processed before WHERE and SELECT. The database optimizer may choose a different physical execution strategy."
+            },
+            {
+              "q": "Q11. Can FROM be used without WHERE?",
+              "a": "Yes. SELECT emp_name FROM employees; retrieves names without filtering rows."
+            },
+            {
+              "q": "Q12. How is FROM used in data engineering?",
+              "a": "FROM identifies the source tables used to extract data, join datasets, validate records, and prepare data for downstream processing and analytics."
+            }
+          ]
+        },
+        {
+          "n": 37,
+          "title": "Selecting Specific Columns",
+          "explanation": [
+            "<h3>1. What Is Selecting Specific Columns?</h3>",
+            "<p><b>Selecting specific columns</b> means retrieving only the required columns from a database table instead of retrieving every column. In SQL, we specify the column names after the SELECT keyword.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> Selecting specific columns allows us to retrieve only the data fields we need from a table.</div>",
+            "<h3>2. Why Do We Need Specific Columns?</h3>",
+            "<ul><li>Retrieve only the information needed for a task.</li><li>Reduce unnecessary data transfer between the database and application.</li><li>Make query results easier to read and understand.</li><li>Avoid retrieving sensitive or irrelevant columns unnecessarily.</li><li>Improve efficiency when working with large datasets and data engineering pipelines.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column1, column2\nFROM table_name;</code></pre></div>",
+            "<p><b>Explanation:</b></p>",
+            "<ul><li><b>SELECT:</b> Specifies which columns to retrieve.</li><li><b>column1, column2:</b> The required column names, separated by commas.</li><li><b>FROM:</b> Identifies the source table.</li><li><b>table_name:</b> The table containing the columns.</li></ul>",
+            "<h3>4. Create a Sample Table</h3>",
+            "<p>Let's create an employees table for practical examples.</p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2),\n    city VARCHAR(50)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary, city)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00, 'Bengaluru'),\n    (2, 'Priya', 'HR', 32000.00, 'Hyderabad'),\n    (3, 'Arun', 'Data', 45000.00, 'Chennai'),\n    (4, 'Meena', 'Data', 52000.00, 'Bengaluru'),\n    (5, 'Kiran', 'IT', 39000.00, 'Tirupati');</code></pre></div>",
+            "<h3>5. Select a Single Column</h3>",
+            "<p>If you need only employee names, select emp_name.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name\nFROM employees;</code></pre></div>",
+            "<p>The result contains one column, emp_name, with one row for each employee.</p>",
+            "<h3>6. Select Multiple Columns</h3>",
+            "<p>Separate column names with commas when retrieving more than one column.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, department, salary\nFROM employees;</code></pre></div>",
+            "<p>This returns the employee name, department, and salary while excluding emp_id and city from the result.</p>",
+            "<h3>7. Select Columns in a Different Order</h3>",
+            "<p>You can specify columns in any order, regardless of their order in the table definition.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT salary, emp_name, city\nFROM employees;</code></pre></div>",
+            "<p>The output columns appear in the order written in the SELECT clause: salary, emp_name, then city.</p>",
+            "<h3>8. Select Specific Columns with WHERE</h3>",
+            "<p>You can combine column selection with filtering to return only the required columns from matching rows.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, salary\nFROM employees\nWHERE department = 'IT';</code></pre></div>",
+            "<p>This returns only the names and salaries of employees in the IT department.</p>",
+            "<h3>9. Select Specific Columns with ORDER BY</h3>",
+            "<p>ORDER BY sorts the returned rows based on a column or expression. The column used for sorting does not always need to appear in the selected output.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, salary\nFROM employees\nORDER BY salary DESC;</code></pre></div>",
+            "<p>This displays employee names and salaries from highest to lowest salary.</p>",
+            "<h3>10. Use Aliases for Column Names</h3>",
+            "<p>An alias gives a selected column a temporary display name using AS.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name AS employee_name,\n       salary AS monthly_salary\nFROM employees;</code></pre></div>",
+            "<p>The result displays the column headings employee_name and monthly_salary. The original table column names are not changed.</p>",
+            "<h3>11. Select Calculated Columns</h3>",
+            "<p>SELECT can return expressions as well as existing columns. For example, you can calculate an annual salary from a monthly salary.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name,\n       salary AS monthly_salary,\n       salary * 12 AS annual_salary\nFROM employees;</code></pre></div>",
+            "<p>This calculates an annualized salary by multiplying the stored salary by 12. The calculation assumes the salary column represents a monthly amount.</p>",
+            "<h3>12. SELECT Specific Columns vs SELECT *</h3>",
+            "<table><thead><tr><th>Feature</th><th>Specific Columns</th><th>SELECT *</th></tr></thead><tbody><tr><td>Syntax</td><td>SELECT emp_name, salary</td><td>SELECT *</td></tr><tr><td>Returned columns</td><td>Only specified columns</td><td>All table columns</td></tr><tr><td>Readability</td><td>Focused results</td><td>May return unnecessary information</td></tr><tr><td>Production usage</td><td>Usually preferred when requirements are known</td><td>Useful for exploration and debugging</td></tr></tbody></table>",
+            "<p>Selecting fewer columns can reduce data transfer and memory usage, particularly when columns contain large values. Actual query performance also depends on indexes, filtering, table design, and the database execution plan.</p>",
+            "<h3>13. Selecting Specific Columns in Data Engineering</h3>",
+            "<p>Data engineers often extract only the fields needed for a transformation, validation task, or analytics dataset.</p>",
+            "<div class=\"diagram\"><pre>Source Table\n     |\n     v\nChoose Required Columns\n     |\n     v\nApply Filters / Transformations\n     |\n     v\nDeliver Required Dataset</pre></div>",
+            "<p>For example, an order pipeline may need only order IDs, customer IDs, and amounts.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id,\n       customer_id,\n       order_amount\nFROM orders\nWHERE order_amount > 0;</code></pre></div>",
+            "<p>This assumes the orders table contains these columns. Retrieving only required fields helps keep pipeline outputs focused and can reduce unnecessary data movement.</p>",
+            "<h3>14. Common Mistakes</h3>",
+            "<ul><li>Forgetting commas between column names.</li><li>Using a column name that does not exist in the table.</li><li>Using double quotes or single quotes incorrectly for column identifiers and string values.</li><li>Assuming selected columns must follow the table's defined order.</li><li>Using SELECT * in a production query when only a few fields are needed.</li><li>Forgetting that aliases change result headings, not the underlying table structure.</li></ul>",
+            "<h3>15. Key Takeaways</h3>",
+            "<ul><li>Specify the required column names after SELECT.</li><li>Use commas to separate multiple columns.</li><li>The output column order follows the SELECT list.</li><li>Combine column selection with WHERE and ORDER BY when needed.</li><li>Use aliases to create clearer output headings.</li><li>Selecting specific columns is an important habit for SQL development and data engineering.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Create the Employees Table</b></p>",
+            "<div class=\"code-block\"><pre><code>CREATE TABLE employees (\n    emp_id INT PRIMARY KEY,\n    emp_name VARCHAR(100) NOT NULL,\n    department VARCHAR(50),\n    salary DECIMAL(10, 2),\n    city VARCHAR(50)\n);\n\nINSERT INTO employees\n    (emp_id, emp_name, department, salary, city)\nVALUES\n    (1, 'Ravi', 'IT', 35000.00, 'Bengaluru'),\n    (2, 'Priya', 'HR', 32000.00, 'Hyderabad'),\n    (3, 'Arun', 'Data', 45000.00, 'Chennai'),\n    (4, 'Meena', 'Data', 52000.00, 'Bengaluru'),\n    (5, 'Kiran', 'IT', 39000.00, 'Tirupati');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Select One Column</b></p>",
+            "<p>Display only employee names.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Select Multiple Columns</b></p>",
+            "<p>Display employee names, departments, and cities.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, department, city\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Change the Output Column Order</b></p>",
+            "<p>Display salary first, followed by employee name and department.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT salary, emp_name, department\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Select Specific Columns with WHERE</b></p>",
+            "<p>Display the names and salaries of employees earning more than 38000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name, salary\nFROM employees\nWHERE salary > 38000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Use Column Aliases</b></p>",
+            "<p>Display emp_name as employee_name and salary as monthly_salary.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name AS employee_name,\n       salary AS monthly_salary\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Calculate a Column</b></p>",
+            "<p>Display employee names and annualized salaries, assuming salary is monthly.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_name,\n       salary * 12 AS annual_salary\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 8: Data Engineering Challenge</b></p>",
+            "<p>From an orders table, retrieve only order_id, customer_id, and order_amount for orders whose status is COMPLETED. Sort by order_amount from highest to lowest.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, customer_id, order_amount\nFROM orders\nWHERE status = 'COMPLETED'\nORDER BY order_amount DESC;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Select one or more columns, control their output order, filter rows, use aliases, and calculate derived values.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What does selecting specific columns mean?",
+              "a": "It means retrieving only the required columns from a table rather than returning every column."
+            },
+            {
+              "q": "Q2. What is the syntax for selecting multiple columns?",
+              "a": "SELECT column1, column2 FROM table_name; Column names are separated by commas."
+            },
+            {
+              "q": "Q3. Can columns be selected in a different order from the table definition?",
+              "a": "Yes. The output columns appear in the order specified in the SELECT clause."
+            },
+            {
+              "q": "Q4. What is the difference between SELECT * and selecting specific columns?",
+              "a": "SELECT * returns all columns, while listing column names returns only those columns."
+            },
+            {
+              "q": "Q5. Can we use WHERE when selecting specific columns?",
+              "a": "Yes. WHERE filters rows, while the SELECT list determines which columns appear in the result."
+            },
+            {
+              "q": "Q6. What is a column alias?",
+              "a": "A column alias is a temporary name for a result column. For example, SELECT salary AS monthly_salary FROM employees; displays the heading monthly_salary."
+            },
+            {
+              "q": "Q7. Does an alias rename the original table column?",
+              "a": "No. An alias changes the result heading for that query, not the underlying table definition."
+            },
+            {
+              "q": "Q8. Can SELECT return calculated columns?",
+              "a": "Yes. SELECT can evaluate expressions such as salary * 12 and return the result under an alias."
+            },
+            {
+              "q": "Q9. Does selecting fewer columns always make a query faster?",
+              "a": "Not always, but it can reduce data transfer and memory usage. Actual performance depends on the query, indexes, table structure, and execution plan."
+            },
+            {
+              "q": "Q10. Can ORDER BY use a column that is not selected?",
+              "a": "Yes. In a typical MySQL SELECT query, ORDER BY can refer to a source column that is not included in the selected output, subject to query-specific restrictions."
+            },
+            {
+              "q": "Q11. What happens if a selected column does not exist?",
+              "a": "MySQL returns an error indicating that the referenced column cannot be found in the relevant source."
+            },
+            {
+              "q": "Q12. Why is selecting specific columns important in data engineering?",
+              "a": "It keeps extracted datasets focused, reduces unnecessary data movement, and makes transformations and pipeline outputs easier to understand and maintain."
+            }
+          ]
+        },
+        {
+          "n": 38,
+          "title": "Selecting All Columns with *",
+          "explanation": [
+            "<h3>1. What Does SELECT * Mean?</h3>",
+            "<p>In SQL, the asterisk (*) is used with SELECT to retrieve all columns from a table. Instead of writing every column name individually, we can use SELECT * to return all columns available in the selected table.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> SELECT * retrieves every column from a table for the rows returned by the query.</div>",
+            "<h3>2. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM table_name;</code></pre></div>",
+            "<p><b>How it works:</b></p><ul><li><b>SELECT</b> specifies which columns to retrieve.</li><li><b>*</b> means all columns.</li><li><b>FROM</b> specifies the table to read from.</li></ul>",
+            "<h3>3. Example Table: employees</h3>",
+            "<p>Assume the employees table contains the following data:</p>",
+            "<table><tr><th>employee_id</th><th>name</th><th>department</th><th>salary</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td><td>45000</td></tr><tr><td>102</td><td>Priya</td><td>HR</td><td>40000</td></tr><tr><td>103</td><td>Arun</td><td>Finance</td><td>50000</td></tr></table>",
+            "<h3>4. Retrieve All Columns</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees;</code></pre></div>",
+            "<p><b>Result:</b> All four columns and all three rows are returned.</p>",
+            "<table><tr><th>employee_id</th><th>name</th><th>department</th><th>salary</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td><td>45000</td></tr><tr><td>102</td><td>Priya</td><td>HR</td><td>40000</td></tr><tr><td>103</td><td>Arun</td><td>Finance</td><td>50000</td></tr></table>",
+            "<h3>5. SELECT * with WHERE</h3>",
+            "<p>You can combine * with WHERE to retrieve all columns for only the rows that satisfy a condition.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'IT';</code></pre></div>",
+            "<p><b>Result:</b> Returns all columns for employees in the IT department. In this example, only Ravi's row is returned.</p>",
+            "<h3>6. SELECT * with ORDER BY</h3>",
+            "<p>You can sort the returned rows while still retrieving all columns.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nORDER BY salary DESC;</code></pre></div>",
+            "<p><b>Explanation:</b> All columns are returned, with employees ordered from highest salary to lowest salary. ORDER BY changes the row order, not the columns returned.</p>",
+            "<h3>7. SELECT * with LIMIT</h3>",
+            "<p>In MySQL, LIMIT restricts the number of rows returned.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nLIMIT 2;</code></pre></div>",
+            "<p><b>Explanation:</b> Returns at most two rows with all columns. Without ORDER BY, the rows returned should not be assumed to follow a guaranteed order.</p>",
+            "<h3>8. SELECT * vs Specific Columns</h3>",
+            "<table><tr><th>Query</th><th>What it returns</th></tr><tr><td>SELECT * FROM employees;</td><td>All columns</td></tr><tr><td>SELECT name, salary FROM employees;</td><td>Only name and salary</td></tr><tr><td>SELECT employee_id FROM employees;</td><td>Only employee_id</td></tr></table>",
+            "<h3>9. Why Should You Avoid SELECT * in Production Queries?</h3>",
+            "<p>SELECT * is useful while learning SQL, exploring a table, or quickly inspecting data. However, selecting every column is not always the best choice for production applications or data pipelines.</p>",
+            "<ul><li><b>Extra data:</b> The query may retrieve columns the application does not need.</li><li><b>Performance:</b> Reading large or unnecessary columns can increase data transfer and processing, especially for wide tables.</li><li><b>Schema changes:</b> If new columns are added, SELECT * can return additional data and potentially affect downstream code.</li><li><b>Clarity:</b> Explicit column names make it easier to understand what the query requires.</li><li><b>Data exposure:</b> It may retrieve sensitive columns that should not be included in the result.</li></ul>",
+            "<div class=\"definition-box\"><b>Production Best Practice:</b> Prefer explicitly listing the columns required by your application or pipeline. Use SELECT * when retrieving all columns is genuinely appropriate.</div>",
+            "<h3>10. SELECT * in Data Engineering</h3>",
+            "<p>During initial data exploration, a Data Engineer may use SELECT * to inspect a source table and understand its structure. In a production ETL or ELT pipeline, explicitly selecting required columns generally makes data movement more predictable.</p>",
+            "<div class=\"code-block\"><pre><code>-- Useful for initial exploration\nSELECT *\nFROM raw_orders\nLIMIT 10;\n\n-- Prefer explicit columns for a stable pipeline\nSELECT order_id, customer_id, order_date, total_amount\nFROM raw_orders;</code></pre></div>",
+            "<p>The first query helps you inspect sample records. The second makes the downstream pipeline's expected columns clear.</p>",
+            "<h3>11. Common Mistakes</h3>",
+            "<ul><li><b>Forgetting FROM:</b> SELECT * FROM employees; is the standard form for retrieving all columns from a table.</li><li><b>Assuming * means every row in the database:</b> It means every column of the specified table or result source; WHERE and LIMIT can restrict the rows returned.</li><li><b>Using * unnecessarily in production:</b> Retrieve only the columns required when practical.</li><li><b>Assuming row order:</b> Use ORDER BY when a specific row order is required.</li></ul>",
+            "<h3>12. Key Takeaways</h3>",
+            "<ul><li>SELECT * retrieves all columns from the selected table or source.</li><li>WHERE filters rows, ORDER BY sorts rows, and LIMIT restricts the number of rows returned.</li><li>SELECT * is convenient for learning and exploration.</li><li>Explicit column names are generally preferable for stable production queries and data pipelines.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Retrieve Every Column</b></p><p>Write a query to retrieve all columns from the employees table.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Filter Rows</b></p><p>Retrieve all columns for employees who belong to the HR department.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'HR';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Sort the Results</b></p><p>Retrieve all columns and display employees in descending salary order.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nORDER BY salary DESC;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Limit the Results</b></p><p>Retrieve all columns but return at most two rows.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nLIMIT 2;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Production Query Practice</b></p><p>Suppose a data pipeline needs only employee_id and department. Rewrite the query to retrieve just those columns.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT employee_id, department\nFROM employees;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Understand how * retrieves every column and how WHERE, ORDER BY, and LIMIT change the returned result. Know when to replace * with explicit column names in production SQL.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What does SELECT * mean in SQL?",
+              "a": "It retrieves all columns from the table or query source specified in the FROM clause."
+            },
+            {
+              "q": "Q2. Does SELECT * retrieve all rows?",
+              "a": "It can return all rows when no row-limiting condition is applied, but WHERE, LIMIT, joins, and other query operations can change which rows appear. The asterisk itself refers to columns, not rows."
+            },
+            {
+              "q": "Q3. What is the difference between SELECT * and SELECT name, salary?",
+              "a": "SELECT * retrieves all columns, while SELECT name, salary retrieves only those two columns."
+            },
+            {
+              "q": "Q4. Can SELECT * be used with WHERE?",
+              "a": "Yes. For example, SELECT * FROM employees WHERE department = 'IT'; returns all columns for rows that match the condition."
+            },
+            {
+              "q": "Q5. Can SELECT * be used with ORDER BY?",
+              "a": "Yes. ORDER BY sorts the returned rows while * continues to select all columns."
+            },
+            {
+              "q": "Q6. Can SELECT * be used with LIMIT in MySQL?",
+              "a": "Yes. SELECT * FROM employees LIMIT 5; returns at most five rows and includes all columns."
+            },
+            {
+              "q": "Q7. Why is SELECT * often avoided in production?",
+              "a": "It can retrieve unnecessary or sensitive data, increase data transfer, and make queries more sensitive to schema changes. Explicit column names make the query's requirements clearer."
+            },
+            {
+              "q": "Q8. Is SELECT * wrong?",
+              "a": "No. It is useful for exploration, debugging, and cases where every column is genuinely needed. The important thing is to use it intentionally."
+            },
+            {
+              "q": "Q9. What does SELECT * FROM employees LIMIT 2 return?",
+              "a": "It returns at most two rows from employees, including every column. Without ORDER BY, you should not rely on which two rows are returned."
+            },
+            {
+              "q": "Q10. How should a Data Engineer use SELECT *?",
+              "a": "Use it when exploring source data or inspecting a small sample. For stable production ETL or ELT pipelines, explicitly select the columns the pipeline needs whenever practical."
+            }
+          ]
+        },
+        {
+          "n": 39,
+          "title": "DISTINCT",
+          "explanation": [
+            "<h3>1. What Is DISTINCT?</h3>",
+            "<p>DISTINCT is a SQL keyword used with SELECT to remove duplicate rows from the query result. It returns only unique combinations of the selected column values.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> DISTINCT displays duplicate-free results based on the column or combination of columns you select.</div>",
+            "<h3>2. Why Do We Need DISTINCT?</h3>",
+            "<p>Database tables often contain repeated values. For example, many employees may work in the same department. If we want to know which departments exist without repeating them, DISTINCT is useful.</p>",
+            "<ul><li>Find unique departments.</li><li>Identify different product categories.</li><li>List unique customer IDs.</li><li>Explore source data during ETL and ELT pipelines.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT column_name\nFROM table_name;</code></pre></div>",
+            "<h3>4. Example Table: employees</h3>",
+            "<table><tr><th>employee_id</th><th>name</th><th>department</th><th>city</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td><td>Bengaluru</td></tr><tr><td>102</td><td>Priya</td><td>HR</td><td>Chennai</td></tr><tr><td>103</td><td>Arun</td><td>IT</td><td>Bengaluru</td></tr><tr><td>104</td><td>Sita</td><td>Finance</td><td>Hyderabad</td></tr><tr><td>105</td><td>Kiran</td><td>HR</td><td>Bengaluru</td></tr></table>",
+            "<h3>5. DISTINCT on a Single Column</h3>",
+            "<p>Suppose we need a list of departments without duplicates.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department\nFROM employees;</code></pre></div>",
+            "<p><b>Possible result:</b></p>",
+            "<table><tr><th>department</th></tr><tr><td>IT</td></tr><tr><td>HR</td></tr><tr><td>Finance</td></tr></table>",
+            "<p>IT appears twice in the source table, and HR also appears twice. DISTINCT returns each department value once. Unless you use ORDER BY, the output order is not guaranteed.</p>",
+            "<h3>6. DISTINCT on Multiple Columns</h3>",
+            "<p>When multiple columns are selected, DISTINCT removes duplicate combinations of values across all selected columns.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department, city\nFROM employees;</code></pre></div>",
+            "<p><b>Possible result:</b></p>",
+            "<table><tr><th>department</th><th>city</th></tr><tr><td>IT</td><td>Bengaluru</td></tr><tr><td>HR</td><td>Chennai</td></tr><tr><td>Finance</td><td>Hyderabad</td></tr><tr><td>HR</td><td>Bengaluru</td></tr></table>",
+            "<p>Notice that Bengaluru appears more than once because the department-city combinations differ. DISTINCT does not make each column individually unique; it makes the complete selected combination unique.</p>",
+            "<h3>7. DISTINCT with SELECT *</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT *\nFROM employees;</code></pre></div>",
+            "<p>This returns unique complete rows across all columns. If two rows differ in even one selected column, both rows remain in the result. For example, two employees in IT are not duplicates if their employee IDs or names differ.</p>",
+            "<h3>8. DISTINCT and NULL Values</h3>",
+            "<p>In MySQL, DISTINCT treats NULL values as duplicates for result de-duplication. If a selected column contains several NULL values, the result includes one NULL value.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department\nFROM employees;</code></pre></div>",
+            "<p>If department contains IT, HR, IT, NULL, NULL, the distinct result contains IT, HR, and one NULL. NULL is retained as a distinct result value rather than being removed.</p>",
+            "<h3>9. DISTINCT vs WHERE</h3>",
+            "<table><tr><th>DISTINCT</th><th>WHERE</th></tr><tr><td>Removes duplicate result rows based on selected columns.</td><td>Filters rows using a condition.</td></tr><tr><td>SELECT DISTINCT department FROM employees;</td><td>SELECT * FROM employees WHERE department = 'IT';</td></tr></table>",
+            "<p>You can use them together:</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department\nFROM employees\nWHERE city = 'Bengaluru';</code></pre></div>",
+            "<p>This filters employees to Bengaluru first, then returns the unique department values from those matching rows.</p>",
+            "<h3>10. DISTINCT vs GROUP BY</h3>",
+            "<p>DISTINCT and GROUP BY can both produce one row for each unique value combination when no aggregate calculations are involved.</p>",
+            "<div class=\"code-block\"><pre><code>-- Using DISTINCT\nSELECT DISTINCT department\nFROM employees;\n\n-- Using GROUP BY\nSELECT department\nFROM employees\nGROUP BY department;</code></pre></div>",
+            "<p>Both queries produce one result row per department. GROUP BY is especially useful when you also need aggregate calculations such as COUNT, SUM, or AVG.</p>",
+            "<h3>11. DISTINCT with COUNT</h3>",
+            "<p>COUNT(DISTINCT column_name) counts unique non-NULL values in that column.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT COUNT(DISTINCT department) AS department_count\nFROM employees;</code></pre></div>",
+            "<p><b>Result:</b> 3, because the example contains three unique non-NULL departments: IT, HR, and Finance.</p>",
+            "<p>Important: COUNT(DISTINCT department) does not count NULL as a department value.</p>",
+            "<h3>12. DISTINCT with ORDER BY</h3>",
+            "<p>Use ORDER BY when you want the unique values in a specific order.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department\nFROM employees\nORDER BY department ASC;</code></pre></div>",
+            "<p>ASC sorts values in ascending order. DESC sorts them in descending order.</p>",
+            "<h3>13. DISTINCT in Data Engineering</h3>",
+            "<p>Data Engineers often use DISTINCT to explore unique categories, locations, statuses, and IDs in source datasets. It can also help investigate repeated values, but it should not automatically be treated as a complete data-cleaning solution.</p>",
+            "<div class=\"code-block\"><pre><code>-- Explore unique order statuses\nSELECT DISTINCT order_status\nFROM raw_orders;\n\n-- Count unique customers\nSELECT COUNT(DISTINCT customer_id) AS unique_customers\nFROM raw_orders;</code></pre></div>",
+            "<p><b>Production note:</b> DISTINCT may require sorting, hashing, or other processing depending on the query plan and database engine. On large datasets, avoid using it without understanding why duplicates exist. If duplicates indicate a data-quality problem, investigate the source and define the correct business rule.</p>",
+            "<h3>14. Common Mistakes</h3>",
+            "<ul><li><b>Expecting one unique value per column:</b> SELECT DISTINCT department, city removes duplicate pairs, not duplicates from each column independently.</li><li><b>Using DISTINCT to hide join problems:</b> Duplicate rows may be caused by an incorrect join or one-to-many relationships. Fix the join when appropriate.</li><li><b>Expecting DISTINCT to remove NULL:</b> MySQL returns one NULL for a DISTINCT column if NULL is present.</li><li><b>Confusing DISTINCT with COUNT(*):</b> COUNT(*) counts rows, while COUNT(DISTINCT column_name) counts unique non-NULL values.</li><li><b>Expecting a fixed order:</b> Use ORDER BY to guarantee the requested sort order.</li></ul>",
+            "<h3>15. Key Takeaways</h3>",
+            "<ul><li>DISTINCT removes duplicate rows from the selected result columns.</li><li>With multiple columns, uniqueness is based on the complete combination.</li><li>SELECT DISTINCT * compares complete rows across all columns.</li><li>COUNT(DISTINCT column_name) counts unique non-NULL values.</li><li>In data pipelines, investigate why duplicates exist before relying on DISTINCT to remove them.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Find Unique Departments</b></p><p>Write a query to display each department only once from employees.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Find Unique Cities</b></p><p>Display all unique cities from the employees table.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT city\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Find Unique Department-City Combinations</b></p><p>Return unique combinations of department and city.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department, city\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Count Unique Customers</b></p><p>Assume a raw_orders table contains customer_id. Count the unique non-NULL customer IDs.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT COUNT(DISTINCT customer_id) AS unique_customers\nFROM raw_orders;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Combine DISTINCT and WHERE</b></p><p>Find unique departments for employees located in Bengaluru.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department\nFROM employees\nWHERE city = 'Bengaluru';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Compare DISTINCT and GROUP BY</b></p><p>Write two queries that return unique department values: one using DISTINCT and one using GROUP BY. Compare their results.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT DISTINCT department\nFROM employees;\n\nSELECT department\nFROM employees\nGROUP BY department;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Understand single-column uniqueness, multi-column combinations, NULL behavior, and counting unique values. Be able to identify when DISTINCT is appropriate and when repeated rows require investigating the underlying data or joins.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is DISTINCT in SQL?",
+              "a": "DISTINCT removes duplicate rows from a query result based on all the columns listed in the SELECT clause."
+            },
+            {
+              "q": "Q2. What is the difference between SELECT department and SELECT DISTINCT department?",
+              "a": "SELECT department may return repeated department values. SELECT DISTINCT department returns each distinct department value once, including one NULL if NULL is present."
+            },
+            {
+              "q": "Q3. What happens when DISTINCT is used with two columns?",
+              "a": "It removes duplicate combinations of the two selected values. For example, DISTINCT department, city keeps each unique department-city pair."
+            },
+            {
+              "q": "Q4. Does SELECT DISTINCT * remove rows that have the same department?",
+              "a": "No. It removes only rows that are identical across every selected column. Employees in the same department remain separate if another column, such as employee_id, differs."
+            },
+            {
+              "q": "Q5. How does DISTINCT handle NULL in MySQL?",
+              "a": "For a selected column, DISTINCT returns one NULL value if one or more NULL values exist."
+            },
+            {
+              "q": "Q6. What is COUNT(DISTINCT customer_id)?",
+              "a": "It counts the unique non-NULL customer_id values. NULL values are not included in this count."
+            },
+            {
+              "q": "Q7. What is the difference between DISTINCT and GROUP BY?",
+              "a": "Both can return unique combinations of selected values. GROUP BY is also used to group rows for aggregate calculations such as COUNT, SUM, and AVG."
+            },
+            {
+              "q": "Q8. Can DISTINCT be combined with WHERE?",
+              "a": "Yes. WHERE filters rows, and DISTINCT removes duplicate selected values or combinations from the filtered result."
+            },
+            {
+              "q": "Q9. Does DISTINCT guarantee sorted results?",
+              "a": "No. Use ORDER BY when you need a guaranteed output order."
+            },
+            {
+              "q": "Q10. Should Data Engineers use DISTINCT to remove duplicates from every dataset?",
+              "a": "No. DISTINCT can help with exploration or intentional de-duplication, but first investigate why duplicates exist. They may come from joins, repeated source events, or legitimate multiple records."
+            }
+          ]
+        },
+        {
+          "n": 40,
+          "title": "Column Aliases using AS",
+          "explanation": [
+            "<h3>1. What Is a Column Alias?</h3>",
+            "<p>A column alias is a temporary name assigned to a column or an expression in a SQL query result. In MySQL, the AS keyword is commonly used to assign an alias.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> A column alias gives a column or calculated result a more meaningful name in the query output. It does not rename the original column in the table.</div>",
+            "<h3>2. Why Do We Need Column Aliases?</h3>",
+            "<ul><li>Make query results easier to understand.</li><li>Give calculated columns meaningful names.</li><li>Improve report and dashboard readability.</li><li>Make aggregate results easier to identify.</li><li>Provide clear column names for downstream data processing.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column_name AS alias_name\nFROM table_name;</code></pre></div>",
+            "<p><b>Explanation:</b></p><ul><li><b>column_name:</b> The original column in the table.</li><li><b>AS:</b> Introduces the alias.</li><li><b>alias_name:</b> The temporary display name in the query result.</li></ul>",
+            "<h3>4. Example Table: employees</h3>",
+            "<table><tr><th>employee_id</th><th>name</th><th>salary</th></tr><tr><td>101</td><td>Ravi</td><td>45000</td></tr><tr><td>102</td><td>Priya</td><td>40000</td></tr><tr><td>103</td><td>Arun</td><td>50000</td></tr></table>",
+            "<h3>5. Give a Column a New Name</h3>",
+            "<p>Suppose we want the salary column to appear as monthly_salary in the result.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT salary AS monthly_salary\nFROM employees;</code></pre></div>",
+            "<p><b>Result:</b></p>",
+            "<table><tr><th>monthly_salary</th></tr><tr><td>45000</td></tr><tr><td>40000</td></tr><tr><td>50000</td></tr></table>",
+            "<p>The original table column is still named salary. Only the result column's displayed name changes.</p>",
+            "<h3>6. Alias Multiple Columns</h3>",
+            "<p>You can assign aliases to multiple columns in the same query.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    employee_id AS id,\n    name AS employee_name,\n    salary AS monthly_salary\nFROM employees;</code></pre></div>",
+            "<p><b>Result column names:</b> id, employee_name, monthly_salary.</p>",
+            "<h3>7. Using AS with Calculated Columns</h3>",
+            "<p>Aliases are especially useful when a query calculates a new value.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    name AS employee_name,\n    salary * 12 AS annual_salary\nFROM employees;</code></pre></div>",
+            "<p><b>Explanation:</b> salary * 12 calculates an annual amount from the stored salary values, assuming salary represents monthly salary. The alias annual_salary gives the calculated column a meaningful name.</p>",
+            "<p><b>Example result:</b></p>",
+            "<table><tr><th>employee_name</th><th>annual_salary</th></tr><tr><td>Ravi</td><td>540000</td></tr><tr><td>Priya</td><td>480000</td></tr><tr><td>Arun</td><td>600000</td></tr></table>",
+            "<h3>8. Using AS with Aggregate Functions</h3>",
+            "<p>Aggregate functions often produce column names that are less descriptive than we want. An alias makes the result clearer.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    COUNT(*) AS total_employees,\n    AVG(salary) AS average_salary,\n    MAX(salary) AS highest_salary\nFROM employees;</code></pre></div>",
+            "<p><b>Explanation:</b></p><ul><li>total_employees shows the number of rows counted.</li><li>average_salary shows the average salary.</li><li>highest_salary shows the largest salary.</li></ul>",
+            "<h3>9. Is AS Mandatory in MySQL?</h3>",
+            "<p>No. In MySQL, AS can usually be omitted when assigning a column alias.</p>",
+            "<div class=\"code-block\"><pre><code>-- Using AS\nSELECT salary AS monthly_salary\nFROM employees;\n\n-- Without AS\nSELECT salary monthly_salary\nFROM employees;</code></pre></div>",
+            "<p>Both queries assign the alias monthly_salary. Using AS is often clearer for beginners and improves readability in team projects.</p>",
+            "<h3>10. Aliases Containing Spaces</h3>",
+            "<p>If an alias contains spaces or special characters, quote it. MySQL supports backticks for identifier names.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT salary AS `Monthly Salary`\nFROM employees;</code></pre></div>",
+            "<p>The result column appears as Monthly Salary. For production SQL, aliases without spaces, such as monthly_salary, are often easier to reference in code.</p>",
+            "<h3>11. Column Alias vs Table Alias</h3>",
+            "<table><tr><th>Type</th><th>Purpose</th><th>Example</th></tr><tr><td>Column alias</td><td>Renames a result column</td><td>salary AS monthly_salary</td></tr><tr><td>Table alias</td><td>Gives a table a short name within a query</td><td>employees AS e</td></tr></table>",
+            "<div class=\"code-block\"><pre><code>SELECT e.name AS employee_name\nFROM employees AS e;</code></pre></div>",
+            "<p>Here, e is the table alias and employee_name is the column alias. The table alias can help make queries involving joins easier to read.</p>",
+            "<h3>12. Can You Use a Column Alias in WHERE?</h3>",
+            "<p>In MySQL, a column alias generally cannot be referenced in the WHERE clause of the same SELECT query because WHERE is evaluated before the SELECT list's aliases are made available.</p>",
+            "<div class=\"code-block\"><pre><code>-- Not valid in MySQL for this alias\nSELECT salary * 12 AS annual_salary\nFROM employees\nWHERE annual_salary &gt; 500000;</code></pre></div>",
+            "<p>Instead, repeat the expression in WHERE:</p>",
+            "<div class=\"code-block\"><pre><code>SELECT salary * 12 AS annual_salary\nFROM employees\nWHERE salary * 12 &gt; 500000;</code></pre></div>",
+            "<p>Alternatively, use a subquery or CTE so that annual_salary becomes a column available to the outer query.</p>",
+            "<h3>13. Using an Alias in ORDER BY</h3>",
+            "<p>MySQL allows a SELECT-list alias to be used in ORDER BY.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    name,\n    salary * 12 AS annual_salary\nFROM employees\nORDER BY annual_salary DESC;</code></pre></div>",
+            "<p>The rows are sorted by annual_salary from highest to lowest.</p>",
+            "<h3>14. Column Aliases in Data Engineering</h3>",
+            "<p>Data Engineers use aliases to create clear output names for transformations, reporting queries, and data pipelines. Consistent names make transformed datasets easier for analysts and downstream systems to understand.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    order_id AS order_id,\n    customer_id AS customer_id,\n    quantity * unit_price AS order_amount\nFROM raw_orders;</code></pre></div>",
+            "<p>In this example, order_amount represents the calculated amount for each order line. Confirm the business definition before using it in production; discounts, taxes, returns, and shipping may affect the final order total.</p>",
+            "<h3>15. Common Mistakes</h3>",
+            "<ul><li><b>Thinking an alias changes the table schema:</b> A SELECT alias changes the result label, not the original column name.</li><li><b>Using an alias in WHERE:</b> Use the original expression, or place the alias in an outer query.</li><li><b>Forgetting quotes around aliases with spaces:</b> Use backticks in MySQL, or choose a simple alias such as total_sales.</li><li><b>Choosing unclear aliases:</b> Prefer descriptive names such as total_orders instead of x.</li><li><b>Assuming aliases are permanent:</b> To change the actual column name in the table, use an appropriate schema-changing operation such as ALTER TABLE, not a SELECT alias.</li></ul>",
+            "<h3>16. Key Takeaways</h3>",
+            "<ul><li>AS assigns a temporary name to a column or expression in the query result.</li><li>MySQL permits column aliases without AS, but AS improves clarity.</li><li>Aliases are useful for calculations and aggregate functions.</li><li>MySQL permits SELECT aliases in ORDER BY, but generally not in WHERE in the same query block.</li><li>Clear aliases make transformed data easier to use in reporting and data pipelines.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Rename One Column</b></p><p>Display the salary column as monthly_salary.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT salary AS monthly_salary\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Rename Multiple Columns</b></p><p>Display employee_id as id and name as employee_name.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    employee_id AS id,\n    name AS employee_name\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Create a Calculated Column</b></p><p>Assume salary represents monthly salary. Calculate annual salary and assign it the alias annual_salary.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    name,\n    salary * 12 AS annual_salary\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Use an Alias with COUNT</b></p><p>Count the employee rows and name the result total_employees.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT COUNT(*) AS total_employees\nFROM employees;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Sort by an Alias</b></p><p>Calculate annual salary and sort from highest to lowest using the alias.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    name,\n    salary * 12 AS annual_salary\nFROM employees\nORDER BY annual_salary DESC;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Practice a Data Engineering Transformation</b></p><p>Assume raw_orders contains order_id, quantity, and unit_price. Calculate the line amount and name it order_amount.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT\n    order_id,\n    quantity * unit_price AS order_amount\nFROM raw_orders;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Use aliases for readable column names, calculations, aggregate results, and downstream data transformations. Understand the difference between a column alias and a permanent table-column rename.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is a column alias in SQL?",
+              "a": "A column alias is a temporary name assigned to a column or expression in the query result."
+            },
+            {
+              "q": "Q2. What does AS do in SQL?",
+              "a": "AS introduces an alias, such as SELECT salary AS monthly_salary FROM employees."
+            },
+            {
+              "q": "Q3. Is AS mandatory for column aliases in MySQL?",
+              "a": "No. MySQL usually permits SELECT salary monthly_salary FROM employees. However, AS makes the alias easier to identify and the query clearer."
+            },
+            {
+              "q": "Q4. Does a column alias change the original table column name?",
+              "a": "No. It changes the column label in that query's result only. The original table schema remains unchanged."
+            },
+            {
+              "q": "Q5. Can we assign an alias to a calculated expression?",
+              "a": "Yes. For example, SELECT salary * 12 AS annual_salary FROM employees gives the calculated expression the result name annual_salary."
+            },
+            {
+              "q": "Q6. Can we use an alias in WHERE in the same SELECT query in MySQL?",
+              "a": "Generally, no. WHERE is processed before the SELECT-list alias is available. Repeat the expression in WHERE or use a subquery or CTE."
+            },
+            {
+              "q": "Q7. Can we use a column alias in ORDER BY?",
+              "a": "Yes. MySQL allows SELECT-list aliases in ORDER BY, such as ORDER BY annual_salary DESC."
+            },
+            {
+              "q": "Q8. How do we create an alias with spaces in MySQL?",
+              "a": "Use backticks around the alias, such as SELECT salary AS `Monthly Salary` FROM employees. In application and pipeline code, names such as monthly_salary are often easier to handle."
+            },
+            {
+              "q": "Q9. What is the difference between a column alias and a table alias?",
+              "a": "A column alias renames a result column, while a table alias gives a table a shorter name within a query. For example, salary AS monthly_salary and employees AS e."
+            },
+            {
+              "q": "Q10. Why are aliases useful in Data Engineering?",
+              "a": "Aliases make calculated fields and transformed outputs easier to understand and provide clear names for reports, datasets, and downstream processing."
+            }
+          ]
         }
   ]
 }
