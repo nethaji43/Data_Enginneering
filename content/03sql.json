@@ -5553,6 +5553,1239 @@
               "a": "Aliases make calculated fields and transformed outputs easier to understand and provide clear names for reports, datasets, and downstream processing."
             }
           ]
+        },
+        {
+          "n": 41,
+          "title": "LIMIT",
+          "explanation": [
+            "<h3>1. What Is LIMIT?</h3>",
+            "<p>LIMIT is a MySQL clause used to restrict the maximum number of rows returned by a SELECT query. It is useful when you want to retrieve a small sample of data instead of displaying an entire table.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> LIMIT controls how many rows a query returns. It does not limit the number of columns.</div>",
+            "<h3>2. Why Do We Need LIMIT?</h3>",
+            "<ul><li>Preview a small number of records from a large table.</li><li>Explore source data during development.</li><li>Display a limited number of results in applications.</li><li>Build pagination for websites and dashboards.</li><li>Inspect data while developing ETL and ELT pipelines.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column_name\nFROM table_name\nLIMIT number_of_rows;</code></pre></div>",
+            "<p>The number_of_rows value specifies the maximum number of rows to return.</p>",
+            "<h3>4. Example Table: employees</h3>",
+            "<table><tr><th>employee_id</th><th>name</th><th>department</th><th>salary</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td><td>45000</td></tr><tr><td>102</td><td>Priya</td><td>HR</td><td>40000</td></tr><tr><td>103</td><td>Arun</td><td>Finance</td><td>50000</td></tr><tr><td>104</td><td>Sita</td><td>IT</td><td>55000</td></tr><tr><td>105</td><td>Kiran</td><td>HR</td><td>42000</td></tr></table>",
+            "<h3>5. LIMIT with SELECT *</h3>",
+            "<p>Suppose the employees table contains thousands of records. You want to inspect only the first three rows returned by the query.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nLIMIT 3;</code></pre></div>",
+            "<p><b>Result:</b> At most three rows are returned, including all columns. Without ORDER BY, do not assume which rows will be returned or in what order.</p>",
+            "<h3>6. LIMIT with Specific Columns</h3>",
+            "<p>You can combine LIMIT with specific column names to return only the required columns and a limited number of rows.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nLIMIT 2;</code></pre></div>",
+            "<p>This returns at most two rows containing only name and salary.</p>",
+            "<h3>7. LIMIT with ORDER BY</h3>",
+            "<p>LIMIT becomes especially useful when combined with ORDER BY. First, define the order you need; then LIMIT returns the first rows in that order.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 3;</code></pre></div>",
+            "<p><b>Explanation:</b> Employees are sorted by salary from highest to lowest, and the query returns at most three rows.</p>",
+            "<p><b>Expected result for the sample data:</b></p>",
+            "<table><tr><th>name</th><th>salary</th></tr><tr><td>Sita</td><td>55000</td></tr><tr><td>Arun</td><td>50000</td></tr><tr><td>Ravi</td><td>45000</td></tr></table>",
+            "<h3>8. LIMIT with OFFSET</h3>",
+            "<p>OFFSET specifies how many rows to skip before returning the requested number of rows. In MySQL, the syntax is LIMIT offset, row_count.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nLIMIT 2, 2;</code></pre></div>",
+            "<p><b>Explanation:</b> Skip the first two rows in the query result, then return at most two rows. Without ORDER BY, the row sequence is not guaranteed.</p>",
+            "<h3>9. LIMIT with the OFFSET Keyword</h3>",
+            "<p>MySQL also supports the more readable LIMIT row_count OFFSET offset syntax.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nORDER BY employee_id\nLIMIT 2 OFFSET 2;</code></pre></div>",
+            "<p>This query sorts by employee_id, skips the first two rows, and returns the next two rows.</p>",
+            "<p>With the sample data, it returns employee IDs 103 and 104.</p>",
+            "<h3>10. Understanding Pagination</h3>",
+            "<p>Pagination divides a large result set into smaller pages. For example, if each page contains 10 records:</p>",
+            "<div class=\"code-block\"><pre><code>-- Page 1: rows 1 to 10\nSELECT * FROM employees\nORDER BY employee_id\nLIMIT 10 OFFSET 0;\n\n-- Page 2: rows 11 to 20\nSELECT * FROM employees\nORDER BY employee_id\nLIMIT 10 OFFSET 10;\n\n-- Page 3: rows 21 to 30\nSELECT * FROM employees\nORDER BY employee_id\nLIMIT 10 OFFSET 20;</code></pre></div>",
+            "<p>For reliable pagination, use ORDER BY with a stable ordering column, preferably a unique key or a combination of columns that uniquely identifies each row.</p>",
+            "<h3>11. Finding the Highest and Lowest Values</h3>",
+            "<p>LIMIT can help find the highest or lowest values when combined with ORDER BY.</p>",
+            "<div class=\"code-block\"><pre><code>-- Highest-paid employee\nSELECT name, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 1;\n\n-- Lowest-paid employee\nSELECT name, salary\nFROM employees\nORDER BY salary ASC\nLIMIT 1;</code></pre></div>",
+            "<p>The first query returns one employee with the highest salary. If multiple employees tie, LIMIT 1 returns only one of them. Add a tie-breaking column if you need deterministic selection.</p>",
+            "<h3>12. LIMIT vs WHERE</h3>",
+            "<table><tr><th>LIMIT</th><th>WHERE</th></tr><tr><td>Restricts the maximum number of returned rows.</td><td>Filters rows according to a condition.</td></tr><tr><td>LIMIT 5</td><td>WHERE department = 'IT'</td></tr></table>",
+            "<p>They can be used together:</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'IT'\nORDER BY employee_id\nLIMIT 5;</code></pre></div>",
+            "<p>This returns at most five IT employees, ordered by employee_id.</p>",
+            "<h3>13. Does LIMIT Always Make a Query Faster?</h3>",
+            "<p>LIMIT can reduce the number of rows returned to the client, but it does not guarantee that the database will do proportionally less work. The database may still need to scan or sort many rows, depending on the query and available indexes.</p>",
+            "<p>For example, an indexed query that retrieves the first few rows in the required order may be efficient. A query that sorts a very large dataset before applying LIMIT may still require substantial work.</p>",
+            "<h3>14. LIMIT in Data Engineering</h3>",
+            "<p>Data Engineers often use LIMIT when exploring raw datasets, checking sample records, and debugging transformations.</p>",
+            "<div class=\"code-block\"><pre><code>-- Inspect a sample of raw orders\nSELECT *\nFROM raw_orders\nLIMIT 10;\n\n-- Inspect the latest orders\nSELECT order_id, customer_id, order_date\nFROM raw_orders\nORDER BY order_date DESC, order_id DESC\nLIMIT 10;</code></pre></div>",
+            "<p>The first query samples up to 10 rows without guaranteeing which rows appear. The second retrieves up to 10 orders in descending order by date, with order_id as a tie-breaker.</p>",
+            "<p><b>Important:</b> LIMIT is not a substitute for incremental extraction or complete data processing. If a pipeline needs every eligible record, using a small LIMIT can silently omit data.</p>",
+            "<h3>15. Common Mistakes</h3>",
+            "<ul><li><b>Forgetting ORDER BY:</b> Without ORDER BY, do not assume the result contains the earliest, latest, or otherwise specific rows.</li><li><b>Confusing rows and columns:</b> LIMIT restricts rows, while SELECT controls the columns returned.</li><li><b>Misunderstanding OFFSET:</b> LIMIT 5 OFFSET 10 skips 10 rows and returns up to the next 5.</li><li><b>Assuming LIMIT guarantees speed:</b> Query performance depends on execution plans, indexes, filtering, and sorting.</li><li><b>Using LIMIT in a complete data pipeline:</b> A fixed limit can cause records to be missed if the pipeline requires the full dataset.</li></ul>",
+            "<h3>16. Key Takeaways</h3>",
+            "<ul><li>LIMIT restricts the maximum number of rows returned in MySQL.</li><li>ORDER BY controls which rows appear first when a specific order is required.</li><li>OFFSET skips rows before returning the requested number.</li><li>LIMIT is useful for exploration, pagination, and top-N queries.</li><li>For Data Engineering pipelines, make sure a limit does not accidentally exclude required data.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Retrieve Five Rows</b></p><p>Write a query to retrieve at most five rows from employees.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nLIMIT 5;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Select Specific Columns</b></p><p>Retrieve name and salary for at most three employees.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nLIMIT 3;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Find the Three Highest Salaries</b></p><p>Display the three highest-paid employees.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 3;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Skip Rows with OFFSET</b></p><p>Sort employees by employee_id, skip the first two rows, and retrieve the next two rows.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nORDER BY employee_id\nLIMIT 2 OFFSET 2;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Filter and Limit</b></p><p>Retrieve at most two IT employees, ordered by employee_id.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'IT'\nORDER BY employee_id\nLIMIT 2;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Data Engineering Sample</b></p><p>Inspect the latest 10 orders from raw_orders. Assume order_id uniquely identifies each order.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, customer_id, order_date\nFROM raw_orders\nORDER BY order_date DESC, order_id DESC\nLIMIT 10;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Understand how LIMIT, ORDER BY, and OFFSET work together. Know how to retrieve samples, implement basic pagination, and find top-N results without accidentally limiting a production pipeline's required data.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is LIMIT in MySQL?",
+              "a": "LIMIT restricts the maximum number of rows returned by a query."
+            },
+            {
+              "q": "Q2. Does LIMIT restrict columns?",
+              "a": "No. LIMIT restricts rows. The SELECT clause determines which columns are returned."
+            },
+            {
+              "q": "Q3. What does SELECT * FROM employees LIMIT 5 do?",
+              "a": "It returns at most five rows from employees, including all columns."
+            },
+            {
+              "q": "Q4. Why should LIMIT be combined with ORDER BY?",
+              "a": "ORDER BY establishes the required row order so LIMIT returns the first rows according to that order. Without ORDER BY, a specific row sequence is not guaranteed."
+            },
+            {
+              "q": "Q5. What does LIMIT 2, 3 mean in MySQL?",
+              "a": "It skips the first two rows of the query result and returns at most the next three rows. The equivalent syntax is LIMIT 3 OFFSET 2."
+            },
+            {
+              "q": "Q6. What does LIMIT 10 OFFSET 20 mean?",
+              "a": "It skips 20 rows and returns at most 10 rows after them."
+            },
+            {
+              "q": "Q7. How can we find the highest salary using LIMIT?",
+              "a": "Use SELECT name, salary FROM employees ORDER BY salary DESC LIMIT 1;. If multiple employees tie, the query returns only one of them unless you request additional rows or use a different approach to include ties."
+            },
+            {
+              "q": "Q8. Does LIMIT always improve query performance?",
+              "a": "No. It limits the result size, but the database may still need to scan, filter, or sort many rows before returning the limited result."
+            },
+            {
+              "q": "Q9. Can LIMIT be used with WHERE?",
+              "a": "Yes. WHERE filters rows, ORDER BY can sort the matching rows, and LIMIT restricts how many of those rows are returned."
+            },
+            {
+              "q": "Q10. Should LIMIT be used in a production ETL pipeline?",
+              "a": "Use it when the pipeline intentionally processes a limited sample or batch. Do not use a fixed limit if the pipeline is required to extract or process all eligible records."
+            }
+          ]
+        },
+        {
+          "n": 42,
+          "title": "TOP / FETCH / OFFSET — Other Database Alternatives",
+          "explanation": [
+            "<h3>1. Introduction</h3>",
+            "<p>Different database systems provide different ways to limit the number of rows returned by a query. MySQL uses LIMIT, while SQL Server commonly uses TOP or OFFSET ... FETCH, and PostgreSQL also supports FETCH and OFFSET.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> LIMIT, TOP, FETCH, and OFFSET help control how many rows a query returns and, when combined with ordering, which portion of the results is returned.</div>",
+            "<h3>2. Why Do Different Databases Have Different Syntax?</h3>",
+            "<p>SQL has common standards, but database vendors implement some features with different syntax. When working as a Data Engineer, you may need to translate queries when moving data between MySQL, SQL Server, PostgreSQL, Oracle, or other database systems.</p>",
+            "<ul><li>Retrieve a small sample of records.</li><li>Find the top-performing products or highest-paid employees.</li><li>Implement pagination in applications.</li><li>Adapt SQL queries during database migration.</li></ul>",
+            "<h3>3. MySQL: LIMIT</h3>",
+            "<p>MySQL uses LIMIT to restrict the maximum number of rows returned.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT employee_id, name, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 3;</code></pre></div>",
+            "<p><b>Explanation:</b> Returns the three highest-paid employees, assuming salary values determine the ranking. If employees have equal salaries, add a unique tie-breaker to make the selected rows deterministic.</p>",
+            "<h3>4. SQL Server: TOP</h3>",
+            "<p>SQL Server supports TOP to return a specified number or percentage of rows.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT TOP 3 employee_id, name, salary\nFROM employees\nORDER BY salary DESC;</code></pre></div>",
+            "<p><b>Explanation:</b> Returns the first three rows in descending salary order. TOP is commonly used in SQL Server for top-N queries.</p>",
+            "<p><b>Important:</b> Without ORDER BY, TOP does not guarantee which rows are selected.</p>",
+            "<h3>5. SQL Server: TOP with PERCENT</h3>",
+            "<p>SQL Server can select a percentage of the result rows using TOP PERCENT.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT TOP 10 PERCENT employee_id, name, salary\nFROM employees\nORDER BY salary DESC;</code></pre></div>",
+            "<p>This requests approximately the top 10 percent of qualifying rows. SQL Server determines the resulting row count according to its TOP PERCENT behavior, including rounding up when needed.</p>",
+            "<h3>6. SQL Server: WITH TIES</h3>",
+            "<p>Sometimes several employees have the same salary as the last row selected by TOP. SQL Server supports WITH TIES to include additional rows tied on the ORDER BY values.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT TOP 3 WITH TIES employee_id, name, salary\nFROM employees\nORDER BY salary DESC;</code></pre></div>",
+            "<p>This can return more than three rows if additional employees tie with the third row on the salary ordering value. Do not add a unique employee ID to this ORDER BY if you want employees tied on salary to remain ties.</p>",
+            "<h3>7. SQL Server and PostgreSQL: OFFSET ... FETCH</h3>",
+            "<p>OFFSET skips a specified number of rows, while FETCH NEXT specifies how many subsequent rows to return. This syntax is available in SQL Server and PostgreSQL.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT employee_id, name, salary\nFROM employees\nORDER BY employee_id\nOFFSET 2 ROWS\nFETCH NEXT 3 ROWS ONLY;</code></pre></div>",
+            "<p><b>Explanation:</b> Orders the employees by employee_id, skips the first two rows, and returns the next three rows, if available.</p>",
+            "<p>In SQL Server, OFFSET ... FETCH is used with ORDER BY. PostgreSQL also supports this form of pagination.</p>",
+            "<h3>8. PostgreSQL: LIMIT and OFFSET</h3>",
+            "<p>PostgreSQL supports LIMIT and OFFSET, similar to MySQL.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT employee_id, name, salary\nFROM employees\nORDER BY employee_id\nLIMIT 3 OFFSET 2;</code></pre></div>",
+            "<p>This skips two rows and returns at most three rows. PostgreSQL also supports FETCH FIRST or FETCH NEXT syntax.</p>",
+            "<h3>9. PostgreSQL: FETCH FIRST</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT employee_id, name, salary\nFROM employees\nORDER BY salary DESC\nFETCH FIRST 3 ROWS ONLY;</code></pre></div>",
+            "<p>This returns at most three rows from the ordered result. FETCH FIRST and FETCH NEXT use SQL-standard-style syntax that is supported by PostgreSQL and several other database systems.</p>",
+            "<h3>10. Comparing the Syntax</h3>",
+            "<table><tr><th>Database</th><th>Example syntax</th><th>Purpose</th></tr><tr><td>MySQL</td><td>LIMIT 3</td><td>Return up to three rows</td></tr><tr><td>SQL Server</td><td>TOP 3</td><td>Return the first three rows</td></tr><tr><td>SQL Server</td><td>OFFSET 2 ROWS FETCH NEXT 3 ROWS ONLY</td><td>Skip two rows and return up to three</td></tr><tr><td>PostgreSQL</td><td>LIMIT 3 OFFSET 2</td><td>Skip two rows and return up to three</td></tr><tr><td>PostgreSQL</td><td>FETCH FIRST 3 ROWS ONLY</td><td>Return up to three rows</td></tr></table>",
+            "<h3>11. Understanding OFFSET</h3>",
+            "<p>OFFSET is used to skip rows before returning the requested result portion. It is useful for pagination, where records are split across pages.</p>",
+            "<div class=\"code-block\"><pre><code>-- MySQL or PostgreSQL: page 1\nSELECT employee_id, name\nFROM employees\nORDER BY employee_id\nLIMIT 10 OFFSET 0;\n\n-- MySQL or PostgreSQL: page 2\nSELECT employee_id, name\nFROM employees\nORDER BY employee_id\nLIMIT 10 OFFSET 10;</code></pre></div>",
+            "<p>For SQL Server, the equivalent page-2 query is:</p>",
+            "<div class=\"code-block\"><pre><code>SELECT employee_id, name\nFROM employees\nORDER BY employee_id\nOFFSET 10 ROWS\nFETCH NEXT 10 ROWS ONLY;</code></pre></div>",
+            "<p>Always use a stable ORDER BY for reliable pagination. For large datasets, keyset pagination can be more efficient than skipping a very large OFFSET.</p>",
+            "<h3>12. Which Syntax Should You Learn First?</h3>",
+            "<ul><li><b>MySQL:</b> Learn LIMIT and OFFSET first.</li><li><b>SQL Server:</b> Learn TOP and OFFSET ... FETCH.</li><li><b>PostgreSQL:</b> Learn LIMIT, OFFSET, and FETCH FIRST.</li><li><b>Database-independent skills:</b> Understand ORDER BY, filtering, pagination, and deterministic sorting.</li></ul>",
+            "<h3>13. Common Mistakes</h3>",
+            "<ul><li><b>Using the wrong dialect:</b> TOP 3 is SQL Server syntax and does not work as written in MySQL.</li><li><b>Forgetting ORDER BY:</b> A row limit without ordering does not guarantee a particular set of rows.</li><li><b>Confusing OFFSET and row count:</b> OFFSET specifies how many rows to skip; FETCH or LIMIT specifies how many to return.</li><li><b>Expecting exactly the requested count:</b> A query may return fewer rows if fewer rows remain after filtering or skipping.</li><li><b>Ignoring tied values:</b> TOP 3 may exclude other employees tied with the third employee. SQL Server's WITH TIES can include ties on the ORDER BY values.</li><li><b>Assuming every database uses the same syntax:</b> Check the database engine and version when migrating SQL.</li></ul>",
+            "<h3>14. Data Engineering Use Cases</h3>",
+            "<p>Data Engineers may work with several database systems in the same pipeline. Knowing these alternatives helps when extracting source data, testing SQL across platforms, building pagination, and migrating queries.</p>",
+            "<div class=\"code-block\"><pre><code>-- MySQL: inspect 10 recent orders\nSELECT order_id, order_date\nFROM raw_orders\nORDER BY order_date DESC, order_id DESC\nLIMIT 10;\n\n-- SQL Server: inspect 10 recent orders\nSELECT TOP 10 order_id, order_date\nFROM raw_orders\nORDER BY order_date DESC, order_id DESC;</code></pre></div>",
+            "<p>These queries use the syntax of different database engines to retrieve up to ten recent orders. The unique order_id tie-breaker makes the ordering deterministic when order dates match.</p>",
+            "<div class=\"definition-box\"><b>Key Takeaway:</b> The syntax varies by database, but the core idea remains the same: establish the required order, then select the desired portion of the result.</div>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: MySQL LIMIT</b></p><p>Retrieve the five highest-paid employees using MySQL syntax.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT employee_id, name, salary\nFROM employees\nORDER BY salary DESC, employee_id\nLIMIT 5;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: SQL Server TOP</b></p><p>Rewrite the previous query using SQL Server TOP syntax.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT TOP 5 employee_id, name, salary\nFROM employees\nORDER BY salary DESC, employee_id;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: PostgreSQL FETCH FIRST</b></p><p>Return the three employees with the highest salaries using FETCH FIRST.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT employee_id, name, salary\nFROM employees\nORDER BY salary DESC, employee_id\nFETCH FIRST 3 ROWS ONLY;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Use OFFSET for Pagination</b></p><p>Using SQL Server syntax, skip the first ten employees ordered by employee_id and retrieve the next ten.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT employee_id, name\nFROM employees\nORDER BY employee_id\nOFFSET 10 ROWS\nFETCH NEXT 10 ROWS ONLY;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Understand Ties</b></p><p>In SQL Server, return at least the top three employees by salary and include all employees tied with the third row on salary.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT TOP 3 WITH TIES employee_id, name, salary\nFROM employees\nORDER BY salary DESC;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Data Engineering Scenario</b></p><p>You are migrating a query from MySQL to SQL Server. Explain which part of the following query must change and why.</p>",
+            "<div class=\"code-block\"><pre><code>-- MySQL\nSELECT order_id, order_date\nFROM raw_orders\nORDER BY order_date DESC, order_id DESC\nLIMIT 10;</code></pre></div>",
+            "<p><b>Expected SQL Server version:</b></p>",
+            "<div class=\"code-block\"><pre><code>SELECT TOP 10 order_id, order_date\nFROM raw_orders\nORDER BY order_date DESC, order_id DESC;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Recognize LIMIT, TOP, FETCH FIRST, and OFFSET syntax, select the correct form for each database engine, and use ORDER BY for predictable top-N queries and pagination.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is the difference between LIMIT and TOP?",
+              "a": "LIMIT is commonly used in MySQL and PostgreSQL. TOP is commonly used in SQL Server. Both can restrict the number of rows returned."
+            },
+            {
+              "q": "Q2. Which database uses SELECT TOP 5?",
+              "a": "SQL Server uses TOP to limit the number of rows returned. Other database systems may use different syntax."
+            },
+            {
+              "q": "Q3. What does OFFSET do?",
+              "a": "OFFSET skips a specified number of rows before returning the requested portion of the result."
+            },
+            {
+              "q": "Q4. What is FETCH NEXT 10 ROWS ONLY?",
+              "a": "It requests up to ten rows after the offset position in databases supporting this syntax, such as SQL Server and PostgreSQL."
+            },
+            {
+              "q": "Q5. Does TOP 5 guarantee the five highest salaries?",
+              "a": "Only if the query uses ORDER BY salary DESC. Without ORDER BY, SQL Server does not guarantee which five rows are selected."
+            },
+            {
+              "q": "Q6. What is TOP 10 PERCENT in SQL Server?",
+              "a": "It requests approximately the top 10 percent of qualifying rows, according to SQL Server's TOP PERCENT behavior."
+            },
+            {
+              "q": "Q7. What does WITH TIES do?",
+              "a": "In SQL Server, WITH TIES includes additional rows that tie with the last selected row according to the ORDER BY values. The result may contain more rows than the TOP count."
+            },
+            {
+              "q": "Q8. Does MySQL support TOP?",
+              "a": "No, MySQL does not support SQL Server's TOP syntax as written. Use LIMIT instead."
+            },
+            {
+              "q": "Q9. Why is ORDER BY important with pagination?",
+              "a": "ORDER BY defines a stable sequence for the pages. Without it, the database does not guarantee which rows appear on each page. Including a unique tie-breaker helps make ordering deterministic."
+            },
+            {
+              "q": "Q10. Which syntax should a Data Engineer use?",
+              "a": "Use the syntax supported by the target database: LIMIT for MySQL, TOP or OFFSET ... FETCH for SQL Server, and LIMIT/OFFSET or FETCH FIRST for PostgreSQL. Always verify the database engine and version."
+            }
+          ]
+        },
+        {
+          "n": 43,
+          "title": "WHERE",
+          "explanation": [
+            "<h3>1. What Is WHERE?</h3>",
+            "<p>WHERE is a SQL clause used to filter rows based on a specified condition. It returns only the rows that satisfy the condition.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> WHERE selects the rows you want from a table by checking a condition.</div>",
+            "<h3>2. Why Do We Need WHERE?</h3>",
+            "<p>Database tables may contain thousands or millions of records. Usually, we need only the rows relevant to a particular task.</p>",
+            "<ul><li>Find employees belonging to a specific department.</li><li>Retrieve orders placed after a particular date.</li><li>Find products whose price exceeds a specified amount.</li><li>Filter source records during ETL and ELT processing.</li><li>Restrict which rows are updated or deleted.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column1, column2\nFROM table_name\nWHERE condition;</code></pre></div>",
+            "<p>The database evaluates the condition for each candidate row. Only rows for which the condition is TRUE are included in the result. Rows for which the condition is FALSE or UNKNOWN, such as a comparison with NULL, are not returned.</p>",
+            "<h3>4. Example Table: employees</h3>",
+            "<table><tr><th>employee_id</th><th>name</th><th>department</th><th>salary</th><th>city</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td><td>45000</td><td>Bengaluru</td></tr><tr><td>102</td><td>Priya</td><td>HR</td><td>40000</td><td>Chennai</td></tr><tr><td>103</td><td>Arun</td><td>IT</td><td>55000</td><td>Bengaluru</td></tr><tr><td>104</td><td>Sita</td><td>Finance</td><td>50000</td><td>Hyderabad</td></tr><tr><td>105</td><td>Kiran</td><td>HR</td><td>42000</td><td>Bengaluru</td></tr></table>",
+            "<h3>5. WHERE with Equality (=)</h3>",
+            "<p>Use the equality operator to find rows matching a specific value.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'IT';</code></pre></div>",
+            "<p><b>Result:</b> Ravi and Arun are returned because they belong to the IT department.</p>",
+            "<table><tr><th>employee_id</th><th>name</th><th>department</th><th>salary</th><th>city</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td><td>45000</td><td>Bengaluru</td></tr><tr><td>103</td><td>Arun</td><td>IT</td><td>55000</td><td>Bengaluru</td></tr></table>",
+            "<h3>6. Comparison Operators</h3>",
+            "<p>WHERE can use comparison operators to filter numeric, date, and other comparable values.</p>",
+            "<table><tr><th>Operator</th><th>Meaning</th><th>Example</th></tr><tr><td>=</td><td>Equal to</td><td>salary = 45000</td></tr><tr><td>&lt;&gt;</td><td>Not equal to</td><td>department &lt;&gt; 'IT'</td></tr><tr><td>&gt;</td><td>Greater than</td><td>salary &gt; 45000</td></tr><tr><td>&lt;</td><td>Less than</td><td>salary &lt; 45000</td></tr><tr><td>&gt;=</td><td>Greater than or equal to</td><td>salary &gt;= 50000</td></tr><tr><td>&lt;=</td><td>Less than or equal to</td><td>salary &lt;= 40000</td></tr></table>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &gt; 45000;</code></pre></div>",
+            "<p><b>Result:</b> Arun and Sita are returned because their salaries are greater than 45000.</p>",
+            "<h3>7. WHERE with AND</h3>",
+            "<p>AND requires all specified conditions to be TRUE.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'IT'\n  AND salary &gt; 50000;</code></pre></div>",
+            "<p><b>Result:</b> Arun is returned because he belongs to IT and earns more than 50000.</p>",
+            "<h3>8. WHERE with OR</h3>",
+            "<p>OR returns a row when at least one of the specified conditions is TRUE.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE department = 'IT'\n   OR department = 'HR';</code></pre></div>",
+            "<p><b>Result:</b> Ravi, Arun, Priya, and Kiran are returned.</p>",
+            "<h3>9. WHERE with AND, OR, and Parentheses</h3>",
+            "<p>When combining AND and OR, use parentheses to make the intended logic clear. AND has higher precedence than OR in SQL.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE (department = 'IT' OR department = 'HR')\n  AND salary &gt;= 42000;</code></pre></div>",
+            "<p><b>Explanation:</b> First consider employees in IT or HR, then keep only those whose salary is at least 42000. The matching employees are Ravi, Arun, and Kiran.</p>",
+            "<h3>10. WHERE with BETWEEN</h3>",
+            "<p>BETWEEN filters values within an inclusive range, meaning both endpoints are included.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary BETWEEN 40000 AND 50000;</code></pre></div>",
+            "<p>This returns employees with salaries from 40000 through 50000, including both values. In the example, Ravi, Priya, Sita, and Kiran are returned.</p>",
+            "<h3>11. WHERE with IN</h3>",
+            "<p>IN checks whether a value matches any value in a specified list.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE department IN ('IT', 'Finance');</code></pre></div>",
+            "<p>This returns employees from IT or Finance. IN can make a list of equality conditions easier to read than multiple OR expressions.</p>",
+            "<h3>12. WHERE with LIKE</h3>",
+            "<p>LIKE performs pattern matching on text values.</p>",
+            "<table><tr><th>Pattern</th><th>Meaning</th></tr><tr><td>'R%'</td><td>Starts with R</td></tr><tr><td>'%a'</td><td>Ends with a</td></tr><tr><td>'%vi%'</td><td>Contains vi</td></tr><tr><td>'_a%'</td><td>Second character is a</td></tr></table>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name LIKE 'R%';</code></pre></div>",
+            "<p>This returns names beginning with R, such as Ravi. In MySQL, case sensitivity depends on the column's collation and data type.</p>",
+            "<h3>13. WHERE with NULL</h3>",
+            "<p>NULL represents a missing or unknown value. You must use IS NULL or IS NOT NULL to test for NULL values.</p>",
+            "<div class=\"code-block\"><pre><code>-- Find employees without a recorded city\nSELECT *\nFROM employees\nWHERE city IS NULL;\n\n-- Find employees with a recorded city\nSELECT *\nFROM employees\nWHERE city IS NOT NULL;</code></pre></div>",
+            "<p>Do not use city = NULL or city &lt;&gt; NULL. Ordinary comparisons with NULL evaluate to UNKNOWN rather than TRUE or FALSE.</p>",
+            "<h3>14. WHERE with Dates</h3>",
+            "<p>WHERE is useful for filtering records by date. For a DATETIME column, a half-open range is often a reliable way to select one day.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, order_date\nFROM orders\nWHERE order_date &gt;= '2026-01-01'\n  AND order_date &lt; '2026-02-01';</code></pre></div>",
+            "<p>This selects orders from January 2026, including all times on January 31 when order_date is a DATETIME value. The upper boundary is excluded, preventing midnight on February 1 from entering the range.</p>",
+            "<h3>15. WHERE vs HAVING</h3>",
+            "<table><tr><th>WHERE</th><th>HAVING</th></tr><tr><td>Filters individual rows before grouping.</td><td>Filters groups after GROUP BY.</td></tr><tr><td>Often used with ordinary column conditions.</td><td>Often used with aggregate conditions.</td></tr><tr><td>WHERE salary &gt; 40000</td><td>HAVING COUNT(*) &gt; 5</td></tr></table>",
+            "<div class=\"code-block\"><pre><code>SELECT department, COUNT(*) AS employee_count\nFROM employees\nWHERE salary &gt;= 40000\nGROUP BY department\nHAVING COUNT(*) &gt; 1;</code></pre></div>",
+            "<p><b>Explanation:</b> WHERE first filters employees by salary. GROUP BY groups the remaining rows by department. HAVING then keeps only departments with more than one qualifying employee.</p>",
+            "<h3>16. WHERE in UPDATE and DELETE</h3>",
+            "<p>WHERE is not limited to SELECT. It also controls which rows are modified or deleted.</p>",
+            "<div class=\"code-block\"><pre><code>-- Preview the target rows first\nSELECT *\nFROM employees\nWHERE employee_id = 102;\n\n-- Update only the matching employee\nUPDATE employees\nSET salary = 42000\nWHERE employee_id = 102;</code></pre></div>",
+            "<p>For DELETE, the same principle applies. Always verify the condition before running a destructive statement. An UPDATE or DELETE without WHERE can affect every row in the table.</p>",
+            "<h3>17. WHERE in Data Engineering</h3>",
+            "<p>Data Engineers use WHERE to filter records during extraction, transformation, validation, and incremental processing.</p>",
+            "<div class=\"code-block\"><pre><code>-- Extract orders from a date range\nSELECT order_id, customer_id, order_date, total_amount\nFROM raw_orders\nWHERE order_date &gt;= '2026-01-01'\n  AND order_date &lt; '2026-02-01';\n\n-- Find invalid order amounts\nSELECT order_id, total_amount\nFROM raw_orders\nWHERE total_amount &lt; 0;</code></pre></div>",
+            "<p>The first query extracts January orders. The second identifies records with negative order amounts for data-quality investigation. A real pipeline should use the correct business rules and date boundaries for its source data.</p>",
+            "<h3>18. Common Mistakes</h3>",
+            "<ul><li><b>Forgetting WHERE:</b> A SELECT without WHERE can return all rows.</li><li><b>Using = NULL:</b> Use IS NULL or IS NOT NULL.</li><li><b>Misunderstanding AND and OR:</b> Use parentheses to make combined conditions explicit.</li><li><b>Confusing WHERE with HAVING:</b> WHERE filters rows; HAVING filters groups.</li><li><b>Using the wrong data type:</b> Compare text, numbers, and dates appropriately.</li><li><b>Updating or deleting without checking:</b> Preview the target rows using SELECT and the same condition first.</li><li><b>Filtering dates incorrectly:</b> For DATETIME ranges, use inclusive start and exclusive end boundaries when appropriate.</li></ul>",
+            "<h3>19. Key Takeaways</h3>",
+            "<ul><li>WHERE filters rows based on conditions.</li><li>Comparison operators, AND, OR, BETWEEN, IN, LIKE, and NULL tests are commonly used with WHERE.</li><li>Use parentheses when combining multiple logical conditions.</li><li>Use WHERE for row filtering and HAVING for filtering aggregate groups.</li><li>In data pipelines, WHERE helps extract relevant records and identify data-quality issues.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Filter by Department</b></p><p>Retrieve all employees who belong to the IT department.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'IT';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Filter by Salary</b></p><p>Retrieve employees earning more than 45000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &gt; 45000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Combine Conditions</b></p><p>Retrieve employees from IT whose salary is at least 50000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'IT'\n  AND salary &gt;= 50000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Use IN</b></p><p>Retrieve employees from HR or Finance.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE department IN ('HR', 'Finance');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Use BETWEEN</b></p><p>Retrieve employees whose salary is between 40000 and 50000, including both endpoints.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary BETWEEN 40000 AND 50000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Find Missing Values</b></p><p>Assume some employees do not have a city recorded. Find those rows.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE city IS NULL;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Data Engineering Scenario</b></p><p>From raw_orders, retrieve orders from January 2026. Assume order_date is a DATE or DATETIME column.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, customer_id, order_date, total_amount\nFROM raw_orders\nWHERE order_date &gt;= '2026-01-01'\n  AND order_date &lt; '2026-02-01';</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Write accurate row filters, combine conditions safely, handle NULL correctly, and use WHERE to extract the right records for SQL queries and data pipelines.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is WHERE in SQL?",
+              "a": "WHERE filters rows based on a condition. Only rows for which the condition is TRUE are returned by a SELECT query."
+            },
+            {
+              "q": "Q2. What is the basic syntax of WHERE?",
+              "a": "SELECT column_name FROM table_name WHERE condition;"
+            },
+            {
+              "q": "Q3. What is the difference between AND and OR?",
+              "a": "AND requires all conditions to be TRUE. OR requires at least one condition to be TRUE."
+            },
+            {
+              "q": "Q4. How do you check for NULL values?",
+              "a": "Use IS NULL to find NULL values and IS NOT NULL to find non-NULL values. Do not use = NULL."
+            },
+            {
+              "q": "Q5. What does BETWEEN do?",
+              "a": "BETWEEN filters values within an inclusive range, including both the lower and upper endpoints."
+            },
+            {
+              "q": "Q6. What is the difference between IN and OR?",
+              "a": "IN checks whether a value matches any value in a list. It can be a more concise alternative to several equality conditions joined by OR."
+            },
+            {
+              "q": "Q7. What is the difference between WHERE and HAVING?",
+              "a": "WHERE filters rows before grouping. HAVING filters groups after GROUP BY, often using aggregate functions."
+            },
+            {
+              "q": "Q8. Can WHERE be used with UPDATE and DELETE?",
+              "a": "Yes. WHERE specifies which rows to update or delete. Without WHERE, these statements can affect every row in the table."
+            },
+            {
+              "q": "Q9. Why should parentheses be used with AND and OR?",
+              "a": "Parentheses make the intended condition grouping explicit and help prevent logical mistakes. AND has higher precedence than OR in SQL."
+            },
+            {
+              "q": "Q10. How is WHERE used in Data Engineering?",
+              "a": "It filters source records, selects date ranges for incremental extraction, isolates invalid data, and reduces the rows processed by downstream transformations."
+            }
+          ]
+        },
+        {
+          "n": 44,
+          "title": "Comparison Operators",
+          "explanation": [
+            "<h3>1. What Are Comparison Operators?</h3>",
+            "<p>Comparison operators are used in SQL to compare two values. They help determine whether a condition is TRUE, FALSE, or UNKNOWN. They are commonly used in WHERE clauses to filter rows based on numbers, text, dates, and other comparable values.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> Comparison operators compare values and help SQL identify which rows satisfy a condition.</div>",
+            "<h3>2. Why Do We Need Comparison Operators?</h3>",
+            "<ul><li>Find employees earning more than a specified salary.</li><li>Retrieve products whose prices fall below a limit.</li><li>Filter orders by date.</li><li>Identify records that do not match an expected value.</li><li>Validate data during ETL and ELT processing.</li></ul>",
+            "<h3>3. Main Comparison Operators</h3>",
+            "<table><tr><th>Operator</th><th>Meaning</th><th>Example</th></tr><tr><td>=</td><td>Equal to</td><td>salary = 45000</td></tr><tr><td>&lt;&gt;</td><td>Not equal to</td><td>department &lt;&gt; 'IT'</td></tr><tr><td>!=</td><td>Not equal to in MySQL</td><td>department != 'IT'</td></tr><tr><td>&gt;</td><td>Greater than</td><td>salary &gt; 45000</td></tr><tr><td>&lt;</td><td>Less than</td><td>salary &lt; 45000</td></tr><tr><td>&gt;=</td><td>Greater than or equal to</td><td>salary &gt;= 45000</td></tr><tr><td>&lt;=</td><td>Less than or equal to</td><td>salary &lt;= 45000</td></tr></table>",
+            "<h3>4. Example Table: employees</h3>",
+            "<table><tr><th>employee_id</th><th>name</th><th>department</th><th>salary</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td><td>45000</td></tr><tr><td>102</td><td>Priya</td><td>HR</td><td>40000</td></tr><tr><td>103</td><td>Arun</td><td>IT</td><td>55000</td></tr><tr><td>104</td><td>Sita</td><td>Finance</td><td>50000</td></tr><tr><td>105</td><td>Kiran</td><td>HR</td><td>42000</td></tr></table>",
+            "<h3>5. Equal To (=)</h3>",
+            "<p>The equal operator checks whether two values are equal.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary = 45000;</code></pre></div>",
+            "<p><b>Result:</b> Ravi is returned because his salary equals 45000.</p>",
+            "<h3>6. Not Equal To (&lt;&gt; and !=)</h3>",
+            "<p>These operators select rows where a value differs from the specified value. In MySQL, both &lt;&gt; and != mean not equal to. The standard SQL spelling is &lt;&gt;.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE department &lt;&gt; 'IT';</code></pre></div>",
+            "<p><b>Result:</b> Priya, Sita, and Kiran are returned because their departments are not IT.</p>",
+            "<h3>7. Greater Than (&gt;)</h3>",
+            "<p>The greater-than operator selects values strictly greater than the specified value.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &gt; 45000;</code></pre></div>",
+            "<p><b>Result:</b> Arun and Sita are returned. Ravi's salary is exactly 45000, so he does not match.</p>",
+            "<h3>8. Less Than (&lt;)</h3>",
+            "<p>The less-than operator selects values strictly smaller than the specified value.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &lt; 45000;</code></pre></div>",
+            "<p><b>Result:</b> Priya and Kiran are returned.</p>",
+            "<h3>9. Greater Than or Equal To (&gt;=)</h3>",
+            "<p>This operator includes values greater than the specified value and values equal to it.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &gt;= 45000;</code></pre></div>",
+            "<p><b>Result:</b> Ravi, Arun, and Sita are returned. Ravi qualifies because his salary is exactly 45000.</p>",
+            "<h3>10. Less Than or Equal To (&lt;=)</h3>",
+            "<p>This operator includes values below the specified value and values equal to it.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &lt;= 42000;</code></pre></div>",
+            "<p><b>Result:</b> Priya and Kiran are returned because their salaries are 40000 and 42000.</p>",
+            "<h3>11. Comparison Operators with Text</h3>",
+            "<p>Comparison operators can compare text values as well as numbers. Equality and ordering comparisons for strings depend on the column's data type and collation. In MySQL, a case-insensitive collation may treat 'IT' and 'it' as equal.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'HR';</code></pre></div>",
+            "<p>This returns rows whose department matches HR according to the comparison rules of the column's collation.</p>",
+            "<h3>12. Comparison Operators with Dates</h3>",
+            "<p>Comparison operators can select dates before, after, or on a particular date.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, order_date\nFROM orders\nWHERE order_date &gt;= '2026-01-01';</code></pre></div>",
+            "<p>This selects orders with order_date on or after January 1, 2026. For DATETIME columns, remember that a date boundary may represent midnight at the start of that date.</p>",
+            "<h3>13. Comparison Operators with NULL</h3>",
+            "<p>NULL represents a missing or unknown value. Ordinary comparison operators such as =, &lt;&gt;, &gt;, and &lt; cannot reliably test whether a value is NULL. Comparisons involving NULL usually evaluate to UNKNOWN.</p>",
+            "<div class=\"code-block\"><pre><code>-- Incorrect way to test for NULL\nSELECT *\nFROM employees\nWHERE department = NULL;\n\n-- Correct way\nSELECT *\nFROM employees\nWHERE department IS NULL;</code></pre></div>",
+            "<p>Use IS NULL or IS NOT NULL to test for missing values. In MySQL, the NULL-safe equality operator &lt;=&gt; can also compare NULL values safely when that behavior is specifically required.</p>",
+            "<h3>14. Combining Comparison Operators</h3>",
+            "<p>Comparison operators can be combined with AND and OR to create more specific filters.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, salary\nFROM employees\nWHERE salary &gt; 40000\n  AND department = 'IT';</code></pre></div>",
+            "<p>This returns IT employees whose salary is greater than 40000.</p>",
+            "<p>You can also combine comparison operators with parentheses to make more complex logic clear.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, salary\nFROM employees\nWHERE (department = 'IT' OR department = 'HR')\n  AND salary &gt;= 42000;</code></pre></div>",
+            "<p>This returns employees in IT or HR whose salary is at least 42000.</p>",
+            "<h3>15. Comparison Operators in Data Engineering</h3>",
+            "<p>Data Engineers use comparisons to filter source records, identify invalid data, validate business rules, and extract data incrementally.</p>",
+            "<div class=\"code-block\"><pre><code>-- Identify orders with negative amounts\nSELECT order_id, total_amount\nFROM raw_orders\nWHERE total_amount &lt; 0;\n\n-- Extract records from a date boundary\nSELECT order_id, order_date\nFROM raw_orders\nWHERE order_date &gt;= '2026-01-01';</code></pre></div>",
+            "<p>The first query identifies potentially invalid amounts for investigation. The second selects records from the given date onward. In production pipelines, use the correct business rules and extraction boundaries for the source system.</p>",
+            "<h3>16. Common Mistakes</h3>",
+            "<ul><li><b>Confusing &gt; with &gt;=:</b> Greater than excludes equality; greater than or equal to includes it.</li><li><b>Confusing &lt; with &lt;=:</b> Less than excludes equality; less than or equal to includes it.</li><li><b>Using = NULL:</b> Use IS NULL or IS NOT NULL instead.</li><li><b>Comparing incompatible types:</b> Use appropriate data types and avoid relying on unexpected implicit conversions.</li><li><b>Assuming text comparisons are always case-sensitive:</b> MySQL behavior depends on collation.</li><li><b>Forgetting logical grouping:</b> Use parentheses when combining multiple conditions with AND and OR.</li></ul>",
+            "<h3>17. Key Takeaways</h3>",
+            "<ul><li>= checks equality; &lt;&gt; and != check inequality.</li><li>&gt; and &lt; perform strict comparisons.</li><li>&gt;= and &lt;= include equality.</li><li>Comparison operators work with compatible numeric, text, and date values.</li><li>Use IS NULL or IS NOT NULL for NULL checks.</li><li>Comparison operators are fundamental to WHERE filters and data-quality rules.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Equal To</b></p><p>Find employees whose salary is exactly 50000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary = 50000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Not Equal To</b></p><p>Find employees who do not belong to the HR department.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE department &lt;&gt; 'HR';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Greater Than</b></p><p>Find employees earning more than 45000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &gt; 45000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Less Than or Equal To</b></p><p>Find employees whose salary is less than or equal to 42000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &lt;= 42000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Combine Comparisons</b></p><p>Find IT employees whose salary is at least 45000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE department = 'IT'\n  AND salary &gt;= 45000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Data Quality Check</b></p><p>Assume raw_orders contains order_id and total_amount. Find orders with a negative total amount.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, total_amount\nFROM raw_orders\nWHERE total_amount &lt; 0;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Choose the correct comparison operator, understand whether equality is included, and apply comparisons safely in filters and data-quality checks.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What are comparison operators in SQL?",
+              "a": "They compare values and are commonly used in WHERE conditions to filter rows."
+            },
+            {
+              "q": "Q2. What is the difference between = and &lt;&gt;?",
+              "a": "= checks whether values are equal, while &lt;&gt; checks whether they are not equal."
+            },
+            {
+              "q": "Q3. What is the difference between &gt; and &gt;=?",
+              "a": "&gt; selects values strictly greater than the comparison value. &gt;= also includes values equal to it."
+            },
+            {
+              "q": "Q4. Are != and &lt;&gt; both supported in MySQL?",
+              "a": "Yes. Both mean not equal to in MySQL. The standard SQL operator is &lt;&gt;."
+            },
+            {
+              "q": "Q5. Can comparison operators be used with dates?",
+              "a": "Yes. They can compare DATE or DATETIME values to identify records before, after, or on a specified date boundary."
+            },
+            {
+              "q": "Q6. Why does department = NULL not work as expected?",
+              "a": "NULL represents an unknown or missing value, so ordinary equality comparisons with NULL evaluate to UNKNOWN. Use IS NULL instead."
+            },
+            {
+              "q": "Q7. Can comparison operators be combined with AND and OR?",
+              "a": "Yes. AND requires all conditions to be TRUE, while OR requires at least one condition to be TRUE. Parentheses help clarify complex conditions."
+            },
+            {
+              "q": "Q8. Are text comparisons case-sensitive in MySQL?",
+              "a": "It depends on the data type and collation. Many common MySQL collations are case-insensitive, while others are case-sensitive."
+            },
+            {
+              "q": "Q9. How are comparison operators used in Data Engineering?",
+              "a": "They filter source data, select date ranges, detect invalid values, and validate data against business rules."
+            },
+            {
+              "q": "Q10. What should you check before using a comparison operator?",
+              "a": "Check the operator's meaning, whether equality should be included, the data types being compared, NULL behavior, and the intended business condition."
+            }
+          ]
+        },
+        {
+          "n": 45,
+          "title": "AND",
+          "explanation": [
+            "<h3>1. What Is AND in SQL?</h3>",
+            "<p>AND is a logical operator used to combine two or more conditions in SQL. A row is returned only when every condition connected by AND evaluates to TRUE.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> AND means all specified conditions must be satisfied.</div>",
+            "<h3>2. Why Do We Need AND?</h3>",
+            "<p>In real-world queries, a single condition is often not enough. You may need to find employees who belong to a particular department and earn above a certain salary.</p>",
+            "<ul><li>Filter employees by department and salary.</li><li>Find products within a price range.</li><li>Retrieve orders within a date range.</li><li>Identify records that satisfy multiple data-quality rules.</li><li>Filter source data in ETL and ELT pipelines.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column1, column2\nFROM table_name\nWHERE condition1\n  AND condition2;</code></pre></div>",
+            "<p>Both condition1 and condition2 must be TRUE for a row to appear in the result.</p>",
+            "<h3>4. Example Table: employees</h3>",
+            "<table><tr><th>employee_id</th><th>name</th><th>department</th><th>salary</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td><td>45000</td></tr><tr><td>102</td><td>Priya</td><td>HR</td><td>40000</td></tr><tr><td>103</td><td>Arun</td><td>IT</td><td>55000</td></tr><tr><td>104</td><td>Sita</td><td>Finance</td><td>50000</td></tr><tr><td>105</td><td>Kiran</td><td>HR</td><td>42000</td></tr></table>",
+            "<h3>5. AND with Two Conditions</h3>",
+            "<p>Suppose we need employees who belong to IT and earn more than 45000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, salary\nFROM employees\nWHERE department = 'IT'\n  AND salary &gt; 45000;</code></pre></div>",
+            "<p><b>Result:</b></p>",
+            "<table><tr><th>name</th><th>department</th><th>salary</th></tr><tr><td>Arun</td><td>IT</td><td>55000</td></tr></table>",
+            "<p><b>Why is Arun returned?</b> His department is IT, and his salary is greater than 45000. Ravi satisfies the department condition but not the salary condition.</p>",
+            "<h3>6. Understanding AND with a Truth Table</h3>",
+            "<table><tr><th>Condition 1</th><th>Condition 2</th><th>AND result</th></tr><tr><td>TRUE</td><td>TRUE</td><td>TRUE</td></tr><tr><td>TRUE</td><td>FALSE</td><td>FALSE</td></tr><tr><td>FALSE</td><td>TRUE</td><td>FALSE</td></tr><tr><td>FALSE</td><td>FALSE</td><td>FALSE</td></tr></table>",
+            "<p>If either condition is FALSE, the combined AND condition is FALSE. If a condition involves NULL, the result can also be UNKNOWN; WHERE returns only rows whose complete condition is TRUE.</p>",
+            "<h3>7. AND with Three Conditions</h3>",
+            "<p>You can combine more than two conditions using AND.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, salary\nFROM employees\nWHERE department = 'IT'\n  AND salary &gt;= 45000\n  AND employee_id &gt; 100;</code></pre></div>",
+            "<p>A row must satisfy all three conditions: the employee must belong to IT, earn at least 45000, and have an employee_id greater than 100.</p>",
+            "<h3>8. AND with Comparison Operators</h3>",
+            "<p>AND commonly combines comparison operators such as =, &lt;&gt;, &gt;, &lt;, &gt;=, and &lt;=.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &gt;= 40000\n  AND salary &lt;= 50000;</code></pre></div>",
+            "<p>This returns employees whose salary is between 40000 and 50000, including both endpoints.</p>",
+            "<p>The same range can be expressed more concisely with BETWEEN:</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary BETWEEN 40000 AND 50000;</code></pre></div>",
+            "<h3>9. AND with IN</h3>",
+            "<p>AND can combine an IN condition with another condition.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, salary\nFROM employees\nWHERE department IN ('IT', 'HR')\n  AND salary &gt;= 42000;</code></pre></div>",
+            "<p>This returns employees in IT or HR whose salary is at least 42000. The IN list allows either department, while AND requires the salary condition to be true as well.</p>",
+            "<h3>10. AND with OR and Parentheses</h3>",
+            "<p>AND can be combined with OR. Because AND has higher precedence than OR, use parentheses to express the intended logic clearly.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, salary\nFROM employees\nWHERE (department = 'IT' OR department = 'HR')\n  AND salary &gt;= 42000;</code></pre></div>",
+            "<p><b>Explanation:</b> First identify employees in IT or HR, then keep only those earning at least 42000. The result contains Ravi, Arun, and Kiran.</p>",
+            "<p>Without parentheses, a condition such as department = 'IT' OR department = 'HR' AND salary &gt;= 42000 is interpreted as department = 'IT' OR (department = 'HR' AND salary &gt;= 42000). That may produce different results.</p>",
+            "<h3>11. AND with NULL Values</h3>",
+            "<p>SQL uses three-valued logic: TRUE, FALSE, and UNKNOWN. Comparisons involving NULL often evaluate to UNKNOWN.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'IT'\n  AND city = 'Bengaluru';</code></pre></div>",
+            "<p>If an employee's city is NULL, the city comparison is UNKNOWN, so that row is not returned by WHERE even if the department condition is TRUE.</p>",
+            "<p>To check for missing values, use IS NULL or IS NOT NULL.</p>",
+            "<h3>12. AND with Date Ranges</h3>",
+            "<p>AND is often used to select records within a date range. For a DATE or DATETIME column, an inclusive start and exclusive end boundary is a reliable pattern for selecting a complete calendar month.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, order_date\nFROM orders\nWHERE order_date &gt;= '2026-01-01'\n  AND order_date &lt; '2026-02-01';</code></pre></div>",
+            "<p>This selects orders from January 2026, including times throughout January when order_date is a DATETIME value.</p>",
+            "<h3>13. AND in UPDATE and DELETE</h3>",
+            "<p>AND can restrict which rows are updated or deleted by requiring multiple conditions to be satisfied. Always preview the target rows before executing a destructive query.</p>",
+            "<div class=\"code-block\"><pre><code>-- Preview matching rows\nSELECT *\nFROM employees\nWHERE department = 'IT'\n  AND salary &lt; 50000;\n\n-- Update only matching rows\nUPDATE employees\nSET salary = 48000\nWHERE department = 'IT'\n  AND salary &lt; 50000;</code></pre></div>",
+            "<p>The UPDATE changes only rows matching both conditions. Verify the intended business rule and the affected row count before committing changes in a production environment.</p>",
+            "<h3>14. AND in Data Engineering</h3>",
+            "<p>Data Engineers use AND to apply multiple rules when extracting, transforming, and validating data.</p>",
+            "<div class=\"code-block\"><pre><code>-- Select valid completed orders from January\nSELECT order_id, order_date, total_amount\nFROM raw_orders\nWHERE order_status = 'COMPLETED'\n  AND order_date &gt;= '2026-01-01'\n  AND order_date &lt; '2026-02-01'\n  AND total_amount &gt;= 0;</code></pre></div>",
+            "<p>This query requires every condition to be TRUE: the order must be completed, fall within January 2026, and have a non-negative amount. In a real pipeline, confirm that these rules match the business requirements.</p>",
+            "<h3>15. Common Mistakes</h3>",
+            "<ul><li><b>Expecting either condition to match:</b> AND requires every condition to be TRUE. Use OR when at least one condition should match.</li><li><b>Incorrect condition grouping:</b> Use parentheses when combining AND and OR.</li><li><b>Ignoring NULL:</b> Comparisons with NULL can produce UNKNOWN, not TRUE.</li><li><b>Using overly restrictive conditions:</b> A row that fails any AND condition is excluded.</li><li><b>Repeating unnecessary conditions:</b> Keep filters clear and avoid redundant predicates.</li><li><b>Updating without checking:</b> Preview the target rows before running UPDATE or DELETE statements.</li></ul>",
+            "<h3>16. Key Takeaways</h3>",
+            "<ul><li>AND combines two or more SQL conditions.</li><li>Every condition must be TRUE for a row to pass a WHERE filter.</li><li>AND can combine comparisons, IN, BETWEEN, and date conditions.</li><li>Use parentheses to make combined AND and OR logic clear.</li><li>AND is useful for applying multiple business rules in Data Engineering pipelines.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Department and Salary</b></p><p>Find IT employees whose salary is greater than 45000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE department = 'IT'\n  AND salary &gt; 45000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Salary Range</b></p><p>Find employees whose salary is at least 40000 and at most 50000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &gt;= 40000\n  AND salary &lt;= 50000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Three Conditions</b></p><p>Find HR employees whose salary is at least 40000 and whose employee_id is greater than 102.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT employee_id, name, salary\nFROM employees\nWHERE department = 'HR'\n  AND salary &gt;= 40000\n  AND employee_id &gt; 102;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Combine AND and OR</b></p><p>Find employees in IT or HR whose salary is at least 42000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, salary\nFROM employees\nWHERE (department = 'IT' OR department = 'HR')\n  AND salary &gt;= 42000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Filter Orders by Date and Status</b></p><p>From raw_orders, retrieve completed orders placed in January 2026.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, order_date, order_status\nFROM raw_orders\nWHERE order_status = 'COMPLETED'\n  AND order_date &gt;= '2026-01-01'\n  AND order_date &lt; '2026-02-01';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Data Quality Validation</b></p><p>Find completed orders with a non-negative amount and a recorded customer_id.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, customer_id, total_amount\nFROM raw_orders\nWHERE order_status = 'COMPLETED'\n  AND total_amount &gt;= 0\n  AND customer_id IS NOT NULL;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Write queries where all required conditions must match. Combine comparison operators, date boundaries, and NULL checks to build accurate filters for SQL reports and Data Engineering pipelines.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is AND in SQL?",
+              "a": "AND is a logical operator that combines conditions. Every condition must be TRUE for a row to pass the WHERE filter."
+            },
+            {
+              "q": "Q2. What is the difference between AND and OR?",
+              "a": "AND requires all conditions to be TRUE. OR requires at least one condition to be TRUE."
+            },
+            {
+              "q": "Q3. Can AND be used with more than two conditions?",
+              "a": "Yes. You can connect three or more conditions using AND, and all must be TRUE for a row to pass."
+            },
+            {
+              "q": "Q4. What happens if one AND condition is FALSE?",
+              "a": "The combined condition is FALSE, so the row is excluded by WHERE."
+            },
+            {
+              "q": "Q5. What happens if an AND condition evaluates to UNKNOWN because of NULL?",
+              "a": "Unless the complete condition evaluates to TRUE, the row is not returned by WHERE. Use IS NULL or IS NOT NULL to test for missing values."
+            },
+            {
+              "q": "Q6. Does AND have higher precedence than OR?",
+              "a": "Yes. AND has higher precedence than OR in SQL. Use parentheses to make the intended logic explicit."
+            },
+            {
+              "q": "Q7. Can AND be used with BETWEEN or IN?",
+              "a": "Yes. For example, WHERE department IN ('IT', 'HR') AND salary >= 42000 combines a department-list condition with a salary condition."
+            },
+            {
+              "q": "Q8. Can AND be used in UPDATE and DELETE?",
+              "a": "Yes. It restricts affected rows to those satisfying all conditions. Preview the matching rows before running a destructive statement."
+            },
+            {
+              "q": "Q9. How is AND useful for date filtering?",
+              "a": "It combines a lower and upper date boundary, such as order_date >= '2026-01-01' AND order_date < '2026-02-01', to select a complete month."
+            },
+            {
+              "q": "Q10. How do Data Engineers use AND?",
+              "a": "They use AND to apply multiple requirements when extracting records, validating data quality, filtering business events, and preparing data for downstream transformations."
+            }
+          ]
+        },
+        {
+          "n": 46,
+          "title": "OR",
+          "explanation": [
+            "<h3>1. What Is OR in SQL?</h3>",
+            "<p>OR is a logical operator used to combine two or more conditions in SQL. A row satisfies an OR condition when at least one condition evaluates to TRUE.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> OR means that any one of the specified conditions can be satisfied for a row to be included.</div>",
+            "<h3>2. Why Do We Need OR?</h3>",
+            "<p>Sometimes we need records that match any one of several requirements rather than all requirements.</p>",
+            "<ul><li>Find employees working in IT or HR.</li><li>Retrieve products that are cheap or on sale.</li><li>Find orders with a pending or failed status.</li><li>Identify records matching alternative data-quality conditions.</li><li>Filter source records in ETL and ELT pipelines.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column1, column2\nFROM table_name\nWHERE condition1\n   OR condition2;</code></pre></div>",
+            "<p>If either condition is TRUE, the row can be included in the result. When both conditions are FALSE, the row is excluded. SQL also supports UNKNOWN when NULL is involved.</p>",
+            "<h3>4. Example Table: employees</h3>",
+            "<table><tr><th>employee_id</th><th>name</th><th>department</th><th>salary</th><th>city</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td><td>45000</td><td>Bengaluru</td></tr><tr><td>102</td><td>Priya</td><td>HR</td><td>40000</td><td>Chennai</td></tr><tr><td>103</td><td>Arun</td><td>IT</td><td>55000</td><td>Bengaluru</td></tr><tr><td>104</td><td>Sita</td><td>Finance</td><td>50000</td><td>Hyderabad</td></tr><tr><td>105</td><td>Kiran</td><td>HR</td><td>42000</td><td>Bengaluru</td></tr></table>",
+            "<h3>5. OR with Two Conditions</h3>",
+            "<p>Suppose we need employees who belong to either IT or HR.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE department = 'IT'\n   OR department = 'HR';</code></pre></div>",
+            "<p><b>Result:</b></p>",
+            "<table><tr><th>name</th><th>department</th></tr><tr><td>Ravi</td><td>IT</td></tr><tr><td>Priya</td><td>HR</td></tr><tr><td>Arun</td><td>IT</td></tr><tr><td>Kiran</td><td>HR</td></tr></table>",
+            "<p>Both IT employees and HR employees are included. A row does not need to match both department conditions.</p>",
+            "<h3>6. Understanding OR with a Truth Table</h3>",
+            "<table><tr><th>Condition 1</th><th>Condition 2</th><th>OR result</th></tr><tr><td>TRUE</td><td>TRUE</td><td>TRUE</td></tr><tr><td>TRUE</td><td>FALSE</td><td>TRUE</td></tr><tr><td>FALSE</td><td>TRUE</td><td>TRUE</td></tr><tr><td>FALSE</td><td>FALSE</td><td>FALSE</td></tr></table>",
+            "<p>OR returns TRUE if at least one condition is TRUE. If neither condition is TRUE and one is UNKNOWN, the result may be UNKNOWN rather than FALSE.</p>",
+            "<h3>7. OR with Comparison Operators</h3>",
+            "<p>OR can combine different comparison conditions.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &lt; 42000\n   OR salary &gt; 50000;</code></pre></div>",
+            "<p><b>Result:</b> Priya and Arun are returned. Their salaries are below 42000 or above 50000, respectively. Employees earning exactly 42000 or 50000 do not match either condition.</p>",
+            "<h3>8. OR with Different Columns</h3>",
+            "<p>The conditions do not need to refer to the same column.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, city\nFROM employees\nWHERE department = 'Finance'\n   OR city = 'Chennai';</code></pre></div>",
+            "<p><b>Result:</b> Priya is included because she is in Chennai, and Sita is included because she works in Finance.</p>",
+            "<h3>9. OR with IN</h3>",
+            "<p>When several OR conditions check equality against the same column, IN is often shorter and easier to read.</p>",
+            "<div class=\"code-block\"><pre><code>-- Using OR\nSELECT name, department\nFROM employees\nWHERE department = 'IT'\n   OR department = 'HR';\n\n-- Using IN\nSELECT name, department\nFROM employees\nWHERE department IN ('IT', 'HR');</code></pre></div>",
+            "<p>Both queries return employees whose department matches IT or HR. IN is particularly useful when the list of allowed values grows.</p>",
+            "<h3>10. OR with AND and Parentheses</h3>",
+            "<p>OR is often combined with AND. In SQL, AND has higher precedence than OR, so parentheses are important when the intended grouping might otherwise be unclear.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, salary\nFROM employees\nWHERE (department = 'IT' OR department = 'HR')\n  AND salary &gt;= 42000;</code></pre></div>",
+            "<p><b>Explanation:</b> First allow employees in IT or HR, then require a salary of at least 42000. The result contains Ravi, Arun, and Kiran.</p>",
+            "<p>Compare this with a query without parentheses:</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, salary\nFROM employees\nWHERE department = 'IT'\n   OR department = 'HR'\n  AND salary &gt;= 42000;</code></pre></div>",
+            "<p>This is interpreted as department = 'IT' OR (department = 'HR' AND salary &gt;= 42000). All IT employees qualify, even if their salaries are below 42000. Use parentheses to express the intended business rule clearly.</p>",
+            "<h3>11. OR with NULL Values</h3>",
+            "<p>SQL uses three-valued logic: TRUE, FALSE, and UNKNOWN. If a comparison involves NULL, its result may be UNKNOWN.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE department = 'IT'\n   OR city = 'Chennai';</code></pre></div>",
+            "<p>A row qualifies if either condition is TRUE. If department is NULL but city is Chennai, the row can still qualify because the city condition is TRUE. If both conditions are FALSE or UNKNOWN and neither is TRUE, the row is not returned.</p>",
+            "<p>To check missing values explicitly, use IS NULL or IS NOT NULL.</p>",
+            "<h3>12. OR with LIKE</h3>",
+            "<p>OR can combine text pattern conditions.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name LIKE 'R%'\n   OR name LIKE 'S%';</code></pre></div>",
+            "<p>This returns employees whose names start with R or S, such as Ravi and Sita. The LIKE comparison behavior can depend on the MySQL collation.</p>",
+            "<h3>13. OR with Date Conditions</h3>",
+            "<p>OR can retrieve records from either of two date ranges or dates.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, order_date\nFROM orders\nWHERE order_date &lt; '2026-01-01'\n   OR order_date &gt;= '2026-02-01';</code></pre></div>",
+            "<p>This selects orders before January 2026 or on or after February 1, 2026, excluding January 2026. For DATETIME columns, the boundaries also handle times within those dates.</p>",
+            "<h3>14. OR in Data Engineering</h3>",
+            "<p>Data Engineers use OR to identify records that meet alternative conditions, such as failed or rejected events, or records that violate one of several quality rules.</p>",
+            "<div class=\"code-block\"><pre><code>-- Find failed or rejected orders\nSELECT order_id, order_status\nFROM raw_orders\nWHERE order_status = 'FAILED'\n   OR order_status = 'REJECTED';\n\n-- Find suspicious order amounts\nSELECT order_id, total_amount\nFROM raw_orders\nWHERE total_amount &lt; 0\n   OR total_amount &gt; 1000000;</code></pre></div>",
+            "<p>The first query finds either status. The second flags amounts outside the chosen range for investigation. The threshold should be based on the actual business rules rather than assumed to be universally invalid.</p>",
+            "<h3>15. OR vs AND</h3>",
+            "<table><tr><th>AND</th><th>OR</th></tr><tr><td>All conditions must be TRUE.</td><td>At least one condition must be TRUE.</td></tr><tr><td>Usually makes filters more restrictive.</td><td>Usually allows more rows to qualify.</td></tr><tr><td>department = 'IT' AND salary &gt; 45000</td><td>department = 'IT' OR salary &gt; 45000</td></tr></table>",
+            "<h3>16. Common Mistakes</h3>",
+            "<ul><li><b>Using AND when either condition should match:</b> Use OR for alternative requirements.</li><li><b>Using OR when all conditions are required:</b> Use AND when every requirement must be satisfied.</li><li><b>Forgetting parentheses:</b> AND has higher precedence than OR.</li><li><b>Repeating equality conditions unnecessarily:</b> Use IN when checking several values in the same column.</li><li><b>Ignoring NULL behavior:</b> UNKNOWN is possible, and WHERE returns only rows whose final condition is TRUE.</li><li><b>Creating overly broad filters:</b> OR can include more rows than intended, so verify the logic with sample data.</li></ul>",
+            "<h3>17. Key Takeaways</h3>",
+            "<ul><li>OR combines alternative conditions.</li><li>A row qualifies when at least one condition evaluates to TRUE.</li><li>OR can combine comparisons, text patterns, dates, and conditions on different columns.</li><li>Use IN for a list of alternatives on the same column.</li><li>Use parentheses when combining OR with AND.</li><li>OR is useful for data-quality checks and filtering alternative business conditions.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Filter Two Departments</b></p><p>Retrieve employees who belong to IT or HR.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE department = 'IT'\n   OR department = 'HR';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Filter by Salary Alternatives</b></p><p>Find employees earning less than 42000 or more than 50000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &lt; 42000\n   OR salary &gt; 50000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Use Different Columns</b></p><p>Find employees who work in Finance or live in Chennai.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, city\nFROM employees\nWHERE department = 'Finance'\n   OR city = 'Chennai';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Replace OR with IN</b></p><p>Rewrite the department query using IN.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE department IN ('IT', 'HR');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Combine OR and AND</b></p><p>Find employees in IT or HR who earn at least 42000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, salary\nFROM employees\nWHERE (department = 'IT' OR department = 'HR')\n  AND salary &gt;= 42000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Data Engineering Scenario</b></p><p>From raw_orders, retrieve orders with either FAILED or REJECTED status.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, order_status\nFROM raw_orders\nWHERE order_status = 'FAILED'\n   OR order_status = 'REJECTED';</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Use OR to retrieve rows that meet alternative conditions, understand how it differs from AND, and avoid logic errors when combining operators.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is OR in SQL?",
+              "a": "OR is a logical operator that combines conditions. A row qualifies when at least one condition evaluates to TRUE."
+            },
+            {
+              "q": "Q2. What is the difference between AND and OR?",
+              "a": "AND requires every condition to be TRUE. OR requires at least one condition to be TRUE."
+            },
+            {
+              "q": "Q3. Can OR be used with different columns?",
+              "a": "Yes. For example, WHERE department = 'Finance' OR city = 'Chennai' returns rows satisfying either condition."
+            },
+            {
+              "q": "Q4. What happens if both OR conditions are FALSE?",
+              "a": "The combined condition is FALSE, and the row is excluded by WHERE."
+            },
+            {
+              "q": "Q5. What happens when NULL is involved in an OR condition?",
+              "a": "A comparison involving NULL may evaluate to UNKNOWN. If another OR condition is TRUE, the overall result is TRUE; if neither condition is TRUE and one is UNKNOWN, the result is UNKNOWN and WHERE excludes the row."
+            },
+            {
+              "q": "Q6. Can IN replace multiple OR conditions?",
+              "a": "Yes. Conditions such as department = 'IT' OR department = 'HR' can be written as department IN ('IT', 'HR')."
+            },
+            {
+              "q": "Q7. Does AND or OR have higher precedence?",
+              "a": "AND has higher precedence than OR. Use parentheses to group conditions according to the intended logic."
+            },
+            {
+              "q": "Q8. Can OR be used with LIKE?",
+              "a": "Yes. For example, WHERE name LIKE 'R%' OR name LIKE 'S%' selects names matching either pattern."
+            },
+            {
+              "q": "Q9. Can OR be used for data-quality checks?",
+              "a": "Yes. It can identify records violating any of several rules, such as a negative amount or an amount above a defined maximum."
+            },
+            {
+              "q": "Q10. When should a Data Engineer use OR?",
+              "a": "Use OR when a record should qualify if any one of several business conditions is satisfied, such as finding failed or rejected events."
+            }
+          ]
+        },
+        {
+          "n": 47,
+          "title": "NOT",
+          "explanation": [
+            "<h3>1. What Is NOT in SQL?</h3>",
+            "<p>NOT is a logical operator that reverses a condition's truth value. If a condition is TRUE, NOT makes it FALSE. If a condition is FALSE, NOT makes it TRUE.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> NOT means the specified condition must not be satisfied.</div>",
+            "<h3>2. Why Do We Need NOT?</h3>",
+            "<ul><li>Find employees who do not belong to a particular department.</li><li>Exclude specific product categories.</li><li>Filter orders that are not completed.</li><li>Identify records that do not meet a validation rule.</li><li>Exclude unwanted records from ETL and ELT pipelines.</li></ul>",
+            "<h3>3. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column1, column2\nFROM table_name\nWHERE NOT condition;</code></pre></div>",
+            "<p>WHERE returns only rows for which the final condition evaluates to TRUE. If NOT condition is FALSE or UNKNOWN, the row is not returned.</p>",
+            "<h3>4. Example Table: employees</h3>",
+            "<table><tr><th>employee_id</th><th>name</th><th>department</th><th>salary</th></tr><tr><td>101</td><td>Ravi</td><td>IT</td><td>45000</td></tr><tr><td>102</td><td>Priya</td><td>HR</td><td>40000</td></tr><tr><td>103</td><td>Arun</td><td>IT</td><td>55000</td></tr><tr><td>104</td><td>Sita</td><td>Finance</td><td>50000</td></tr><tr><td>105</td><td>Kiran</td><td>HR</td><td>42000</td></tr></table>",
+            "<h3>5. NOT with Equality</h3>",
+            "<p>Suppose we want employees who do not belong to the IT department.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE NOT department = 'IT';</code></pre></div>",
+            "<p><b>Result:</b></p>",
+            "<table><tr><th>name</th><th>department</th></tr><tr><td>Priya</td><td>HR</td></tr><tr><td>Sita</td><td>Finance</td></tr><tr><td>Kiran</td><td>HR</td></tr></table>",
+            "<p>The condition department = 'IT' is TRUE for Ravi and Arun. NOT reverses that condition, so those rows are excluded.</p>",
+            "<h3>6. NOT with Comparison Operators</h3>",
+            "<p>NOT can reverse a comparison condition.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE NOT salary &gt; 45000;</code></pre></div>",
+            "<p>This returns employees whose salary is not greater than 45000. For non-NULL salary values, that means salary is less than or equal to 45000.</p>",
+            "<p>The same condition can be written more directly:</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary &lt;= 45000;</code></pre></div>",
+            "<h3>7. NOT with IN</h3>",
+            "<p>NOT IN excludes values from a specified list.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE department NOT IN ('IT', 'HR');</code></pre></div>",
+            "<p><b>Result:</b> Sita is returned because her department is Finance, which is neither IT nor HR.</p>",
+            "<p><b>Important:</b> If the tested department is NULL, the NOT IN condition evaluates to UNKNOWN and that row is not returned. Be particularly careful when the list used by NOT IN comes from a subquery that might contain NULL.</p>",
+            "<h3>8. NOT with BETWEEN</h3>",
+            "<p>NOT BETWEEN selects values outside an inclusive range.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary NOT BETWEEN 40000 AND 45000;</code></pre></div>",
+            "<p>This returns employees whose salary is below 40000 or above 45000. In the example, Arun and Sita are returned.</p>",
+            "<h3>9. NOT with LIKE</h3>",
+            "<p>NOT LIKE excludes text values matching a specified pattern.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name NOT LIKE 'R%';</code></pre></div>",
+            "<p>This returns names that do not start with R, such as Priya, Arun, Sita, and Kiran. Matching behavior may depend on the MySQL collation.</p>",
+            "<h3>10. NOT with EXISTS</h3>",
+            "<p>NOT EXISTS checks whether a subquery returns no rows for the current outer row. It is useful for finding records that have no related record in another table.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT c.customer_id, c.customer_name\nFROM customers AS c\nWHERE NOT EXISTS (\n    SELECT 1\n    FROM orders AS o\n    WHERE o.customer_id = c.customer_id\n);</code></pre></div>",
+            "<p><b>Explanation:</b> This returns customers for whom no matching order exists. The example assumes customers has customer_id and customer_name, and orders has customer_id.</p>",
+            "<h3>11. NOT with NULL Values</h3>",
+            "<p>SQL uses three-valued logic: TRUE, FALSE, and UNKNOWN. Comparisons with NULL usually produce UNKNOWN, and NOT UNKNOWN is still UNKNOWN.</p>",
+            "<div class=\"code-block\"><pre><code>-- This does not return rows with NULL department\nSELECT *\nFROM employees\nWHERE NOT department = 'IT';\n\n-- Explicitly include rows with missing departments\nSELECT *\nFROM employees\nWHERE department &lt;&gt; 'IT'\n   OR department IS NULL;</code></pre></div>",
+            "<p>The first query excludes rows whose department is NULL. The second includes those rows as well as departments other than IT.</p>",
+            "<h3>12. NOT with AND and OR</h3>",
+            "<p>NOT can be combined with AND and OR. Parentheses help show exactly which condition is being reversed.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department, salary\nFROM employees\nWHERE NOT (department = 'IT' OR salary &lt; 42000);</code></pre></div>",
+            "<p>This excludes employees who are in IT or whose salary is below 42000. The remaining employees must be outside IT and have a salary of at least 42000.</p>",
+            "<p>De Morgan's laws explain how NOT can be distributed across logical conditions:</p>",
+            "<div class=\"code-block\"><pre><code>NOT (A AND B) = (NOT A) OR (NOT B)\nNOT (A OR B)  = (NOT A) AND (NOT B)</code></pre></div>",
+            "<h3>13. NOT in Data Engineering</h3>",
+            "<p>Data Engineers use NOT to exclude unwanted categories, identify missing relationships, and find records that violate expected conditions.</p>",
+            "<div class=\"code-block\"><pre><code>-- Exclude cancelled orders\nSELECT order_id, order_status\nFROM raw_orders\nWHERE NOT (order_status = 'CANCELLED');\n\n-- Find customers with no orders\nSELECT c.customer_id, c.customer_name\nFROM customers AS c\nWHERE NOT EXISTS (\n    SELECT 1\n    FROM orders AS o\n    WHERE o.customer_id = c.customer_id\n);</code></pre></div>",
+            "<p>In the first query, rows with NULL order_status are not returned because the condition evaluates to UNKNOWN. If the requirement is to retain missing statuses too, explicitly add OR order_status IS NULL. The second query finds customers without matching orders.</p>",
+            "<h3>14. Common Mistakes</h3>",
+            "<ul><li><b>Ignoring NULL:</b> NOT does not turn UNKNOWN into TRUE.</li><li><b>Misusing NOT IN:</b> A NULL in a subquery result can prevent expected matches.</li><li><b>Incorrect logical grouping:</b> Use parentheses when combining NOT with AND or OR.</li><li><b>Confusing NOT with not equal:</b> NOT reverses a condition; &lt;&gt; compares two values for inequality.</li><li><b>Excluding missing data accidentally:</b> Add an explicit IS NULL condition if missing values should be retained.</li></ul>",
+            "<h3>15. Key Takeaways</h3>",
+            "<ul><li>NOT reverses a condition's truth value.</li><li>NOT IN, NOT BETWEEN, and NOT LIKE are common exclusion patterns.</li><li>NOT EXISTS finds rows without matching records in a related query.</li><li>NOT UNKNOWN remains UNKNOWN, so NULL requires special care.</li><li>In Data Engineering, make exclusion rules explicit and verify how missing values should be handled.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Exclude a Department</b></p><p>Retrieve employees who do not belong to IT.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE NOT department = 'IT';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Use NOT IN</b></p><p>Retrieve employees who belong to neither IT nor HR.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE department NOT IN ('IT', 'HR');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Use NOT BETWEEN</b></p><p>Find employees whose salary falls outside the range 40000 to 45000, including neither endpoint.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, salary\nFROM employees\nWHERE salary NOT BETWEEN 40000 AND 45000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Use NOT LIKE</b></p><p>Find employees whose names do not start with R.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name NOT LIKE 'R%';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Handle NULL Correctly</b></p><p>Find employees whose department is not IT, including employees whose department is missing.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, department\nFROM employees\nWHERE department &lt;&gt; 'IT'\n   OR department IS NULL;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Data Engineering Scenario</b></p><p>Assume customers and orders tables are related by customer_id. Find customers who have never placed an order.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT c.customer_id, c.customer_name\nFROM customers AS c\nWHERE NOT EXISTS (\n    SELECT 1\n    FROM orders AS o\n    WHERE o.customer_id = c.customer_id\n);</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Use NOT to exclude matching values, reverse conditions, handle NULL deliberately, and find missing relationships with NOT EXISTS.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is NOT in SQL?",
+              "a": "NOT is a logical operator that reverses a condition's truth value. TRUE becomes FALSE, FALSE becomes TRUE, and UNKNOWN remains UNKNOWN."
+            },
+            {
+              "q": "Q2. What is the difference between NOT and &lt;&gt;?",
+              "a": "NOT reverses a complete condition, while &lt;&gt; directly compares two values for inequality. For example, NOT salary > 45000 is equivalent to salary <= 45000 for non-NULL salary values."
+            },
+            {
+              "q": "Q3. What does NOT IN do?",
+              "a": "NOT IN returns rows whose values do not match any listed value, provided the condition evaluates to TRUE. NULL values require special care."
+            },
+            {
+              "q": "Q4. What does NOT BETWEEN do?",
+              "a": "It selects values outside the inclusive range defined by BETWEEN. For non-NULL values, NOT BETWEEN 40000 AND 45000 means less than 40000 or greater than 45000."
+            },
+            {
+              "q": "Q5. What does NOT LIKE do?",
+              "a": "NOT LIKE selects values that do not match the specified text pattern."
+            },
+            {
+              "q": "Q6. What is NOT EXISTS used for?",
+              "a": "NOT EXISTS returns an outer row when its correlated subquery finds no matching rows. It is often used to find customers without orders or records without related entries."
+            },
+            {
+              "q": "Q7. Does NOT make a comparison with NULL TRUE?",
+              "a": "No. A comparison involving NULL usually evaluates to UNKNOWN, and NOT UNKNOWN is still UNKNOWN. WHERE excludes rows when the final condition is UNKNOWN."
+            },
+            {
+              "q": "Q8. Why can NOT IN produce unexpected results with NULL?",
+              "a": "If the NOT IN list or subquery result contains NULL, comparisons can evaluate to UNKNOWN, preventing expected rows from being returned. NOT EXISTS is often a safer alternative for relationship checks."
+            },
+            {
+              "q": "Q9. Can NOT be combined with AND and OR?",
+              "a": "Yes. Use parentheses to clarify which condition is being reversed. De Morgan's laws can also help rewrite compound logical conditions."
+            },
+            {
+              "q": "Q10. How is NOT useful in Data Engineering?",
+              "a": "It helps exclude unwanted records, identify missing relationships, and define validation rules. Engineers should explicitly decide how NULL values should be handled."
+            }
+          ]
+        },
+        {
+          "n": 48,
+          "title": "IN",
+          "explanation": [
+            "<h3>1. What Is the IN Operator?</h3>",
+            "<p>The <code>IN</code> operator checks whether a value matches any value in a specified list. It is a shorter and more readable alternative to writing multiple <code>OR</code> conditions.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> IN checks whether a value belongs to a given set of values.</div>",
+            "<h3>2. Why Do We Need IN?</h3>",
+            "<p>Suppose you want to retrieve employees who work in the IT, HR, or Finance departments. You can use multiple OR conditions, but IN makes the query shorter and easier to maintain.</p>",
+            "<h3>3. Sample Table</h3>",
+            "<table><tr><th>emp_id</th><th>name</th><th>department</th><th>salary</th></tr><tr><td>1</td><td>Ravi</td><td>IT</td><td>50000</td></tr><tr><td>2</td><td>Priya</td><td>HR</td><td>40000</td></tr><tr><td>3</td><td>Arun</td><td>Finance</td><td>45000</td></tr><tr><td>4</td><td>Meena</td><td>Sales</td><td>35000</td></tr><tr><td>5</td><td>Kiran</td><td>IT</td><td>55000</td></tr></table>",
+            "<h3>4. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column_name\nFROM table_name\nWHERE column_name IN (value1, value2, value3);</code></pre></div>",
+            "<h3>5. Example: Using IN</h3>",
+            "<p>Retrieve employees who work in either the IT or HR department.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, department\nFROM employees\nWHERE department IN ('IT', 'HR');</code></pre></div>",
+            "<p><b>Result:</b></p>",
+            "<table><tr><th>emp_id</th><th>name</th><th>department</th></tr><tr><td>1</td><td>Ravi</td><td>IT</td></tr><tr><td>2</td><td>Priya</td><td>HR</td></tr><tr><td>5</td><td>Kiran</td><td>IT</td></tr></table>",
+            "<h3>6. IN vs OR</h3>",
+            "<p>The following queries return the same rows when the listed comparisons have ordinary non-NULL values.</p>",
+            "<div class=\"code-block\"><pre><code>-- Using OR\nSELECT * FROM employees\nWHERE department = 'IT'\n   OR department = 'HR'\n   OR department = 'Finance';\n\n-- Using IN\nSELECT * FROM employees\nWHERE department IN ('IT', 'HR', 'Finance');</code></pre></div>",
+            "<div class=\"definition-box\"><b>Key Point:</b> Use IN when checking one column against several possible values. It is generally easier to read and update than a long chain of OR conditions.</div>",
+            "<h3>7. IN with Numeric Values</h3>",
+            "<p>IN works with numbers as well as strings.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, salary\nFROM employees\nWHERE salary IN (40000, 45000, 50000);</code></pre></div>",
+            "<p>This query returns employees whose salary equals 40000, 45000, or 50000.</p>",
+            "<h3>8. NOT IN</h3>",
+            "<p><code>NOT IN</code> selects values that do not match any value in the specified list.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, department\nFROM employees\nWHERE department NOT IN ('IT', 'HR');</code></pre></div>",
+            "<p>This returns employees in departments other than IT and HR. Rows where department is NULL are not returned because the condition evaluates to UNKNOWN.</p>",
+            "<h3>9. IN with a Subquery</h3>",
+            "<p>IN can also compare a value with the results returned by another query. This is useful when the matching values change over time.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name\nFROM employees\nWHERE department IN (\n    SELECT department_name\n    FROM active_departments\n);</code></pre></div>",
+            "<p>This retrieves employees whose department appears in the result of the subquery. The subquery must return one column for this form of IN.</p>",
+            "<h3>10. IN and NULL Values</h3>",
+            "<p>NULL represents a missing or unknown value. It cannot be matched by writing NULL inside an IN list.</p>",
+            "<div class=\"code-block\"><pre><code>-- Does not find rows where department is NULL\nSELECT * FROM employees\nWHERE department IN ('IT', NULL);\n\n-- Correct way to find NULL departments\nSELECT * FROM employees\nWHERE department IS NULL;</code></pre></div>",
+            "<p>If a comparison does not match any listed value and the IN list contains NULL, the result may be UNKNOWN rather than FALSE. WHERE returns only rows for which the condition is TRUE.</p>",
+            "<h3>11. IN with AND and OR</h3>",
+            "<p>You can combine IN with other filtering conditions. Use parentheses when combining AND and OR so that the intended logic is clear.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, department, salary\nFROM employees\nWHERE department IN ('IT', 'Finance')\n  AND salary >= 45000;</code></pre></div>",
+            "<p>This returns employees in IT or Finance whose salary is at least 45000.</p>",
+            "<h3>12. IN in Data Engineering</h3>",
+            "<ul><li><b>Data validation:</b> Check whether a record belongs to an allowed set of status values.</li><li><b>ETL pipelines:</b> Filter records for selected departments, regions, or categories.</li><li><b>Reporting:</b> Retrieve sales data for selected product categories.</li><li><b>Data quality:</b> Identify records with values outside an approved list using NOT IN, while handling NULL separately.</li></ul>",
+            "<h3>13. Common Mistakes</h3>",
+            "<ul><li><b>Missing quotes:</b> Use <code>'IT'</code> for a string value; numeric values generally do not need quotes.</li><li><b>Using IN for partial matches:</b> IN checks equality, not whether text contains a substring. Use LIKE for pattern matching.</li><li><b>Ignoring NULL:</b> IN and NOT IN do not treat NULL as an ordinary value.</li><li><b>Using NOT IN with a subquery that returns NULL:</b> This can cause the condition to evaluate to UNKNOWN for otherwise unmatched rows. Consider NOT EXISTS when appropriate.</li><li><b>Unnecessarily long lists:</b> For changing lists of values, consider joining to a lookup or staging table.</li></ul>",
+            "<h3>14. Best Practices</h3>",
+            "<ul><li>Use IN for a short list of exact values.</li><li>Use consistent data types for the column and listed values.</li><li>Use a subquery or JOIN when the list comes from another table.</li><li>Check how NULL values affect the result, especially with NOT IN.</li><li>Use EXPLAIN to investigate query performance when filtering large datasets.</li></ul>",
+            "<h3>15. Key Takeaways</h3>",
+            "<ul><li>IN checks whether a value matches any item in a list.</li><li>IN is a readable alternative to multiple OR comparisons on the same column.</li><li>NOT IN excludes matching values.</li><li>IN supports lists of constants and single-column subqueries.</li><li>NULL requires special handling with IS NULL or IS NOT NULL.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Select Multiple Departments</b></p>",
+            "<p>Using the employees table, retrieve employees working in IT, Finance, or Sales.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, department\nFROM employees\nWHERE department IN ('IT', 'Finance', 'Sales');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Filter by Salary</b></p>",
+            "<p>Retrieve employees whose salary is exactly 35000, 45000, or 55000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, salary\nFROM employees\nWHERE salary IN (35000, 45000, 55000);</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Exclude Departments</b></p>",
+            "<p>Retrieve employees who do not work in IT or HR. Consider what happens if department contains NULL.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, department\nFROM employees\nWHERE department NOT IN ('IT', 'HR');</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Combine IN with AND</b></p>",
+            "<p>Retrieve employees in IT or Finance who earn at least 50000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, department, salary\nFROM employees\nWHERE department IN ('IT', 'Finance')\n  AND salary >= 50000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Use IN with a Subquery</b></p>",
+            "<p>Assume an active_departments table contains a department_name column. Retrieve employees who belong to those departments.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, department\nFROM employees\nWHERE department IN (\n    SELECT department_name\n    FROM active_departments\n);</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Understand how to filter rows using multiple exact values, exclude selected values, combine IN with other conditions, and use a subquery as the list source.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is the IN operator in SQL?",
+              "a": "IN checks whether a value matches any value in a specified list or the result of a subquery."
+            },
+            {
+              "q": "Q2. What is the difference between IN and OR?",
+              "a": "Both can express equivalent equality checks on the same column. IN is usually shorter and easier to read when comparing against several values."
+            },
+            {
+              "q": "Q3. Can IN be used with numeric values?",
+              "a": "Yes. For example, WHERE salary IN (40000, 45000, 50000) matches any of those three salary values."
+            },
+            {
+              "q": "Q4. What does NOT IN do?",
+              "a": "NOT IN checks that a value does not match any listed value. NULL values need special consideration because SQL uses three-valued logic."
+            },
+            {
+              "q": "Q5. Can IN be used with a subquery?",
+              "a": "Yes. A subquery can provide the list of values, and it should return one column for this form of IN."
+            },
+            {
+              "q": "Q6. Does IN ('IT', NULL) find rows where the department is NULL?",
+              "a": "No. Use department IS NULL to find rows where department is NULL."
+            },
+            {
+              "q": "Q7. What happens if a NOT IN subquery returns NULL?",
+              "a": "For unmatched values, the comparison can evaluate to UNKNOWN, causing WHERE to exclude the rows. NOT EXISTS is often safer when the subquery may contain NULL."
+            },
+            {
+              "q": "Q8. Can IN be combined with AND?",
+              "a": "Yes. For example, WHERE department IN ('IT', 'Finance') AND salary >= 45000 filters by department and salary."
+            },
+            {
+              "q": "Q9. Is IN suitable for partial text matching?",
+              "a": "No. IN checks exact values. Use LIKE with wildcards when you need pattern matching."
+            },
+            {
+              "q": "Q10. How is IN useful in Data Engineering?",
+              "a": "It can filter records for approved status values, selected regions, product categories, or departments during data extraction and transformation."
+            }
+          ]
+        },
+        {
+          "n": 49,
+          "title": "BETWEEN",
+          "explanation": [
+            "<h3>1. What Is the BETWEEN Operator?</h3>",
+            "<p>The BETWEEN operator filters records where a value falls within a specified range. In MySQL, BETWEEN includes both the starting and ending values.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> BETWEEN checks whether a value is greater than or equal to the lower limit and less than or equal to the upper limit.</div>",
+            "<h3>2. Why Do We Need BETWEEN?</h3>",
+            "<p>In Data Engineering, we often filter data by date ranges, salary ranges, product prices, scores, or numeric measurements. BETWEEN makes these range conditions easier to read.</p>",
+            "<h3>3. Sample Table</h3>",
+            "<table><tr><th>emp_id</th><th>name</th><th>department</th><th>salary</th></tr><tr><td>1</td><td>Ravi</td><td>IT</td><td>30000</td></tr><tr><td>2</td><td>Priya</td><td>HR</td><td>40000</td></tr><tr><td>3</td><td>Arun</td><td>Finance</td><td>50000</td></tr><tr><td>4</td><td>Meena</td><td>Sales</td><td>60000</td></tr><tr><td>5</td><td>Kiran</td><td>IT</td><td>70000</td></tr></table>",
+            "<h3>4. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column_name\nFROM table_name\nWHERE column_name BETWEEN lower_value AND upper_value;</code></pre></div>",
+            "<p>The lower and upper boundaries are both included in the result.</p>",
+            "<h3>5. Example: Filter by Salary</h3>",
+            "<p>Retrieve employees whose salary is between 40000 and 60000, including both limits.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, salary\nFROM employees\nWHERE salary BETWEEN 40000 AND 60000;</code></pre></div>",
+            "<p><b>Result:</b></p>",
+            "<table><tr><th>emp_id</th><th>name</th><th>salary</th></tr><tr><td>2</td><td>Priya</td><td>40000</td></tr><tr><td>3</td><td>Arun</td><td>50000</td></tr><tr><td>4</td><td>Meena</td><td>60000</td></tr></table>",
+            "<h3>6. BETWEEN vs Comparison Operators</h3>",
+            "<p>The following queries are logically equivalent for ordinary non-NULL numeric values.</p>",
+            "<div class=\"code-block\"><pre><code>-- Using BETWEEN\nSELECT * FROM employees\nWHERE salary BETWEEN 40000 AND 60000;\n\n-- Using comparison operators\nSELECT * FROM employees\nWHERE salary >= 40000\n  AND salary <= 60000;</code></pre></div>",
+            "<div class=\"definition-box\"><b>Key Point:</b> BETWEEN is a convenient way to express an inclusive range. It is equivalent to using greater-than-or-equal and less-than-or-equal conditions joined with AND.</div>",
+            "<h3>7. NOT BETWEEN</h3>",
+            "<p>NOT BETWEEN selects values outside the specified inclusive range.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, salary\nFROM employees\nWHERE salary NOT BETWEEN 40000 AND 60000;</code></pre></div>",
+            "<p>This returns employees earning less than 40000 or greater than 60000. Salaries equal to either boundary are excluded, and NULL salaries are not returned because the condition evaluates to UNKNOWN.</p>",
+            "<h3>8. BETWEEN with Dates</h3>",
+            "<p>BETWEEN can filter date values. Consider an orders table containing order_id, order_date, and amount.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, order_date, amount\nFROM orders\nWHERE order_date BETWEEN '2026-01-01' AND '2026-01-31';</code></pre></div>",
+            "<p>For a DATE column, this includes January 1 through January 31, 2026. However, if order_date is a DATETIME or TIMESTAMP column, the ending value represents midnight at the start of January 31, so later times on that day may be excluded.</p>",
+            "<h3>9. Best Practice for DATETIME Ranges</h3>",
+            "<p>For timestamp data, use a half-open interval: include the start and exclude the next period's start. This safely includes all times on the intended end date.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, order_date, amount\nFROM orders\nWHERE order_date >= '2026-01-01'\n  AND order_date <  '2026-02-01';</code></pre></div>",
+            "<p>This includes timestamps from January 1 at midnight up to, but not including, February 1 at midnight.</p>",
+            "<h3>10. BETWEEN with Text Values</h3>",
+            "<p>BETWEEN can also compare strings according to the column's collation and comparison rules. However, text ranges may be less intuitive than numeric ranges.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT *\nFROM employees\nWHERE name BETWEEN 'A' AND 'M';</code></pre></div>",
+            "<p>This does not mean every name starting with letters A through M in every possible situation. String comparison depends on collation and the full string values. For alphabetic categories, a carefully designed condition may be clearer.</p>",
+            "<h3>11. Combining BETWEEN with AND</h3>",
+            "<p>You can combine a range filter with other conditions to narrow the result.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, department, salary\nFROM employees\nWHERE salary BETWEEN 40000 AND 70000\n  AND department = 'IT';</code></pre></div>",
+            "<p>This returns IT employees earning between 40000 and 70000, including both salary boundaries.</p>",
+            "<h3>12. Important Rules About BETWEEN</h3>",
+            "<ul><li><b>Inclusive boundaries:</b> Both the lower and upper limits are included.</li><li><b>Range order:</b> Use the lower limit first and the upper limit second.</li><li><b>NULL values:</b> Comparisons involving NULL do not evaluate to TRUE.</li><li><b>Data types:</b> Use compatible data types for the column and range values.</li><li><b>Dates and timestamps:</b> Be careful about time components in the upper boundary.</li></ul>",
+            "<h3>13. Common Mistakes</h3>",
+            "<ul><li><b>Assuming the upper limit is excluded:</b> BETWEEN includes it.</li><li><b>Using the wrong date boundary:</b> A DATETIME ending at midnight may exclude the rest of that day.</li><li><b>Reversing the range:</b> BETWEEN 60000 AND 40000 does not automatically reorder the boundaries.</li><li><b>Ignoring NULL:</b> Rows with NULL in the filtered column do not pass the condition.</li><li><b>Using BETWEEN for a non-contiguous list:</b> Use IN when checking specific separate values rather than a continuous range.</li></ul>",
+            "<h3>14. BETWEEN in Data Engineering</h3>",
+            "<ul><li><b>ETL pipelines:</b> Extract records within a specified date range.</li><li><b>Incremental loads:</b> Filter data by timestamps, using suitable inclusive or half-open boundaries.</li><li><b>Data quality:</b> Find measurements outside an acceptable range with NOT BETWEEN.</li><li><b>Reporting:</b> Retrieve transactions for a period or salaries within a selected range.</li><li><b>Analytics:</b> Filter product prices, scores, quantities, or sensor readings.</li></ul>",
+            "<h3>15. Key Takeaways</h3>",
+            "<ul><li>BETWEEN filters values within an inclusive range.</li><li>NOT BETWEEN selects values outside that range.</li><li>BETWEEN works with numeric, date, and text values, subject to their comparison rules.</li><li>For DATETIME ranges, a half-open interval is often safer than BETWEEN.</li><li>Use IN for a list of separate values and BETWEEN for a continuous range.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Filter Salaries</b></p>",
+            "<p>Retrieve employees earning between 30000 and 50000, including both boundaries.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, salary\nFROM employees\nWHERE salary BETWEEN 30000 AND 50000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Find Salaries Outside a Range</b></p>",
+            "<p>Retrieve employees whose salaries are outside the range 40000 to 60000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, salary\nFROM employees\nWHERE salary NOT BETWEEN 40000 AND 60000;</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Combine BETWEEN with AND</b></p>",
+            "<p>Retrieve IT employees whose salary is between 40000 and 70000.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name, department, salary\nFROM employees\nWHERE salary BETWEEN 40000 AND 70000\n  AND department = 'IT';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Filter a DATE Column</b></p>",
+            "<p>Assume order_date is a DATE column. Retrieve orders placed during January 2026.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, order_date, amount\nFROM orders\nWHERE order_date BETWEEN '2026-01-01' AND '2026-01-31';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Filter a DATETIME Column Safely</b></p>",
+            "<p>Assume order_date is a DATETIME column. Retrieve all orders from January 2026, including those placed late on January 31.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT order_id, order_date, amount\nFROM orders\nWHERE order_date >= '2026-01-01'\n  AND order_date <  '2026-02-01';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Choose BETWEEN or IN</b></p>",
+            "<p>Write a query for each requirement: (1) salaries between 40000 and 60000; (2) salaries equal to only 40000, 50000, or 70000.</p>",
+            "<div class=\"code-block\"><pre><code>-- Continuous range\nSELECT * FROM employees\nWHERE salary BETWEEN 40000 AND 60000;\n\n-- Specific values\nSELECT * FROM employees\nWHERE salary IN (40000, 50000, 70000);</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Learn to filter inclusive numeric ranges, exclude ranges, combine conditions, and handle DATE and DATETIME boundaries correctly.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is BETWEEN in SQL?",
+              "a": "BETWEEN filters rows where a value falls within a specified range, including both boundaries."
+            },
+            {
+              "q": "Q2. Are the lower and upper boundaries included?",
+              "a": "Yes. In MySQL, BETWEEN 10 AND 20 includes both 10 and 20."
+            },
+            {
+              "q": "Q3. What is the difference between BETWEEN and IN?",
+              "a": "BETWEEN filters a continuous range, while IN checks for matches against a list of specific values."
+            },
+            {
+              "q": "Q4. What does NOT BETWEEN do?",
+              "a": "NOT BETWEEN returns values outside the specified range. NULL values do not pass the condition."
+            },
+            {
+              "q": "Q5. Is BETWEEN equivalent to using comparison operators?",
+              "a": "Yes. For ordinary non-NULL values, salary BETWEEN 40000 AND 60000 is equivalent to salary >= 40000 AND salary <= 60000."
+            },
+            {
+              "q": "Q6. Can BETWEEN be used with dates?",
+              "a": "Yes. It can filter DATE values and other comparable date/time values. Pay attention to the time component when the column is DATETIME or TIMESTAMP."
+            },
+            {
+              "q": "Q7. Why can BETWEEN miss records from the last day of a month?",
+              "a": "If a DATETIME column is compared with an end-date string such as '2026-01-31', it may be interpreted as midnight at the start of that day. Later times on January 31 can be excluded."
+            },
+            {
+              "q": "Q8. What is a safer way to filter a full month of timestamps?",
+              "a": "Use order_date >= '2026-01-01' AND order_date < '2026-02-01'. This half-open range includes the entire month of January."
+            },
+            {
+              "q": "Q9. What happens if the range boundaries are reversed?",
+              "a": "BETWEEN does not automatically reorder the boundaries. A condition such as salary BETWEEN 60000 AND 40000 normally matches no ordinary salary value."
+            },
+            {
+              "q": "Q10. How is BETWEEN useful in Data Engineering?",
+              "a": "It can filter numeric measurements, prices, scores, and DATE ranges. For timestamp-based incremental loads, half-open ranges often help avoid missing or duplicating records between batches."
+            }
+          ]
+        },
+        {
+          "n": 50,
+          "title": "LIKE",
+          "explanation": [
+            "<h3>1. What Is the LIKE Operator?</h3>",
+            "<p>The LIKE operator in SQL is used to search for a specific pattern in text data. Instead of matching an entire value exactly, LIKE allows you to find values that match a pattern using wildcard characters.</p>",
+            "<div class=\"definition-box\"><b>Simple Definition:</b> LIKE searches text values based on a pattern, using wildcards such as % and _.</div>",
+            "<h3>2. Why Do We Need LIKE?</h3>",
+            "<p>In Data Engineering, data often contains names, email addresses, product descriptions, and other text fields. LIKE helps filter records when you know only part of the text.</p>",
+            "<ul><li>Find employees whose names start with a particular letter.</li><li>Search email addresses from a particular domain.</li><li>Find product names containing a keyword.</li><li>Identify records matching a text pattern during data validation.</li></ul>",
+            "<h3>3. Sample Table</h3>",
+            "<table><tr><th>emp_id</th><th>name</th><th>email</th><th>department</th></tr><tr><td>1</td><td>Ravi</td><td>ravi@gmail.com</td><td>IT</td></tr><tr><td>2</td><td>Priya</td><td>priya@yahoo.com</td><td>HR</td></tr><tr><td>3</td><td>Arun</td><td>arun@gmail.com</td><td>Finance</td></tr><tr><td>4</td><td>Meena</td><td>meena@outlook.com</td><td>Sales</td></tr><tr><td>5</td><td>Kiran</td><td>kiran@gmail.com</td><td>IT</td></tr></table>",
+            "<h3>4. Basic Syntax</h3>",
+            "<div class=\"code-block\"><pre><code>SELECT column_name\nFROM table_name\nWHERE column_name LIKE 'pattern';</code></pre></div>",
+            "<p>The pattern determines which text values are returned.</p>",
+            "<h3>5. The Two Main Wildcards</h3>",
+            "<table><tr><th>Wildcard</th><th>Meaning</th><th>Example</th></tr><tr><td>%</td><td>Matches zero or more characters.</td><td>'R%'</td></tr><tr><td>_</td><td>Matches exactly one character.</td><td>'R_vi'</td></tr></table>",
+            "<p><b>Important:</b> % can match an empty sequence of characters, while _ must match exactly one character.</p>",
+            "<h3>6. Starts With a Pattern</h3>",
+            "<p>Use the pattern followed by % to find values that start with the specified text.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name LIKE 'R%';</code></pre></div>",
+            "<p>This matches names beginning with R, such as Ravi. It can also match a value consisting of just R because % can match zero characters.</p>",
+            "<h3>7. Ends With a Pattern</h3>",
+            "<p>Place % before the pattern to find values that end with the specified text.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, email\nFROM employees\nWHERE email LIKE '%gmail.com';</code></pre></div>",
+            "<p>This finds email values ending with gmail.com, such as ravi@gmail.com and kiran@gmail.com.</p>",
+            "<h3>8. Contains a Pattern</h3>",
+            "<p>Place % before and after a word to find values containing that text anywhere within the value.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name LIKE '%ri%';</code></pre></div>",
+            "<p>This matches names containing the consecutive characters ri, such as Priya.</p>",
+            "<h3>9. Using the Underscore Wildcard (_)</h3>",
+            "<p>The underscore matches exactly one character.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name LIKE '_avi';</code></pre></div>",
+            "<p>This matches a four-character value whose first character can be anything and whose remaining characters are avi, such as Ravi.</p>",
+            "<p>You can use multiple underscores when you need a specific number of characters.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name LIKE '____';</code></pre></div>",
+            "<p>This matches names containing exactly four characters, subject to the database's character and collation rules.</p>",
+            "<h3>10. Combining % and _</h3>",
+            "<p>You can combine both wildcards in one pattern.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name LIKE 'R_vi%';</code></pre></div>",
+            "<p>This pattern requires R, followed by any single character, followed by vi, and then zero or more characters.</p>",
+            "<h3>11. NOT LIKE</h3>",
+            "<p>NOT LIKE returns rows whose values do not match the specified pattern.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, email\nFROM employees\nWHERE email NOT LIKE '%gmail.com';</code></pre></div>",
+            "<p>This returns non-NULL email values that do not end with gmail.com. Rows where email is NULL are not returned because the condition evaluates to UNKNOWN.</p>",
+            "<h3>12. LIKE and Case Sensitivity in MySQL</h3>",
+            "<p>Whether LIKE is case-sensitive depends on the character set and collation used for the comparison. Many common MySQL collations are case-insensitive, but others are case-sensitive.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name LIKE 'r%';</code></pre></div>",
+            "<p>Under a case-insensitive collation, this can match names beginning with either r or R. Check your column collation if exact case matching matters.</p>",
+            "<h3>13. Searching for Literal Wildcard Characters</h3>",
+            "<p>If you want to search for an actual % or _ character instead of using it as a wildcard, escape that character.</p>",
+            "<div class=\"code-block\"><pre><code>-- Search for a literal percent sign\nSELECT product_name\nFROM products\nWHERE product_name LIKE '%\\\\%%' ESCAPE '\\\\';\n\n-- Search for a literal underscore\nSELECT product_name\nFROM products\nWHERE product_name LIKE '%\\\\_%' ESCAPE '\\\\';</code></pre></div>",
+            "<p>These MySQL examples use a backslash as the explicit escape character. SQL string escaping can depend on SQL mode, so confirm the mode and escaping rules in your environment when using literal backslashes or wildcard characters.</p>",
+            "<h3>14. LIKE vs =</h3>",
+            "<table><tr><th>Operator</th><th>Purpose</th><th>Example</th></tr><tr><td>=</td><td>Exact equality comparison</td><td>name = 'Ravi'</td></tr><tr><td>LIKE</td><td>Pattern-based text matching</td><td>name LIKE 'R%'</td></tr></table>",
+            "<p>Use = when you need an exact value. Use LIKE when you need to match a text pattern.</p>",
+            "<h3>15. LIKE and Performance</h3>",
+            "<p>Pattern matching can have different performance characteristics depending on the pattern, indexes, collation, and data distribution.</p>",
+            "<ul><li><b>Prefix pattern:</b> LIKE 'R%' can often use a suitable index.</li><li><b>Leading wildcard:</b> LIKE '%avi' generally cannot use a conventional B-tree index for a direct prefix lookup.</li><li><b>Large datasets:</b> Check the execution plan with EXPLAIN when performance matters.</li><li><b>Alternative searches:</b> For advanced text search, consider full-text indexes or a dedicated search system when appropriate.</li></ul>",
+            "<h3>16. LIKE in Data Engineering</h3>",
+            "<ul><li><b>Data cleaning:</b> Identify invalid or unexpected text patterns.</li><li><b>ETL transformations:</b> Filter records by email domain, product prefix, or identifier format.</li><li><b>Log processing:</b> Search text fields for known message fragments.</li><li><b>Data validation:</b> Find identifiers that do not follow an expected pattern.</li><li><b>Exploratory analysis:</b> Search datasets when only part of a value is known.</li></ul>",
+            "<h3>17. Common Mistakes</h3>",
+            "<ul><li><b>Forgetting wildcards:</b> LIKE 'R' normally matches the exact pattern R, not every name beginning with R.</li><li><b>Confusing % and _:</b> % matches zero or more characters; _ matches exactly one.</li><li><b>Assuming case sensitivity:</b> Results depend on collation and comparison rules.</li><li><b>Ignoring NULL:</b> LIKE and NOT LIKE conditions do not return NULL values as matches.</li><li><b>Using a leading wildcard on a huge table:</b> This may require examining many rows.</li><li><b>Using LIKE for exact matching:</b> Prefer = when no pattern matching is needed.</li></ul>",
+            "<h3>18. Key Takeaways</h3>",
+            "<ul><li>LIKE performs pattern matching on text values.</li><li>% matches zero or more characters.</li><li>_ matches exactly one character.</li><li>NOT LIKE excludes values matching a pattern.</li><li>Case sensitivity depends on the comparison collation.</li><li>Patterns beginning with % can be expensive on large tables.</li></ul>"
+          ],
+          "practice": [
+            "<p class=\"practice-note\"><b>Step 1: Find Names Starting With R</b></p>",
+            "<p>Retrieve all employees whose names start with R.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT emp_id, name\nFROM employees\nWHERE name LIKE 'R%';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 2: Find Gmail Addresses</b></p>",
+            "<p>Retrieve employees whose email addresses end with gmail.com.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, email\nFROM employees\nWHERE email LIKE '%gmail.com';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 3: Find Names Containing 'ri'</b></p>",
+            "<p>Retrieve employee names containing the consecutive characters ri.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name LIKE '%ri%';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 4: Match Exactly Four Characters</b></p>",
+            "<p>Retrieve employee names consisting of exactly four characters.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name\nFROM employees\nWHERE name LIKE '____';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 5: Exclude Gmail Addresses</b></p>",
+            "<p>Retrieve employees whose non-NULL email addresses do not end with gmail.com.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT name, email\nFROM employees\nWHERE email NOT LIKE '%gmail.com';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 6: Find Product Names Starting With 'Data'</b></p>",
+            "<p>Assume a products table contains product_id and product_name. Find products whose names start with Data.</p>",
+            "<div class=\"code-block\"><pre><code>SELECT product_id, product_name\nFROM products\nWHERE product_name LIKE 'Data%';</code></pre></div>",
+            "<p class=\"practice-note\"><b>Step 7: Compare LIKE and IN</b></p>",
+            "<p>Write one query to find names beginning with R and another to find only Ravi or Rahul by exact value.</p>",
+            "<div class=\"code-block\"><pre><code>-- Pattern matching\nSELECT name FROM employees\nWHERE name LIKE 'R%';\n\n-- Exact values from a list\nSELECT name FROM employees\nWHERE name IN ('Ravi', 'Rahul');</code></pre></div>",
+            "<div class=\"definition-box\"><b>Practice Goal:</b> Learn to use % and _, search for prefixes and suffixes, find text fragments, exclude patterns, and distinguish pattern matching from exact-value filtering.</div>"
+          ],
+          "qna": [
+            {
+              "q": "Q1. What is the LIKE operator?",
+              "a": "LIKE is an SQL operator used to match text values against a pattern."
+            },
+            {
+              "q": "Q2. What does the % wildcard mean?",
+              "a": "It matches zero or more characters. For example, LIKE 'A%' matches values starting with A."
+            },
+            {
+              "q": "Q3. What does the _ wildcard mean?",
+              "a": "It matches exactly one character. For example, LIKE '_at' can match cat, bat, or hat."
+            },
+            {
+              "q": "Q4. How do you find names ending with 'an'?",
+              "a": "Use WHERE name LIKE '%an'. The percent sign allows any sequence of characters before an."
+            },
+            {
+              "q": "Q5. How do you find values containing a word?",
+              "a": "Use a pattern such as LIKE '%data%' to find values containing the consecutive text data, subject to collation rules."
+            },
+            {
+              "q": "Q6. What is the difference between LIKE and =?",
+              "a": "The equals operator checks equality, while LIKE supports wildcard-based pattern matching."
+            },
+            {
+              "q": "Q7. What does NOT LIKE do?",
+              "a": "NOT LIKE returns rows whose values do not match the specified pattern. NULL values do not pass the condition."
+            },
+            {
+              "q": "Q8. Is LIKE case-sensitive in MySQL?",
+              "a": "It depends on the character set and collation used for comparison. Many common MySQL collations are case-insensitive."
+            },
+            {
+              "q": "Q9. Can LIKE search for a literal percent sign?",
+              "a": "Yes. Escape the percent sign using an explicit escape character so it is treated as a literal character rather than a wildcard."
+            },
+            {
+              "q": "Q10. Can LIKE affect query performance?",
+              "a": "Yes. A pattern such as LIKE 'A%' can often use a suitable index, while a pattern such as LIKE '%A' generally cannot use a conventional B-tree index for a direct prefix lookup."
+            },
+            {
+              "q": "Q11. Does LIKE return rows where the column is NULL?",
+              "a": "No. LIKE comparisons involving NULL evaluate to UNKNOWN, so those rows are not returned by WHERE."
+            },
+            {
+              "q": "Q12. How is LIKE useful in Data Engineering?",
+              "a": "It helps filter text data, validate identifier patterns, search logs, find email domains, and identify records containing specific text fragments."
+            }
+          ]
         }
   ]
 }
